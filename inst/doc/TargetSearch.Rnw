@@ -1,0 +1,456 @@
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+%\VignetteIndexEntry{The TargetSearch Package}
+%\VignetteDepends{TargetSearchData}
+%\VignetteKeywords{preprocess, GC-MS, analysis}
+%\VignettePackage{TargetSearch}
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+\usepackage[authoryear,round]{natbib}
+
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in 
+
+
+\title{The TargetSearch Package}
+\author{Alvaro Cuadros-Inostroza, Henning Redestig and Matthew A Hannah \\
+Max Planck Institute for Molecular Plant Physiology\\
+Potsdam, Germany\\
+\url{http://www.mpimp-golm.mpg.de/}
+}
+
+\begin{document}
+\maketitle
+
+This document describes how to use \Rpackage{TargetSearch} to preprocess
+a GC-MS data.
+
+<<LibraryPreload, echo = FALSE, results = hide>>=
+library(xcms)
+library(TargetSearch)
+library(TargetSearchData)
+@
+
+\section{Supplied Files}
+
+This section describes the files that have to be prepared before running 
+\Rpackage{TargetSearch}. They are the sample file, the reference library 
+file and the retention marker definition. For example purposes, we will 
+use the example files provided by the package 
+\Rpackage{TargetSearchData}. 
+
+\subsection{NetCDF Files and Sample File} 
+
+\Rpackage{TargetSearch} can currently read only NetCDF files. Many GC-MS 
+software packages are able to convert raw chromatograms to NetCDF. It is 
+also recommended to baseline correct your chromatograms before exporting 
+to NetCDF. Please refer to your software documentation for details. 
+
+After exporting the NetCDF files, please place them in a convenient 
+location. Then prepare a text file to describe your samples. It must be 
+tab-delimited and have at least two columns: ``CDF\_FILE'' and 
+``MEASUREMENT\_DAY''. Other columns such as sample name, sample group, 
+treatment, etc. may be additionally included to aid sample sub-setting 
+and downstream analyses. An example is shown in table~\ref{sample:file}. 
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\hline
+CDF\_FILE & MEASUREMENT\_DAY & TIME\_POINT \\
+\hline
+7235eg08.cdf & 7235 & 1 \\
+7235eg11.cdf & 7235 & 1 \\
+7235eg26.cdf & 7235 & 1 \\
+7235eg04.cdf & 7235 & 3 \\
+7235eg30.cdf & 7235 & 3 \\
+7235eg32.cdf & 7235 & 3 \\
+...&&\\
+\hline
+\end{tabular}
+\caption{Sample file example, ``samples.txt''}
+\label{sample:file}
+\end{table}
+
+To import the sample list into R, use the function 
+\Rfunction{ImportSamples()}. You also need to specify the directory 
+where the NetCDF files are (\Rfunarg{CDFpath}) and a directory where the 
+transformed cdf files, the so called RI files, will be saved 
+(\Rfunarg{RIpath}). 
+
+
+<<ImportSample>>=
+library(TargetSearchData)
+library(TargetSearch)
+cdf.path <- system.file("gc-ms-data", package = "TargetSearchData")
+sample.file <- file.path(cdf.path, "samples.txt")
+samples <- ImportSamples(sample.file, CDFpath = cdf.path,
+                         RIpath = ".")
+@
+
+You could alternatively create a \Robject{tsSample} by using the sample class
+methods.
+
+<<ImportSample2>>=
+cdffiles <- dir(cdf.path, pattern="cdf$")
+# define the RI file names
+rifiles  <- paste("RI_", sub("cdf","txt", cdffiles), sep = "")
+# take the measurement day info from the cdf file names.
+days <- substring(cdffiles, 1, 4)
+# sample names 
+smp_names <- sub("\\.cdf", "", cdffiles)
+# add some sample info
+smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))
+# create the sample object
+samples <- new("tsSample", Names = smp_names, CDFfiles = cdffiles,
+               CDFpath = cdf.path, RIpath = ".", days = days,
+               RIfiles = rifiles, data = smp_data)
+@
+
+\subsection{Retention Time Markers}
+
+The RI markers time definition, time window and $m/z$ value has to be provided
+in a tab-delimited text file. The first two columns indicate the lower and
+upper window limits where the retention marker will be searched. The third
+column is the RI of that particular marker. An example is shown in
+table \ref{rim:file}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrr}
+\hline
+LowerLimit & UpperLimit & RIstandard \\
+\hline
+230 & 280 &	262320\\
+290	& 340 &	323120\\
+350 & 400 &	381020\\
+\hline
+\end{tabular}
+\caption{Retention time definition file example, ``rimLimits.txt''}
+\label{rim:file}
+\end{table}
+
+Use the function \Rfunction{ImportFameSettings()} to import the limits and
+to set the $mz/z$ marker.
+
+<<ImportFameSettings>>=
+rim.file  <- file.path(cdf.path, "rimLimits.txt")
+rimLimits <- ImportFameSettings(rim.file, mass = 87)
+@
+
+This will import the limits in ``rimLimits.txt'' file and set the
+marker mass to 87.
+
+If you do not use RI markers, you can skip this part by setting the parameter
+\Rfunarg{rimLimits} to \Robject{NULL} in \Rfunction{RIcorrect} function.
+Please note that in this case, no retention time correction will be performed.
+
+\section{Peak Identification and RI correction}
+
+Initially, TargetSearch identifies the local apex intensities 
+in all chromatograms, finds the retention time of the RI markers and converts
+the retention time to RI using linear interpolation \cite{VandenDool1963}.
+This is done by the function \Rfunction{RIcorrect()}. It takes as parameter the
+sample and retention time limits objects, the mass range to extract (\Rfunarg{
+MassRange = c(85,500)}), the intensity threshhold (\Rfunarg{IntThreshold = 10}),
+the peak picking method (\Rfunarg{pp.method}) and a \Rfunarg{Window} parameter
+that will be used by said method. The function will return a matrix
+with the retention times of the retention time markers and creates a
+tab-delimited file (RI file) per every chromatogram in the selected directory.
+These files contein the extracted peak list of the respective NetCDF file.
+
+
+<<RIcorrection>>=
+RImatrix <- RIcorrect(samples, rimLimits, massRange = c(85,500),
+            IntThreshold = 10, pp.method = "smoothing", Window = 7)
+@
+
+
+There are two peak picking methods available. ``smoothing'' implements the
+algorithm used by Tagfinder \cite{Luedemann2008}. The ``ppc'' algorithm is a
+port from the package \Rpackage{ppc} function \Rfunction{ppc.peaks}. It looks for
+the local maxima within a given time window. The \Rfunarg{Window} parameter
+sets the window size of the chosen peak picking method.
+
+After that, it is possible to check for outliers in the samples by using
+the function \Rfunction{FAMEoutliers()}. It creates a PDF report
+of the retention time markers informing of possible outliers that the
+user can remove or not. Alternatively, retention index markers can
+be checked manually by the function \Rfunction{plotFAME}. Figure~\ref{fig:01}
+shows the retention times of the marker 1.
+
+<<PeakIdentification>>=
+outliers <- FAMEoutliers(samples, RImatrix, threshold = 3)
+@
+
+Here \Rfunarg{threshold} sets the number of standard deviation a sample will
+be considered outlier. In this example, no outliers were detected. 
+
+\begin{figure}[htp]
+\centering
+<<plotFAME, fig=true, width=8, height=5>>=
+plotFAME(samples, RImatrix, 1)
+@
+\caption{Retention Index Marker 1.}\label{fig:01}
+\end{figure}
+
+\section{Library Search}
+
+\subsection{Reference Library File}
+
+The ``reference library'' file contains the information of the
+metabolites or mass spectral tags (MSTs) that will be searched for in
+the chromatograms. A public spectra database could be found here
+\url{http://csbdb.mpimp-golm.mpg.de/csbdb/gmd/gmd.html} at
+\emph{The Golm Metabolome Database} (\cite{Kopka2005}).
+
+Required information is the metabolite name
+(``Name''), expected retention time index (``RI''), 
+selective masses (``SEL\_MASS''), most abundant masses
+(``TOP\_MASS''), spectrum (``SPECTRUM'') and RI deviations
+(``Win\_1'', ``Win\_2'', ``Win\_3''). See example in table~\ref{library:file}.
+The columns ``Name'' and ``RI'' are mandatory and you have
+at least to include one of the columns ``SEL\_MASS'', ``TOP\_MASS''
+or ``SPECTRUM'' in the file (see below). The RI deviation columns are
+optional.
+
+\begin{table}[ht]
+\centering
+{\footnotesize
+\begin{tabular}{lllll}
+\hline
+Name & RI & Win\_1 & SEL\_MASS & SPECTRUM\\
+\hline
+Pyruvic acid    & 222767 & 4000 & 89;115;158;174;189  & 85:7 86:14 87:7 88:5 8... \\
+Glycine (2TMS)  & 228554 & 4000 & 86;102;147;176;204  & 86:26 87:19 88:8 89:4...\\
+Valine & 271500 & 2000 & 100;144;156;218;246          & 85:8 86:14 87:6 88:5 8...\\
+Glycerol (3TMS) & 292183 & 2000 & 103;117;205;293     & 85:14 86:2 87:16 88:13...\\
+Leucine         & 306800 & 1500 & 102;158;232;260     & 158:999 159:148 160:45...\\
+Isoleucine      & 319900 & 1500 & 102;103;158;163;218 & 90:11 91:2 92:1 93:1 9...\\
+Glycine & 325000 & 2000 & 86;100;174;248;276          & 85:6 86:245 87:24 88:12...\\
+\hline
+\end{tabular}
+}
+\caption{Reference Library example, ``library.txt''}
+\label{library:file}
+\end{table}
+
+In this file, masses and intensities must be positive integers. RIs and RI deviations
+can be any positive real number. The selective and most abundant masses list
+must be delimited by semicolon (;). The spectrum is described by
+a list of mass and intensity pair. Every mass-intensity pair is separated by
+colon (:) and different pairs are separated by spaces.
+
+The function \Rfunction{ImportLibrary()} imports the reference file. 
+
+<<ImportLibrary>>=
+lib.file <- file.path(cdf.path, "library.txt")
+lib      <- ImportLibrary(lib.file, RI_dev = c(2000,1000,200),
+            TopMasses = 15, ExcludeMasses = c(147, 148, 149))
+@
+
+
+Here we set the RI window deviations to 2000, 1000 and 200 RI units. Since ``Win\_1''
+column is already in the file, the first value (2000) is ignored. Also, the 15th most
+abundant masses are taken but excluding the masses 147, 148 and 149 (common
+confounding masses)
+
+\subsection{Library Search Algorithm}
+
+The library search is performed in three steps. First, for every metabolite,
+selective masses are searched in a given time window around the expected RI.
+This is done by the function \Rfunction{medianRILib()}. This function calculates
+the median RI of the selective masses and return new library object with the
+updated RI. The time deviation is given either in the library file (column
+``Win\_1'') or when the library is imported (see \Rfunction{ImportLibrary()}).
+
+
+<<LibrarySearch1>>=
+lib <- medianRILib(samples, lib)
+@
+
+It is also posible to examinate visually the RI deviation of the metabolites
+by setting the parameter \Rfunarg{makeReport=TRUE}, which creates a pdf report
+like the one shown in figure~\ref{fig:02}. This may help to set or update
+the expected RI deviation.
+
+\begin{figure}[htp]
+\centering
+<<medianLib, fig=true, width=8, height=8, echo=false>>=
+resPeaks <- FindPeaks(RIfiles(samples), refLib(lib, w = 1, sel = TRUE))
+plotRIdev(lib, resPeaks, libId = 1:9)
+@
+\caption{RI deviation of first 9 metabolites in the library.}\label{fig:02}
+\end{figure}
+
+In the second step, the function \Rfunction{sampleRI()} searches the selective
+masses again, but using the updated RI and the RI deviation defined in the library
+object (``Win\_2''). After that, the intensities of the selected masses
+are normalised to the median of the day, and then used to extract
+other masses with correlated apex profiles. The masses for which
+the Pearson correlation coefficient is above \Rfunarg{r\_thres} are
+taken as metabolite markers and their RIs are averaged on a per
+sample basis. This average RI represents the exact position where
+the metabolite elutes in the respective sample, which is returned
+in a matrix form.
+
+<<LibrarySearch2>>=
+cor_RI <- sampleRI(samples, lib, r_thres = 0.95,
+                     method = "dayNorm")
+@
+
+The third step will look up for all the masses (selective and most abundant masses)
+in all the samples. This is done by the function \Rfunction{peakFind()}. It returns
+a \Rclass{tsMSdata} object with the intensities and RI of every mass (rows) and every
+sample (columns) that were search for.
+
+
+<<LibrarySearch3>>=
+peakData <- peakFind(samples, lib, cor_RI)
+@
+
+
+The intensity and RI matrices can be accessed by using the \Rmethod{Intensity}
+and \Rmethod{retIndex} methods.
+
+
+<<LibrarySearch4>>=
+met.RI        <- retIndex(peakData)
+met.Intensity <- Intensity(peakData)
+@
+
+
+\section{Metabolite Profile}
+
+The function \Rfunction{Profile} makes a profile of the MS data by
+averaging all the normalised mass intensities whose Pearson coefficient
+is greater that \Rfunarg{r\_thresh}.
+
+
+<<MetaboliteProfile>>=
+Profile <- Profile(samples, lib, peakData, r_thres = 0.95,
+                      method = "dayNorm")
+@
+
+
+A \Rclass{msProfile} object is returned. The averaged intensities
+and RI matrices that can be obtained by \Rmethod{Intensity} and \Rmethod{retIndex}
+methods. The profile information is represented by a \Rclass{data.frame}
+in the \Rmethod{info} slot (accessible by \Rmethod{profileInfo} method). The
+columns are:
+
+\begin{description}
+
+\item[Name]
+    The metabolite/analyte name. 
+
+\item[Lib\_RI]
+    The expected RI (library RI).
+
+\item[Mass\_count]
+    The number of correlating masses.
+
+\item[Non\_consecutive\_Mass\_count]
+     Same as above, but not counting the consecutive masses.
+
+\item[Sample\_count]
+    The total number of masses that were found in the samples.
+   
+\item[Masses]
+    The correlating masses.
+
+\item[RI]
+    The average RI.
+
+\item[Score\_all\_masses]
+    The similarity score calculated using the average intensity of all
+	the masses that were searched for, regardless of whether they are
+	correlating masses.
+
+\item[Score\_cor\_masses]
+    Same as above, but only correlating masses are considered.
+
+\end{description}
+
+As metabolites with similar selective masses and RIs can be
+present in metabolite libraries, it is necessary to reduce redundancy.
+This is performed by the function \Rfunction{ProfileCleanUp} which selects
+peaks for which the RI gap is smaller than \Rfunarg{timeSplit} and
+computes the Pearson correlation between them. When two
+metabolites within such a time-group are tightly correlated (given by \Rfunarg{r\_thres})
+only the one with more correlated masses is retained.
+
+<<MetaboliteProfile2>>=
+finalProfile <- ProfileCleanUp(Profile, timeSplit = 500,
+                                r_thres = 0.95)
+@
+
+The function returns a \Rclass{msProfile} object. The \Rmethod{info} slot
+is similar as described above, but extra columns with a ``Cor\_'' preffix
+(e.g., ``Cor\_Name'') are included. They provide information about
+metabolite redundancy.
+
+\section{Peaks and Spectra Visualisation}
+
+Finally, it may be of interest to check the chromatographic peak of selected
+metabolites and compare the median spectra of the metabolites, i.e., the median
+intensities of the selected masses across all the samples, with the reference
+spectra of the library. There are two functions to do so: \Rfunction{plotPeak}
+and \Rfunction{plotSpectra}.
+
+For example, we can compare the median spectrum of ``Valine'' against its
+spectrum reference. Here we look for the library index of ``Valine'' and plot the
+spectra comparison in a ``head-tail'' plot (figure~\ref{fig:03}).
+
+\begin{figure}[htp]
+\centering
+<<plotSpectra, fig=true, width=8, height=6>>=
+grep("Valine", libName(lib))
+plotSpectra(lib, peakData, libId = 3, type = "ht")
+@
+\caption{Spectra comparison of ``Valine''}\label{fig:03}
+\end{figure}
+
+To look at the chromatographic peak of ``Valine'' in a given sample,
+we use the functions \Rfunction{peakCDFextraction} to extract
+the raw chromatogram and \Rfunction{plotPeak} to plot the peak (figure~\ref{fig:04}).
+
+\begin{figure}[htp]
+\centering
+<<plotPeak, fig=true, width=8, height=6>>=
+# select "Valine" top masses
+top.masses <- topMass(lib)[[3]]
+# we select the first sample
+sample.id <- 1
+cdf.file  <- file.path(cdf.path, cdffiles[sample.id])
+rawpeaks  <- peakCDFextraction(cdf.file, massRange = c(85,500))
+plotPeak(rawpeaks, time.range = libRI(lib)[3] + c(-2000,2000),
+    masses = top.masses, useRI = TRUE, rimTime = RImatrix[,sample.id],
+    standard = rimStandard(rimLimits), massRange = c(85, 500),
+    main = "Valine")
+@
+\caption{Chromatographic peak of Valine.}\label{fig:04}
+\end{figure}
+
+Refer to the documentation of the functions \Rfunction{plotPeak}
+and \Rfunction{plotSpectra} for further options not covered here.
+
+\bibliographystyle{plainnat}
+\bibliography{biblio}
+
+\end{document}
