@@ -101,3 +101,29 @@ setMethod("[", "tsSample", function(x, i, j, ..., drop) {
 setMethod("$", "tsSample", function(x, name) {
     eval(substitute(sampleData(x)$NAME_ARG, list(NAME_ARG=name)))
 })
+
+setMethod("initialize",
+          "tsSample",
+          function(.Object, Names    = character(0), CDFfiles = character(0),
+                            RIfiles  = character(0), CDFpath  = ".", RIpath   = ".",
+                            days     = character(0), data     = data.frame()) {
+            if (length(CDFfiles) > 0) {
+                if(length(Names) == 0)
+                    Names <- gsub(".cdf", "", CDFfiles, ignore.case = T)
+                if(length(RIfiles) == 0)
+                    RIfiles <- sub("cdf$", "txt", paste("RI_", CDFfiles, sep = ""), ignore.case = T)
+                if(length(days) == 0)
+                    days <- substring(CDFfiles,1,4)
+                if(all(dim(data) == 0))
+                    data <- data.frame(Names = Names, CDF_FILE = CDFfiles, MEASUREMENT_DAY = days , RI_FILE = RIfiles)
+            }
+                    
+            .Object@Names    <- Names
+            .Object@CDFfiles <- CDFfiles
+            .Object@RIfiles  <- RIfiles
+            .Object@CDFpath  <- CDFpath
+            .Object@RIpath   <- RIpath
+            .Object@days     <- days
+            .Object@data     <- data
+            .Object
+          })

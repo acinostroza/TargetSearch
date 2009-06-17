@@ -45,7 +45,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     
 	    M <- res_log[x,]
   	  tmp <- cor(t(M), use="pair")
- 			tmp[is.finite(M) %*% is.finite(t(M)) <= minPairObs] <- 0
+ 			tmp[is.finite(M) %*% is.finite(t(M)) < minPairObs] <- 0
     
 	    tmp.sel <- tmp[tmp.max,]
     

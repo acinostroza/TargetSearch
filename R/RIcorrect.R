@@ -1,23 +1,24 @@
 RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold,
-	pp.method = "smoothing", showProgressBar = FALSE ) {
+	pp.method = "smoothing", showProgressBar = FALSE) {
 	
-	standard  <- rimStandard(rimLimits)
-	mass      <- rimMass(rimLimits)
 	manyFiles <- CDFfiles(samples)
 	outFile   <- RIfiles(samples)
 	Names     <- sampleNames(samples)
-	rLimits   <- rimLimits(rimLimits)
 
-	if(mass < massRange[1] | mass > massRange[2])
-		stop("'mass' marker out of Range")
-	
+	if(is.null(rimLimits) == FALSE) {
+		standard  <- rimStandard(rimLimits)
+		mass      <- rimMass(rimLimits)
+		rLimits   <- rimLimits(rimLimits)
+		if(mass < massRange[1] | mass > massRange[2])
+			stop("'mass' marker out of Range")
+		RIcheck <- matrix(nrow=dim(rLimits)[1], ncol=length(Names))
+	}
+
 	# check Files
 	if(!all(file.exists(manyFiles))) {
 	 	stop("These files don't exist: ", paste(manyFiles[!file.exists(manyFiles)], collapse = " "))
 	}
 
-	RIcheck <- matrix(nrow=dim(rLimits)[1], ncol=length(Names))
-	
 	if(showProgressBar)
 		pb <- ProgressBar(title="Extracting peaks...", label="File in processing...")
 	for(i in 1:length(manyFiles)) {
@@ -43,5 +44,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 		colnames(RIcheck) <- Names
 		rownames(RIcheck) <- rownames(rLimits)
 		return(RIcheck)
+	} else {
+		return(NULL)
 	}
 }

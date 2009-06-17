@@ -20,22 +20,26 @@ function(tmp.file=NA, mass = NA, ...) {
                         c(1070,1110))
   } else {
     rim.limits <- as.matrix(read.delim(tmp.file, ...))
-    if(ncol(rim.limits) != 3)
-	  	stop("Error reading FAME file. The file doesn't have 3 columns (LowerLimits, UpperLimit, RIperfect)")
+    if(ncol(rim.limits) != 3 & ncol(rim.limits) != 4)
+	  	stop("Error reading FAME file. The file doesn't have 3 or 4 columns",
+			" (LowerLimits, UpperLimit, RIperfect, [mz marker] )")
 
 		if(any(rim.limits[,1] > rim.limits[,2]))
 			stop("Error: LowerLimits are greater than UpperLimits. Please check your file (rows ", 
 				paste(which(rim.limits[,1] > rim.limits[,2]), collapse = " "), ")")
 
+		if(ncol(rim.limits) == 4)
+			mass <- as.numeric(rim.limits[,4])
+
 		rim.perfect <- rim.limits[,3]
 		rim.limits  <- rim.limits[,1:2]
-		
   }
-  if(is.na(mass))
+  if(any(is.na(mass)))
   	mass <- 87
 
   colnames(rim.limits) <- c("LowerLimit", "UpperLimit")
-  rownames(rim.limits) <- paste("RI.Marker", 1:nrow(rim.limits))
+	if(is.null(rownames(rim.limits)) | all(rownames(rim.limits) == 1:nrow(rim.limits) ))
+		rownames(rim.limits) <- paste("RI.Marker", 1:nrow(rim.limits))
   
-  new("tsRim", limits = rim.limits, standard = rim.perfect, mass = mass[1])
+  new("tsRim", limits = rim.limits, standard = rim.perfect, mass = mass)
 }

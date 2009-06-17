@@ -96,7 +96,7 @@ int peaks(int *x, int ispan, int n, int *ans)
                 ans[i] = 1;
                 j = i-ispan;
                 while( ans[i] == 1 && j <= i+ispan) {
-                        if(x[j] >= x[i])
+                        if(x[j] > x[i])
                                 ans[i] = 0;
                         j++;
                         if(j == i)

@@ -37,7 +37,7 @@ Potsdam, Germany\\
 \maketitle
 
 This document describes how to use \Rpackage{TargetSearch} to preprocess
-a GC-MS data.
+GC-MS data.
 
 <<LibraryPreload, echo = FALSE, results = hide>>=
 library(xcms)
@@ -146,7 +146,8 @@ LowerLimit & UpperLimit & RIstandard \\
 \end{table}
 
 Use the function \Rfunction{ImportFameSettings()} to import the limits and
-to set the $mz/z$ marker.
+to set the $mz/z$ markers. Alternatively, the markers could be specified
+by an additional column in the RI markers file.
 
 <<ImportFameSettings>>=
 rim.file  <- file.path(cdf.path, "rimLimits.txt")
@@ -343,7 +344,7 @@ is greater that \Rfunarg{r\_thresh}.
 
 
 <<MetaboliteProfile>>=
-Profile <- Profile(samples, lib, peakData, r_thres = 0.95,
+MetabProfile <- Profile(samples, lib, peakData, r_thres = 0.95,
                       method = "dayNorm")
 @
 
@@ -396,7 +397,7 @@ metabolites within such a time-group are tightly correlated (given by \Rfunarg{r
 only the one with more correlated masses is retained.
 
 <<MetaboliteProfile2>>=
-finalProfile <- ProfileCleanUp(Profile, timeSplit = 500,
+finalProfile <- ProfileCleanUp(MetabProfile, timeSplit = 500,
                                 r_thres = 0.95)
 @
 

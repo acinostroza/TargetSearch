@@ -83,6 +83,15 @@ require(TargetSearchData)
 CDFpath <- system.file("gc-ms-data", package = "TargetSearchData")
 cdffiles <- dir(CDFpath, "cdf")
 
+# define the RI file path 
+RIpath  <- "."
+
+# create the sample object
+sampleDescription <- new("tsSample", CDFfiles = cdffiles, CDFpath = CDFpath, RIpath = RIpath) 
+
+##
+
+# More parameters could be defined:
 # define the RI files and the RI path
 RIfiles <- sub("cdf$", "txt", paste("RI_", cdffiles, sep = ""))
 RIpath  <- "."

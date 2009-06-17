@@ -52,7 +52,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
       tmp <- cor(t(res_log[x,]), use="pair")
       # this counts the number of pair values that were used to calculate the correlation
       # coefficient of every member of "tmp" and set to 0 the pairs with less than minPairObs
-      tmp[is.finite(res_log[x,]) %*% is.finite(t(res_log[x,])) <= minPairObs] <- 0
+      tmp[is.finite(res_log[x,]) %*% is.finite(t(res_log[x,])) < minPairObs] <- 0
 
       tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
       tmp.sel <- tmp[tmp.max,]
