@@ -27,7 +27,7 @@
 
 
 \title{The TargetSearch Package}
-\author{Alvaro Cuadros-Inostroza, Henning Redestig and Matthew A Hannah \\
+\author{Alvaro Cuadros-Inostroza, Jan Lisec, Henning Redestig and Matthew A Hannah\\
 Max Planck Institute for Molecular Plant Physiology\\
 Potsdam, Germany\\
 \url{http://www.mpimp-golm.mpg.de/}
@@ -103,7 +103,7 @@ samples <- ImportSamples(sample.file, CDFpath = cdf.path,
                          RIpath = ".")
 @
 
-You could alternatively create a \Robject{tsSample} by using the sample class
+You could alternatively create a \Robject{tsSample} object by using the sample class
 methods.
 
 <<ImportSample2>>=
