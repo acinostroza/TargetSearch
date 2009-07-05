@@ -1,5 +1,6 @@
 RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold,
-	pp.method = "smoothing", showProgressBar = FALSE) {
+	pp.method = "smoothing", showProgressBar = FALSE,
+	baseline = FALSE, baseline.opts = NULL ) {
 	
 	manyFiles <- CDFfiles(samples)
 	outFile   <- RIfiles(samples)
@@ -27,7 +28,8 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 				title=paste("Extracting peaks (", round(100*i/length(manyFiles)), "%)"),
 				label=basename(manyFiles[i]))
 			
-		Peaks  <- NetCDFPeakFinding(manyFiles[i], massRange, Window, IntThreshold, pp.method = pp.method)
+		Peaks  <- NetCDFPeakFinding(manyFiles[i], massRange, Window, IntThreshold, pp.method = pp.method,
+				baseline = baseline, baseline.opts = baseline.opts)
 		if(is.null(rimLimits) == FALSE) {
 			fameTimes <- findRetentionTime(Peaks$Time, Peaks$Peaks[, mass - massRange[1] + 1], rLimits)
 			RIcheck[,i] <- fameTimes

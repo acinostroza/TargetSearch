@@ -9,24 +9,20 @@ ImportFameSettings(tmp.file = NA, mass = NA, ...)
 }
 \arguments{
   \item{tmp.file}{ A character string naming a file with standard markers. }
-  \item{mass}{ The m/z standard markers. }
+  \item{mass}{ The m/z standard marker.  }
   \item{\dots}{ Other options passed to \code{read.delim} function. }
 }
 \details{
     The standard marker file is a tab-delimited text file with 3 or 4 columns.
-    Column names doesn't matter, however they must be in the following order.
+    Column names doesn't matter. They must be in the following order.
  
   \itemize{
   \item \code{LowerLimit} - The Retention time lower limit in seconds.
   \item \code{UpperLimit} - The Retention time upper limit in seconds.
   \item \code{RIstandard} - The RI value of that standard.
-  \item \code{mzMarker}   - The m/z standard markers. This is optional
-  since it could be specified with the \code{mass} parameter.
-  }
-    
-  If \code{mass} is a numeric vector of length equal to 1, this value will
-  be applied to all markers. Otherwise, the length of the vector must be
-  equal to the number of standards.
+  \item \code{mass} - The m/z standard marker. This column is optional since
+  it could be set by the \code{mass} parameter.
+ }
     If no arguments are given, a default object will be returned.
 }
 \value{

@@ -24,6 +24,9 @@ setValidity("tsRim", function(object) {
 	else if(nrow(object@limits) != length(object@standard)) 
 		paste("Unequal number of standards and limits: ", length(object@standard),
 			", ", nrow(object@limits), sep = "")
+	else if(length(object@mass) != 1 & length(object@mass) != length(object@standard))
+		message(paste("Unequal number of standards and mass markers: ", length(object@standard),
+		", ", length(object@mass), sep = ""))
 	else TRUE
 })
 

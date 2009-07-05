@@ -111,7 +111,7 @@ setValidity("tsLib", function(object) {
 	else if(length(object@selMass) != n)
 		paste("Unequal number of Names and selMass: ", n,", ", length(object@selMass), sep = "")
 	else if(length(object@topMass) != n)
-		paste("Unequal number of Names and selMass: ", n,", ", length(object@topMass), sep = "")
+		paste("Unequal number of Names and topMass: ", n,", ", length(object@topMass), sep = "")
 	else if(length(object@spectra) != n & length(object@spectra) != 0)
 		paste("Unequal number of Names and spectra: ", n,", ", length(object@spectra), sep = "")
 	else if(nrow(object@libData) != n)
@@ -122,3 +122,31 @@ setValidity("tsLib", function(object) {
 setMethod("$", "tsLib", function(x, name) {
     eval(substitute(libData(x)$NAME_ARG, list(NAME_ARG=name)))
 })
+
+setMethod("initialize",
+          "tsLib",
+          function(.Object, Name    = character(0), RI      = numeric(0),
+                            medRI   = numeric(0),   RIdev   = matrix(0,0,3),
+                            selMass = list(),       topMass = list(),
+                            spectra = list(),       libData = data.frame()) {
+            if (length(Name) > 0) {
+                if(length(medRI) == 0)
+                    medRI   <- RI
+                if(length(topMass) == 0)
+                    topMass <- selMass
+                if(all(dim(libData) == 0))
+                    libData <- data.frame(Name = Name, RI = RI)
+                if(is.matrix(RIdev) == FALSE & length(RIdev) == 3)
+                    RIdev   <- matrix(rep(RIdev, length(Name)), length(Name), 3, byrow = T)
+            }
+                    
+            .Object@Name     <- Name
+            .Object@RI       <- RI
+            .Object@medRI    <- medRI
+            .Object@RIdev    <- RIdev
+            .Object@selMass  <- selMass
+            .Object@topMass  <- topMass
+            .Object@spectra  <- spectra
+            .Object@libData  <- libData
+            .Object
+          })

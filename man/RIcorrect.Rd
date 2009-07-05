@@ -8,7 +8,8 @@
 }
 \usage{
 RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold, 
-	pp.method = "smoothing", showProgressBar = FALSE)
+	pp.method = "smoothing", showProgressBar = FALSE, baseline = FALSE,
+    baseline.opts = NULL )
 }
 \arguments{
   \item{samples}{ A \code{tsSample} object created by \code{ImportSamples} function. }
@@ -20,6 +21,8 @@ RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold,
   \item{IntThreshold}{ Apex intensities lower than this value will be removed from the RI files. }
   \item{pp.method}{ Peak picking method. Options are either "smoothing" or "ppc". See details. }
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
+  \item{baseline}{Logical. Should baseline correction be performed?}
+  \item{baseline.opts}{A list of options passed to \code{\link{baselineCorrection}}}.
 }
 \details{
 	There are two pick picking methods available: "smoothing" and "ppc". 

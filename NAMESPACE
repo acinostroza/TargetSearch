@@ -64,6 +64,8 @@ export(
 	"Profile",
 	"sampleRI",
 	"ImportLibrary",
+	"ImportLibrary.tab",
+	"ImportLibrary.msp",
 	"ImportSamples",
 	"ImportFameSettings",
 	"NetCDFPeakFinding",
@@ -79,5 +81,9 @@ export(
 	"RIcorrect",
 	"rt2ri",
 	"ri2rt",
-	"Write.Results"
+	"Write.Results",
+	"baseline",
+	"baselineCorrection",
+	"fixRIcorrection",
+	"TargetSearchGUI"
 )

@@ -10,7 +10,7 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
 		file.peak.int <- paste(prefix, ".peak.intensity.txt", sep ="")
 		file.peak.ri  <- paste(prefix, ".peak.RI.txt", sep = "")
 
-    med_RI    <- apply(retIndex(peakData), 1, median, na.rm = T)
+    med_RI    <- format(apply(retIndex(peakData), 1, median, na.rm = T), digits = 3)
     libId     <- libId(Lib, sel = FALSE)
     Name      <- libName(Lib)[libId]
     libRI     <- libRI(Lib)[libId]
@@ -19,10 +19,10 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
     
     Lib2 <- data.frame(Lib_RI = libRI, Mass = mass, IS_SEL = is_sel)
 		
-		write.table( data.frame(cbind(Name, Lib2, med_RI, Intensity(peakData))), file = file.peak.int,
-			sep = "\t", quote = F, row.names = F)
-		write.table( data.frame(cbind(Name, Lib2, med_RI, retIndex(peakData))), file = file.peak.ri,
-			sep = "\t", quote = F, row.names = F)
+		write.table( data.frame(cbind(Name, Lib2, med_RI, Intensity(peakData)),
+            check.names = FALSE), file = file.peak.int,	sep = "\t", quote = F, row.names = F)
+		write.table( data.frame(cbind(Name, Lib2, med_RI, retIndex(peakData)),
+            check.names = FALSE), file = file.peak.ri, sep = "\t", quote = F, row.names = F)
 		
 		msg <- 1
 		message(
@@ -32,8 +32,8 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
 
 		if(length(retTime(peakData)) > 0) {
 			file.peak.rt  <- paste(prefix, ".peak.RT.txt", sep = "")
-			write.table( data.frame(cbind(Name, Lib2, med_RI, retTime(peakData))), file = file.peak.rt,
-				sep = "\t", quote = F, row.names = F)
+			write.table( data.frame(cbind(Name, Lib2, med_RI, retTime(peakData)), check.names = FALSE),
+                file = file.peak.rt, sep = "\t", quote = F, row.names = F)
 			message(" - ", file.peak.rt, " RTs of th RAW intensties.\n")
   	}
 	}

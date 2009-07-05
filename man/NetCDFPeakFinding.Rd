@@ -9,7 +9,7 @@
 
 \usage{
 NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10,
-                  pp.method = "smoothing")
+                  pp.method = "smoothing", baseline = FALSE, baseline.opts = NULL)
 }
 
 \arguments{
@@ -19,6 +19,8 @@ NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10
 		is \code{2*Window + 1}.  }
   \item{IntThreshold}{Apex intensities lower than this value will be removed from the RI files. }
   \item{pp.method}{The pick picking method to be used. Options are \code{"smoothing"} and \code{"ppc"}.}
+  \item{baseline}{Logical. Should baseline correction be performed?}
+  \item{baseline.opts}{A list of options passed to \code{\link{baselineCorrection}}}.
 }
 
 \details{

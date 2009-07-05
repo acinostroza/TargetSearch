@@ -9,6 +9,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{hyperref}
+\usepackage{graphicx}
 \usepackage[authoryear,round]{natbib}
 
 \newcommand{\Robject}[1]{{\texttt{#1}}}
@@ -27,10 +28,10 @@
 
 
 \title{The TargetSearch Package}
-\author{Alvaro Cuadros-Inostroza, Jan Lisec, Henning Redestig and Matthew A Hannah\\
-Max Planck Institute for Molecular Plant Physiology\\
-Potsdam, Germany\\
-\url{http://www.mpimp-golm.mpg.de/}
+\author{Alvaro Cuadros-Inostroza, Jan Lisec,\\Henning Redestig and Matthew A Hannah\\
+\small{Max Planck Institute for Molecular Plant Physiology}\\
+\small{Potsdam, Germany}\\
+\small{\url{http://www.mpimp-golm.mpg.de/}}
 }
 
 \begin{document}
@@ -124,7 +125,7 @@ samples <- new("tsSample", Names = smp_names, CDFfiles = cdffiles,
 
 \subsection{Retention Time Markers}
 
-The RI markers time definition, time window and $m/z$ value has to be provided
+The RI markers time definition, time window and $m/z$ values has to be provided
 in a tab-delimited text file. The first two columns indicate the lower and
 upper window limits where the retention marker will be searched. The third
 column is the RI of that particular marker. An example is shown in
@@ -161,11 +162,11 @@ If you do not use RI markers, you can skip this part by setting the parameter
 \Rfunarg{rimLimits} to \Robject{NULL} in \Rfunction{RIcorrect} function.
 Please note that in this case, no retention time correction will be performed.
 
-\section{Peak Identification and RI correction}
+\section{Baseline correction, peak identification and RI correction}
 
-Initially, TargetSearch identifies the local apex intensities 
+Initially, \Rpackage{TargetSearch} identifies the local apex intensities 
 in all chromatograms, finds the retention time of the RI markers and converts
-the retention time to RI using linear interpolation \cite{VandenDool1963}.
+the retention time to RI using linear interpolation \citep{VandenDool1963}.
 This is done by the function \Rfunction{RIcorrect()}. It takes as parameter the
 sample and retention time limits objects, the mass range to extract (\Rfunarg{
 MassRange = c(85,500)}), the intensity threshhold (\Rfunarg{IntThreshold = 10}),
@@ -183,10 +184,19 @@ RImatrix <- RIcorrect(samples, rimLimits, massRange = c(85,500),
 
 
 There are two peak picking methods available. ``smoothing'' implements the
-algorithm used by Tagfinder \cite{Luedemann2008}. The ``ppc'' algorithm is a
+algorithm used by Tagfinder \citet{Luedemann2008}. The ``ppc'' algorithm is a
 port from the package \Rpackage{ppc} function \Rfunction{ppc.peaks}. It looks for
 the local maxima within a given time window. The \Rfunarg{Window} parameter
 sets the window size of the chosen peak picking method.
+
+In case that the chromatograms were not baseline corrected by the platform
+specific GC-MS software, it is possible to do so with the function
+\Rfunction{RIcorrect()} as well. There are to extra arguments you have
+to include: \Rfunarg{baseline} is a logical value that tells \Rfunction{RIcorrect()}
+whether to baseline correct the chromatograms or not. \Rfunarg{baseline.opts}
+is a list of options passed to \Rfunction{baselineCorrection()} function.
+This algorithm is based on the work of \citet{chang07} and a description
+is found in \Rfunction{baselineCorrection()} documentation.
 
 After that, it is possible to check for outliers in the samples by using
 the function \Rfunction{FAMEoutliers()}. It creates a PDF report
@@ -218,7 +228,7 @@ The ``reference library'' file contains the information of the
 metabolites or mass spectral tags (MSTs) that will be searched for in
 the chromatograms. A public spectra database could be found here
 \url{http://csbdb.mpimp-golm.mpg.de/csbdb/gmd/gmd.html} at
-\emph{The Golm Metabolome Database} (\cite{Kopka2005}).
+\emph{The Golm Metabolome Database} \citep{Kopka2005}.
 
 Required information is the metabolite name
 (``Name''), expected retention time index (``RI''), 
@@ -450,6 +460,75 @@ plotPeak(rawpeaks, time.range = libRI(lib)[3] + c(-2000,2000),
 
 Refer to the documentation of the functions \Rfunction{plotPeak}
 and \Rfunction{plotSpectra} for further options not covered here.
+
+\section{TargetSearch GUI}
+
+We provide a grahical user interface intended to facilitate the use
+of \emph{TargetSearch} for users unfamiliar with R. Many parameters that
+would be set calling the individual \Rpackage{TargetSearch} functions as
+described in this document can be set here ``in one go'' before running the
+complete analysis. A screenshot of the GUI is shown in figure~\ref{fig:05}.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=0.7]{tsGUI.png}
+\caption{The \Rpackage{TargetSearch} GUI.}\label{fig:05}
+\end{figure}
+
+This is a descript of all the GUI options.
+
+\begin{description}
+\item[Working Directory]: Use the \emph{Browse}-button to select the folder
+on your hard drive containing all your GC-MS data files. The output of
+\Rpackage{TargetSearch} will be written to this folder too.
+
+\item[File Import]: Clicking \emph{NetCDF Data} or \emph{Apex Data} radio buttons will open
+a file select dialog. Choose the files you would like to be processed. You
+may check your selection pressing the \emph{Show}-button.
+
+\item[Baseline Correction]: Clicking \emph{on/off} button will perform
+baseline correction before peak detection. If selected, the \Rfunarg{threshold}
+parameter is a numeric value between 0 and 1. A value of one returns a baseline
+above the noise, 0.5 in the middle of the noise and 0 below the noise. See
+\Rfunction{baselineCorrection} documentation for further details.
+
+\item[Retention Index Correction]: Retention Index Correction is neccessary and
+applied only if you supply NetCDF Data (Apex Data contain already Retention
+Indices). You may \emph{Load} or \emph{Create} the search windows for your RI-Markers
+here. 
+
+\item[Peak Detection]: \emph{Search Windows} refers to the allowed RI deviation of your
+metabolites which are narrowed in 3 consecutive searches. \emph{Intensity Counts
+threshold} defines the minimum apex intensity incorporated in the analysis.
+A value of 1 would include all peaks. \emph{Mass Range} allows to limit the mass
+values ($m/z$) to be included in the analysis. \emph{Smoothing} averages raw data
+to eliminate some inherent noise leading to multiple peaks otherwise. 
+
+\item[Library]: A Library (to detect metabolites) usable by \Rpackage{TargetSearch} contains
+at least information about the metabolite `Name', its expected `RI' and the
+selective masses in its spectrum `SEL\_MASS'. You may \emph{Load} or \emph{Create} one
+yourself using the respective buttons. A more detailed description of
+the file formats can be found in \Rfunction{ImportLibrary}.
+
+\item[Normalization]: This selects how the data will be normalized during
+the metabolite search. Options are \Rfunarg{dayNorm}, a day based median
+normalization, \Rfunarg{medianNorm}, normalization using the median of all the intensities
+of a given mass, and \Rfunarg{none}, no normalization at all.
+
+\item[Final Profiles]: Here you may set the parameters used by the functions
+\Rfunction{Profile} and \Rfunction{ProfileCleanUp}. \emph{timesplit} sets an
+RI window that will be used to look for metabolites that could have been redundanly
+identified. \emph{correl. thr.} is the correlation threshold and \emph{min. number
+of correlation samples} is a threshold used to make sure that correlations are
+computed with at least said number of observations.
+
+\item[Parameters]: You may \emph{Save} the current parameters as an \texttt{*.RData}
+file or \emph{Load} previously saved parameters to compare the outcome of different settings or
+just repeat the analysis.
+
+\item[Program]: \emph{Run} starts to process all currently selected files using the current
+parameters and saving output to \emph{Working Directory}. \emph{Quit} closes the GUI.
+\end{description}
 
 \bibliographystyle{plainnat}
 \bibliography{biblio}
