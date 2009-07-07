@@ -3,9 +3,15 @@
 baseline <- function(ncData, baseline.opts = NULL) {
 
 	foo <- function(x, y, si, pc) y[si[x] + 1:pc[x]]
-	int <- sapply(1:length(ncData$scanindex), foo, ncData$intensity, ncData$scanindex, ncData$point_count)
-	if(is.list(int))
-		stop("Baseline correction Error. It seems that the data is already baseline corrected.")
+	if( all(ncData$point_count == ncData$point_count[1]) ) {
+    	int <- sapply(1:length(ncData$scanindex), foo, ncData$intensity, ncData$scanindex, ncData$point_count)
+    	stopifnot(is.matrix(int))
+	} else {
+		warning("Baseline Correction: It seems that the data is already baseline corrected.")
+		int <- t(.Call("peakExtraction", ncData$mz, ncData$intensity,
+            ncData$point_count, ncData$scanindex, range(ncData$mz),
+            PACKAGE = "TargetSearch"))
+	}
 
 	int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
 	ncData$intensity <- as.vector(int)
