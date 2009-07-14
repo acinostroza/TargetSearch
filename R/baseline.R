@@ -6,15 +6,23 @@ baseline <- function(ncData, baseline.opts = NULL) {
 	if( all(ncData$point_count == ncData$point_count[1]) ) {
     	int <- sapply(1:length(ncData$scanindex), foo, ncData$intensity, ncData$scanindex, ncData$point_count)
     	stopifnot(is.matrix(int))
+   		int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
+    	ncData$intensity <- as.vector(int)
 	} else {
 		warning("Baseline Correction: It seems that the data is already baseline corrected.")
 		int <- t(.Call("peakExtraction", ncData$mz, ncData$intensity,
             ncData$point_count, ncData$scanindex, range(ncData$mz),
             PACKAGE = "TargetSearch"))
+ 
+## updata ncData components...
+        int.id  <- lapply(1:length(ncData$scanindex), function(x) which( int[,x] > 0 ))
+        ncData$intensity <- as.vector( int[int > 0] )
+        ncData$mz <- range(ncData$mz)
+        ncData$mz <- ncData$mz[1]:ncData$mz[2]
+        ncData$mz <- unlist(sapply(int.id, function(x) ncData$mz[x]))
+        ncData$point_count  <- sapply(int.id, length)
+        ncData$scanindex  <- c(0, cumsum(ncData$point_count))[1:length(ncData$point_count)]
 	}
-
-	int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
-	ncData$intensity <- as.vector(int)
 	ncData
 }
 
@@ -32,14 +40,17 @@ baseline <- function(ncData, baseline.opts = NULL) {
 #   signalwindow:
 
 baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0.2,
-    segments = 100, signalWindow = 10) {
+    segments = 100, signalWindow = 10, method = "linear") {
 
         n <- ncol(int)
         bfrac <- round(bfraction * segments)
+        met <- pmatch(method, c("linear", "spline"))[1]
+        if(is.na(met))
+            stop("Invalid method '", method, "' for baseline correction")
 
         baseline <- apply(int, 1, function(x) {
                 # apply high pass filter
-                xf <- hpf(x, alpha)
+                xf <- TargetSearch:::hpf(x, alpha)
                 # divide xf in segments
                 np <- ceiling( n / segments )
                 segment.idx  <- rep(1:segments, each = np)[1:n]
@@ -54,12 +65,15 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
                 # and the center of a signal window of width signalwindow
                 tmp  <- which(abs( xf ) > 2*stdn)
                 # windowing step: apply signalwindow to the signal points obtained before
-                sm   <- windowingStep(tmp, n, signalWindow)
+                sm   <- TargetSearch:::windowingStep(tmp, n, signalWindow)
                 sm[1] <- sm[n] <- FALSE
+                if(met == 2) {
                 # Fit a cubic smoothing spline of the baseline using the points 
                 # considerated noise.
-                sp <- smooth.spline((1:n)[!sm], x[!sm])
-                spx <- predict(sp, 1:n)
+                    sp <- smooth.spline((1:n)[!sm], x[!sm])
+                    spx <- predict(sp, 1:n)
+                } else if (met == 1)
+                    spx <- approx( (1:n)[!sm], x[!sm], 1:n )
                 # returns the smoothed points plus offset
                 spx$y + 2 * (threshold - 0.5) * 2 * stdn
         })

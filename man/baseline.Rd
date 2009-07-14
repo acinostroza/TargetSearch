@@ -7,7 +7,7 @@
 }
 \usage{
     baselineCorrection(int, threshold = 0.5, alpha = 0.95, bfraction = 0.2,
-           segments = 100, signalWindow = 10) 
+           segments = 100, signalWindow = 10, method = "linear")
     
     baseline(ncData, baseline.opts = NULL)
 }
@@ -21,6 +21,8 @@
   the filtered signal that are assumed to be baseline signal.}
   \item{segments}{The number of segments in which the filtered signal is divided.}
   \item{signalWindow}{The window size (number of points) used in the signal windowing step.}
+  \item{method}{The method used to approximate the baseline. \code{"linear"} (default) uses
+  linear interpolation. \code{"spline"} fits a cubic smoothing spline (warning: really slow). }
   \item{ncData}{A list returned by the function \code{xcms:::netCDFRawData}}.
   \item{baseline.opts}{A list with parameters to be passed to \code{baselineCorrection}
   function. For example \code{baseline.opts = list(threshold = 0.5, alpha = 0.95)}.}
@@ -40,7 +42,8 @@ every one of the points found to be signal as the center of a signal window (\co
 and marks the points within that window as signal. The remaining points are now considered
 to be noise.
 
-The baseline signal is obtained by fitting a cubic smoothing spline taking only
+The baseline signal is obtained by either using linear interpolation (default) or fitting a cubic
+smoothing spline taking only
 the noise. The baseline can be shifted up or down by using the parameter (threshold),
 which is done by the formula: \emph{B' = B + 2*(threshold - 0.5)*2*stdn}, where
 \emph{B} is the fitted spline, \emph{stdn} the standard deviation of the noise,
