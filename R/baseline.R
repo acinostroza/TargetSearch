@@ -13,7 +13,7 @@ baseline <- function(ncData, baseline.opts = NULL) {
 		int <- t(.Call("peakExtraction", ncData$mz, ncData$intensity,
             ncData$point_count, ncData$scanindex, range(ncData$mz),
             PACKAGE = "TargetSearch"))
- 
+        int <- do.call(baselineCorrection, append(list(int = int), baseline.opts)) 
 ## updata ncData components...
         int.id  <- lapply(1:length(ncData$scanindex), function(x) which( int[,x] > 0 ))
         ncData$intensity <- as.vector( int[int > 0] )
