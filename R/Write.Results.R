@@ -61,3 +61,40 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
 		}
 	}
 }
+
+# function to create a MSP file that can be viewed with NIST
+
+writeMSP <- function(lib, peaks, file, append=FALSE) {
+
+    if(is.logical(append) == FALSE) {
+        stop("append must be logical")
+    }
+    file <- file(file, ifelse(append[1], "a", "w"))
+    tmp <- t(Intensity(peaks))
+    
+    for(i in 1:length(lib)) {
+
+        x <- tmp[, colnames(tmp) == i]
+        if(all(is.na(x))) {
+            next
+        }
+   		# remove samples with no data.
+		x <- x[apply(x, 1, function(x) all(is.na(x))) == FALSE,]
+
+   		# remove masses with no data
+		bar      <- apply(x, 2, function(x) all(is.na(x))) == FALSE
+		x        <- x[,bar]
+
+   		x.median <- apply(x, 2, median, na.rm = T)
+		x.median <- round(999 * x.median / max(x.median))
+		mz <- topMass(lib)[[i]][bar]
+
+		cat(sprintf("Name: %s", libName(lib)[i]), file = file, sep = "\n")
+		cat(sprintf("Synon: RI: %.1f", medRI(lib)[i]), file = file, sep = "\n")
+		cat(sprintf("Synon: MST SEL MASS: %s", paste(selMass(lib)[[i]], collapse = ";") ), file = file, sep = "\n")
+		cat(sprintf("Num Peaks: %d", length(x.median)), file = file, sep = "\n")
+		cat(paste(paste(mz, x.median, sep = ":"), collapse = " "), file = file, sep = "\n")
+		cat("", file = file, sep = "\n")
+	}
+	close(file)
+}

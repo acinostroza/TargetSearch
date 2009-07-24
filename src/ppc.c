@@ -65,9 +65,10 @@ SEXP ppc(SEXP MassValues, SEXP IntensityValues, SEXP PointCount,
 	* raw data */
 	for(s = 0; s < scan_number; s++)
 		for (i = 0; i < point_count[s]; i++)
-			if((ans[(mass[scan_index[s] + i]-min) * scan_number + s] == 0) ||
-				(intensity[scan_index[s] + i] < min_int))
-				maxm[(mass[scan_index[s] + i]-min) * scan_number + s] = 0;
+			if(mass[scan_index[s]+i] >= min && mass[scan_index[s]+i] <= max)
+				if((ans[(mass[scan_index[s] + i]-min) * scan_number + s] == 0) ||
+					(intensity[scan_index[s] + i] < min_int))
+					maxm[(mass[scan_index[s] + i]-min) * scan_number + s] = 0;
 
 	UNPROTECT(6);
 	Free(ans);

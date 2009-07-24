@@ -10,7 +10,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 		standard  <- rimStandard(rimLimits)
 		mass      <- rimMass(rimLimits)
 		rLimits   <- rimLimits(rimLimits)
-		if(mass < massRange[1] | mass > massRange[2])
+		if(any(mass < massRange[1] | mass > massRange[2]))
 			stop("'mass' marker out of Range")
 		RIcheck <- matrix(nrow=dim(rLimits)[1], ncol=length(Names))
 	}
