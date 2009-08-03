@@ -530,6 +530,66 @@ just repeat the analysis.
 parameters and saving output to \emph{Working Directory}. \emph{Quit} closes the GUI.
 \end{description}
 
+\section{Untargeted search}
+
+Although \Rpackage{TargetSearch} was designed to be targeted oriented, it is possible
+to perform untargeted searches. The basic idea is to create a library that contains
+evenly distributed ``metabolites'' in time and every ``metabolite'' uses the whole
+range of possible masses as selective masses. An example:
+
+<<untargeted1>>=
+metRI    <- seq(200000, 300000, by = 5000)
+metMZ    <- 85:250
+metNames <- paste("Metab",format(metRI,digits=6), sep = "_")
+@
+
+Here we define a set of metabolites located every 5000 RI units
+from each other in the RI range 200000-300000, with selective masses
+in the range of 85-300, and assign them a name. After that, we
+create an \Robject{tsLib} object.
+
+<<untargeted2>>=
+metLib   <- new("tsLib", Name = metNames, RI = metRI,
+     selMass = rep(list(metMZ), length(metRI)), RIdev = c(3000, 1500, 500))
+@
+
+Now we can use this library object to perform a targetive search with
+this library on the \emph{E. coli} samples as we did before.
+
+<<untargeted3>>=
+metLib <- medianRILib(samples, metLib)
+metCorRI <- sampleRI(samples, metLib)
+metPeakData <- peakFind(samples, metLib, metCorRI)
+metProfile <- Profile(samples, metLib, metPeakData)
+metFinProf <- ProfileCleanUp(metProfile, timeSplit = 500)
+@
+
+The \Robject{metFinProf} object can be used to create
+a new library by taking only the metabolites that have, for
+example, more than 5 correlating masses and using the correlating
+masses as selective ones.
+
+<<untargeted4>>=
+sum(  profileInfo(metFinProf)$Mass_count > 5)
+tmp   <-  profileInfo(metFinProf)$Mass_count > 5
+metRI    <- profileInfo(metFinProf)$RI[tmp]
+metNames <-  as.character( profileInfo(metFinProf)$Name[tmp] )
+metMZ <- sapply(profileInfo(metFinProf)$Masses[tmp],
+	function(x) as.numeric(unlist(strsplit(x,";"))) )
+metLib   <- new("tsLib", Name = metNames, RI = metRI,
+     selMass = metMZ, RIdev = c(1500, 750, 250))
+@
+
+After the new library object is created, the process can be
+repeated as shown above.
+
+Finally, by using the function \Rfunction{writeMSP},
+it is possible to export the spectrum of the
+unknown metabolites to MSP format used by NIST mass spectra
+search (\url{http://www.nist.gov/srd/mslist.htm}),
+so the unknown spectra can be search
+against known metabolite spectra databases.
+
 \bibliographystyle{plainnat}
 \bibliography{biblio}
 

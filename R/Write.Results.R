@@ -91,9 +91,12 @@ writeMSP <- function(lib, peaks, file, append=FALSE) {
 
 		cat(sprintf("Name: %s", libName(lib)[i]), file = file, sep = "\n")
 		cat(sprintf("Synon: RI: %.1f", medRI(lib)[i]), file = file, sep = "\n")
-		cat(sprintf("Synon: MST SEL MASS: %s", paste(selMass(lib)[[i]], collapse = ";") ), file = file, sep = "\n")
+		cat(sprintf("Synon: MST SEL MASS: %s", substring(paste(selMass(lib)[[i]], collapse = ";"), 1, 230)), file = file, sep = "\n")
 		cat(sprintf("Num Peaks: %d", length(x.median)), file = file, sep = "\n")
-		cat(paste(paste(mz, x.median, sep = ":"), collapse = " "), file = file, sep = "\n")
+#		cat(paste(mz, " ", x.median, ";" , sep = ""), file = file, sep = "\n")
+        foo <- paste(mz, " ", x.median, ";", sep = "")
+        foo <- split(foo, rep(1:ceiling(length(foo)/6), each = 6)[1:length(foo)])
+        cat (sapply(foo, function(x) paste(x, collapse = " ")), file = file, sep = "\n")
 		cat("", file = file, sep = "\n")
 	}
 	close(file)

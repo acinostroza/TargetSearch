@@ -82,6 +82,7 @@ export(
 	"rt2ri",
 	"ri2rt",
 	"Write.Results",
+	"writeMSP",
 	"baseline",
 	"baselineCorrection",
 	"fixRIcorrection",

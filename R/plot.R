@@ -106,8 +106,13 @@ plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
 		x.median <- 999 * x.median / max(x.median)
 
 		mz <- topMass(Lib)[[id]][bar]
-		sp.mz  <- spectra(Lib)[[id]][,1]
-		sp.int <- spectra(Lib)[[id]][,2]
+		if(length(spectra(Lib)) > 0 ) {
+    		sp.mz  <- spectra(Lib)[[id]][,1]
+	       	sp.int <- spectra(Lib)[[id]][,2]
+     	} else {
+            sp.mz <- mz
+            sp.int <- rep(0, length(sp.mz))
+     	}
 
 		if(ptype == 1) {
 			plot  (mz, x.median, type = 'h', col = 'blue', ylim = c(-1000,1000), main = libName(Lib)[id],
