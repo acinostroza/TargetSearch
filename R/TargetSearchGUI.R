@@ -8,7 +8,10 @@ TargetSearchGUI <- function() {
 # Gets the GUI icon path and TargetSearch Version
   ts.ico     <- file.path(.find.package("TargetSearch"), "ico/Icon_TSGUI.ico")
   ts.version <- installed.packages()["TargetSearch", "Version"]
-  tkwm.iconbitmap(TS_GUI, ts.ico)
+# Set the GUI's icon (Windows only)
+  if (.Platform$OS.type == "windows")
+      try(tkwm.iconbitmap(TS_GUI, ts.ico), silent=TRUE)
+      
 # Specify correct Path
   tktitle(TS_GUI) <- paste("TargetSearch", ts.version)
   tclServiceMode(FALSE)
