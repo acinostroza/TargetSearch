@@ -15,13 +15,13 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
     Name      <- libName(Lib)[libId]
     libRI     <- libRI(Lib)[libId]
     mass      <- unlist(topMass(Lib))
-    is_sel    <- F
+    is_sel    <- unlist(lapply(seq(Lib), function(x) topMass(Lib)[[x]] %in% selMass(Lib)[[x]]))
     
     Lib2 <- data.frame(Lib_RI = libRI, Mass = mass, IS_SEL = is_sel)
 		
-		write.table( data.frame(cbind(Name, Lib2, med_RI, Intensity(peakData)),
+		write.table( data.frame(libId, Name, Lib2, med_RI, Intensity(peakData), row.names = NULL,
             check.names = FALSE), file = file.peak.int,	sep = "\t", quote = F, row.names = F)
-		write.table( data.frame(cbind(Name, Lib2, med_RI, retIndex(peakData)),
+		write.table( data.frame(libId, nName, Lib2, med_RI, retIndex(peakData), row.names = NULL,
             check.names = FALSE), file = file.peak.ri, sep = "\t", quote = F, row.names = F)
 		
 		msg <- 1
