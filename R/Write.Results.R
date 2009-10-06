@@ -21,7 +21,7 @@ Write.Results <- function(Lib = NA, peakData = NA, finalProfile = NA, prefix = N
 		
 		write.table( data.frame(libId, Name, Lib2, med_RI, Intensity(peakData), row.names = NULL,
             check.names = FALSE), file = file.peak.int,	sep = "\t", quote = F, row.names = F)
-		write.table( data.frame(libId, nName, Lib2, med_RI, retIndex(peakData), row.names = NULL,
+		write.table( data.frame(libId, Name, Lib2, med_RI, retIndex(peakData), row.names = NULL,
             check.names = FALSE), file = file.peak.ri, sep = "\t", quote = F, row.names = F)
 		
 		msg <- 1
