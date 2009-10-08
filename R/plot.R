@@ -102,7 +102,7 @@ plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
 		x        <- x[,bar]
 		# x        <- apply(x, 1,median,na.rm = T), FUN = "/")
 
-		x.median <- apply(x, 2, median, na.rm = T)
+		x.median <- if(is.null(dim(x))) median(x, na.rm = T) else  apply(x, 2, median, na.rm = T)
 		x.median <- 999 * x.median / max(x.median)
 
 		mz <- topMass(Lib)[[id]][bar]
