@@ -6,6 +6,10 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
   resInt <- Intensity(peakData)
   resRI  <- retIndex(peakData)
   libId  <- libId(Lib, sel = FALSE)
+  
+  # extract addictonal information
+  addiData  <- libData(Lib)
+  addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
 
   searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
   rownames(searchData) <- 1:length(Lib)
@@ -82,6 +86,9 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
         medRI[i,] <- apply(resRI[x[y],],2,median, na.rm=T)
     }
   }
+
+  if(length(addiNames) > 0) searchData <- cbind(searchData, addiData[,addiNames])
+
   options(warn=0)
 	tmp <- new("tsMSdata", RI = medRI, Intensity = medInt)  
   return(new("tsProfile", tmp, info = cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData)))
