@@ -87,7 +87,15 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     }
   }
 
-  if(length(addiNames) > 0) searchData <- cbind(searchData, addiData[,addiNames])
+    if(length(addiNames) > 0) {
+        if(length(addiNames) == 1) {
+            addiTemp <-  data.frame(addiData[,addiNames], stringsAsFactors=FALSE)
+            colnames(addiTemp) <- addiNames
+        } else {
+            addiTemp <- addiData[,addiNames]
+        }
+        searchData <- cbind(searchData, addiTemp)
+    } 
 
   options(warn=0)
 	tmp <- new("tsMSdata", RI = medRI, Intensity = medInt)  

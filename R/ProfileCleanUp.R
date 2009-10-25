@@ -28,17 +28,15 @@ function(Profile, timeSplit=500, r_thres=0.95){
   addiInfo <- NULL
   if(length(foo) == 0) stop("Error in Profile. @info slot: column 'Score_cor_masses' doesn't exist")
   if(foo < ncol(searchData2)) {
-    addiInfo <- searchData2[,(foo+1):ncol(searchData2)]
-    searchData2 <- searchData2[,1:foo]
+    addiInfo <- colnames(searchData2)[(foo+1):ncol(searchData2)]
   }
-
   # as long as only consider MSTs with >=3 then quite robust against changing timeSplit
   # timeSplit <- 500
   
   tmGroups <- timeGroups(searchData2$RI, timeSplit)
 
   corGroups <- 1:nrow(searchData2)
-  corData   <- searchData2[, colnames(searchData2) != "Lib_RI"]
+  corData   <- searchData2[,! colnames(searchData2) %in% c("Lib_RI",addiInfo)]
   colnames(corData) <- paste("Cor_", colnames(corData), sep = "")
   corData$RI_dev <- format(searchData2$Lib_RI - searchData2$RI, digits = 3)
   corData$Cor_RI <- format(corData$Cor_RI, digits = 5)
@@ -65,12 +63,7 @@ function(Profile, timeSplit=500, r_thres=0.95){
   medInt2 <- medInt2[o,]
   medRI2 <- medRI2[o,]
   d <- duplicated(cbind(tmGroups,corGroups))
-  if(is.null(addiInfo) == FALSE) {
-    addiInfo <- addiInfo[o,]
-    MET_info <- cbind(searchData2[d == F,],corData[d == F,],addiInfo[d == F,])
-  } else {
-    MET_info <- cbind(searchData2[d == F,],corData[d == F,])
-  }
+  MET_info <- cbind(searchData2[d == F,],corData[d == F,])
   MET <- medInt2[d == F,]
   MET_RI <- medRI2[d == F,]
   MET_info$final_sample_count <- apply(MET, 1, function(x) sum(is.finite(x)))
