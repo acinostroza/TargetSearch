@@ -1,0 +1,24 @@
+citHeader("To cite 'TargetSearch' in publications use:")
+
+citEntry(entry="article",
+  title   = paste("TargetSearch - a Bioconductor package for the efficient",
+            "pre-processing of GC-MS metabolite profiling data"),
+  author  = personList(person(first="Alvaro",last="Cuadros-Inostroza"),
+                       person(first="Camila",last="Caldana"),
+                       person(first="Henning",last="Redestig"),
+                       person(first="Jan",last="Lisec"),
+                       person(first="Hugo",last="Pena-Cortes"),
+                       person(first="Lothar",last="Willmitzer"),
+                       person(first="Matthew",middle="A",last="Hannah")),
+  journal = "BMC Bioinformatics",
+  year    = "2009",
+  volume  = "10",
+  pages   = "428",
+  doi     = "10.1186/1471-2105-10-428",
+  textVersion = paste("Cuadros-Inostroza A, Caldana C, Redestig H, Lisec L,",
+               "Pena-Cortes H, Willmitzer L, and Hannah MA.",
+               "TargetSearch - a Bioconductor package for the efficient",
+               "pre-processing of GC-MS metabolite profiling data.",
+               "BMC Bioinformatics 2009, 10:428.")
+)
+

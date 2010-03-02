@@ -101,7 +101,7 @@ RIpath  <- "."
 days <- substring(cdffiles, 1, 4)
 
 # sample names 
-smp_names <- sub("\\.cdf", "", cdffiles)
+smp_names <- sub(".cdf", "", cdffiles, fixed = TRUE)
 
 # add some sample info
 smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))

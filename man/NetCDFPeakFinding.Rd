@@ -51,7 +51,7 @@ NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10
 require(TargetSearchData)
 data(TargetSearchData)
 CDFpath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
-CDFfiles <- dir(CDFpath, pattern = "\\.cdf$", full.names = TRUE)
+CDFfiles <- dir(CDFpath, pattern = ".cdf$", full.names = TRUE)
 CDFfiles
 
 # extrac peaks of first chromatogram
