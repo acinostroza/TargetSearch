@@ -28,21 +28,19 @@ data(TargetSearchData)
 
 # get RI file path
 RI.path <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
+
 # update RI file path
 RIpath(sampleDescription) <- RI.path
 
 peakData <- peakFind(sampleDescription, refLibrary, corRI)
 # show peak Intensities. 
-head(Intensity(peakData))
+head(Intensity(peakData), 2)
 
 # How to get intensities for a particular metabolite
-#
-# make a library index using top masses
-libId <- libId(refLibrary, sel = FALSE)
-# get the peak intensities of Metabolite 1, for example, of every mass
-int.1 <- Intensity(peakData)[libId == 1,]
-# this assigns the mass values to the row names of int.1
-rownames(int.1) <- topMass(refLibrary)[[1]]
+# just select the identifier. Here extract the intensities
+# for the first metabolite in the library
+IntMatrix <- Intensity(peakData)[[1]]
 
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }

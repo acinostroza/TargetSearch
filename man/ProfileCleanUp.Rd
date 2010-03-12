@@ -31,6 +31,18 @@ ProfileCleanUp(Profile, timeSplit = 500, r_thres = 0.95)
 require(TargetSearchData)
 data(TargetSearchData)
 
+RI.path <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
+# update RI file path
+RIpath(sampleDescription) <- RI.path
+# update median RI
+refLibrary        <- medianRILib(sampleDescription, refLibrary)
+# get the sample RI
+corRI             <- sampleRI(sampleDescription, refLibrary, r_thres = 0.95)
+# obtain the peak Intensities of all the masses in the library
+peakData          <- peakFind(sampleDescription, refLibrary, corRI)
+metabProfile      <- Profile(sampleDescription, refLibrary, peakData, r_thres = 0.95) 
+
 # here we use the metabProfile previously calculated and return a "cleaned" profile.
 metabProfile.clean <- ProfileCleanUp(metabProfile, timeSplit = 500,
                       r_thres = 0.95) 

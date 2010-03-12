@@ -111,6 +111,8 @@ TargetSearchGUI <- function() {
       f3z5 <- tkframe(f3, borderwidth=2)
       f3z6 <- tkframe(f3, borderwidth=2)
       f3z7 <- tkframe(f3, borderwidth=2)
+      f3z7b <- tkframe(f3, borderwidth=2) # frame for top masses
+      f3z7c <- tkframe(f3, borderwidth=2) # frame for excluded masses
       f3z8 <- tkframe(f3, borderwidth=2)
       f3z9 <- tkframe(f3, borderwidth=2)
       f3z10 <- tkframe(f3, borderwidth=2)
@@ -198,6 +200,31 @@ TargetSearchGUI <- function() {
       valPDSmoothing <- tclVar(7)
       ebxPDSmoothing <- tkentry(parent=f3z7, width=4, textvariable=valPDSmoothing)
       labPDSmoothing <- tklabel(parent=f3z7, text="smoothing (Data Points)")
+      
+    # top Massses section and exclude Masses
+      labPDz7b <- tklabel(parent=f3, text="")
+      valPDtopMass <- tclVar(10)
+      ebxPDtopMass <- tkentry(parent=f3z7b, width=4, textvariable=valPDtopMass)
+      labPDtopMass <- tklabel(parent=f3z7b, text="# of top masses")
+      labPDz7c <- tklabel(parent=f3, text="")
+      valPDexcludeMass <- tclVar("147:149")
+      ebxPDexcludeMass <- tkentry(parent=f3z7c, width=20, textvariable=valPDexcludeMass)
+      labPDexcludeMass <- tklabel(parent=f3z7c, text="excluded masses")
+    
+    # A function to read a masses range to an R-vector
+    # Example:  fcnMzRangeToVector("126,147:149,160") = 126, 147, 148, 149, 160.
+      fcnMzRangeToVector <- function(x) {
+        x <- gsub(" ", "",x[1]) # remove spaces
+        if(grepl("^(\\d+[,:]?)+$", x, perl=TRUE)) {
+            x <- sub("[,:]$","",x)
+            x <- strsplit(unlist(strsplit(x, ",")), ":")
+            x <- lapply(x, as.numeric)
+            unlist(lapply(x, function(z) if(length(z)==1) z else seq(z[1],z[2])))
+        } else {
+            return(NULL)
+        }
+      }
+
     # Library
       labLib <- tklabel(parent=f3, text="    Library")
       valLibData <- tclVar("")
@@ -271,6 +298,8 @@ TargetSearchGUI <- function() {
       tkpack(ebxPDthr, labPDthr, side="left", anchor="w", padx=1)
       tkpack(ebxPDmin, ebxPDmax, labPDmass, side="left", anchor="w", padx=1)
       tkpack(ebxPDSmoothing, labPDSmoothing, side="left", anchor="w", padx=1)
+      tkpack(ebxPDtopMass, labPDtopMass, side="left", anchor="w", padx=1)      
+      tkpack(ebxPDexcludeMass, labPDexcludeMass, side="left", anchor="w", padx=1)            
       tkpack(butLibLoad, butLibCreate, butLibEdit, butLibSave, side="left", padx=1, anchor="w")
       tkpack(labNorm1, rbtNorm1, labNorm2, rbtNorm2, labNorm3, rbtNorm3, side="left", padx=1, anchor="w")
       tkpack(ebxProfTS, labProfTS, ebxProfthr, labProfthr, side="left", padx=1, anchor="w") 
@@ -282,6 +311,8 @@ TargetSearchGUI <- function() {
       tkgrid(labPDz5, f3z5, sticky="w")
       tkgrid(labPDz6, f3z6, sticky="w")
       tkgrid(labPDz7, f3z7, sticky="w")
+      tkgrid(labPDz7b, f3z7b, sticky="w")
+      tkgrid(labPDz7c, f3z7c, sticky="w")            
       tkgrid(labLib, f3z8, sticky="w")
       tkgrid(labNorm, f3z9, sticky="w")
       tkgrid(labProf, f3z10, sticky="w")
@@ -311,6 +342,8 @@ TargetSearchGUI <- function() {
         tclvalue(valPDmin) <- TSPar$"PeakDetection"$"MassRange"[1]
         tclvalue(valPDmax) <- TSPar$"PeakDetection"$"MassRange"[2]
         tclvalue(valPDSmoothing) <- TSPar$"PeakDetection"$"Smoothing"
+        tclvalue(valPDtopMass)     <- TSPar$"PeakDetection"$"topMass"
+        tclvalue(valPDexcludeMass) <- TSPar$"PeakDetection"$"excludeMass"
         tclvalue(valLibData) <- TSPar$"Library"
         tclvalue(rbNorm) <- TSPar$"Normalization"
         tclvalue(valProfTS) <- TSPar$"Profiles"$"TimeSplit"
@@ -336,7 +369,9 @@ TargetSearchGUI <- function() {
             "SearchWin" = as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
             "Threshold" = as.numeric(tclvalue(valPDthr)),
             "MassRange" = as.numeric(c(tclvalue(valPDmin), tclvalue(valPDmax))),
-            "Smoothing" = as.numeric(tclvalue(valPDSmoothing))
+            "Smoothing" = as.numeric(tclvalue(valPDSmoothing)),
+            "topMass"   = as.numeric(tclvalue(valPDtopMass)),
+            "excludeMass" = tclvalue(valPDexcludeMass)
           ),
           "Library" = tclvalue(valLibData),
           "Library_Data" = "",
@@ -372,7 +407,6 @@ TargetSearchGUI <- function() {
           tkconfigure(butLibEdit, "-state", "normal")
           tkconfigure(butLibSave, "-state", "normal")
         } 
-        print(str(TSPar))
         fncPutParameters(TSPar)
       }
       fncMainRun <- function() {
@@ -398,23 +432,29 @@ TargetSearchGUI <- function() {
           CDF_FILE <- basename( fncSplitTclStrg(tclvalue(valFiles)) )
           RI_FILE <- gsub("cdf", "txt", paste("RI_", CDF_FILE, sep=""))
         }
-        MEASUREMENT_DAY <- substring(CDF_FILE,1,4)
+        MEASUREMENT_DAY <- sub('^([0-9]+).*$','\\1', CDF_FILE)
         UpdateTextGUI(NA, "Import Samples")
         samples   <- new("tsSample", CDFfiles = CDF_FILE, RIfiles = RI_FILE, days = MEASUREMENT_DAY, CDFpath = CDFdir, RIpath = RIdir)
         if (all(get("TSPar", envir=envirGUI)$Library_Data == "")) {
-          Lib <- ImportLibrary(libfile = tclvalue(valLibData), 
+          Lib <- ImportLibrary(libfile = tclvalue(valLibData),
                                RI_dev = as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))))
         } else {
           Lib <- get("TSPar", envir=envirGUI)$Library_Data
+##          print(tclvalue(valPDtopMass))
+##          print(tclvalue(valPDexcludeMass))
+          selMass <- sapply(as.character(Lib[,"SEL_MASS"]), function(x) as.numeric(unlist(strsplit(x, ";"))), simplify=FALSE)
+          spectra <- if(is.null(Lib$SPECTRUM)) list() else TargetSearch:::Spectra(Lib$SPECTRUM)
+          # insert the options from the GUI
+          tM  <- as.numeric(tclvalue(valPDtopMass))
+          eM  <- fcnMzRangeToVector(tclvalue(valPDtopMass))
+          topMass <- if(length(spectra)==0) selMass else mapply(union, selMass, lapply(spectra, TargetSearch:::Top.Masses, tM, eM), SIMPLIFY=FALSE)
           Lib <- new("tsLib", Name = Lib[,"Name"],
                               RI = as.numeric(Lib[,"RI"]),
                               medRI = as.numeric(Lib[,"RI"]),
                               RIdev = matrix(rep(as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
                                       each=nrow(Lib)), ncol=3, dimnames=list(NULL, c("w1", "w2", "w3"))),
-                              selMass = sapply(as.character(Lib[,"SEL_MASS"]), function(x) as.numeric(unlist(strsplit(x, ";"))), simplify=FALSE),
-                              topMass = sapply(as.character(Lib[,"SEL_MASS"]), function(x) as.numeric(unlist(strsplit(x, ";"))), simplify=FALSE),
-                              libData = data.frame(Met = Lib[,"Name"],
-                                                   RI = as.numeric(Lib[,"RI"])))
+                              selMass = selMass, topMass = topMass, spectra = spectra,
+                              libData = data.frame(Met = Lib[,"Name"], RI = as.numeric(Lib[,"RI"])))
         }
       # RI correction can be ommited in case that RI_..txt Files are already existent
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {
@@ -432,7 +472,8 @@ TargetSearchGUI <- function() {
                                 Window = as.numeric(tclvalue(valPDSmoothing)), 
                                 IntThreshold = as.numeric(tclvalue(valPDthr)),
                                 baseline = as.logical(as.numeric(tclvalue(valCBBaseline))),
-                                baseline.opts = list(threshold = as.numeric(tclvalue(valBaseline))))
+                                baseline.opts = list(threshold = as.numeric(tclvalue(valBaseline))),
+                                showProgressBar = TRUE)
           outliers <- FAMEoutliers(samples, RImatrix)
         }
       # search for median RI and updates
@@ -453,7 +494,7 @@ TargetSearchGUI <- function() {
                                        timeSplit = as.numeric(tclvalue(valProfTS)), 
                                        r_thres = as.numeric(tclvalue(valProfthr)))
       # save your results in tabbed text format files
-        Write.Results(Lib, peakData, finalProfile)
+        Write.Results(Lib, finalProfile)
         #save(finalProfile, file="finalProfile.RData")
         UpdateTextGUI()
         cat(paste("\nTargetSearch ", ts.version, " finished processing your data...\nOutput was stored to ", tclvalue(valWD),"\n\n", sep=""))

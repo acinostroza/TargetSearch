@@ -7,6 +7,7 @@ setClass("tsLib", representation(
 	RIdev   = "matrix",
 	selMass = "list",
 	topMass = "list",
+	quantMass = "numeric",
 	libData = "data.frame",
 	spectra = "list"
 ))
@@ -28,13 +29,15 @@ setClass("tsSample", representation(
 )
 
 setClass("tsMSdata", representation(
-	RI        = "matrix",
-	RT        = "matrix",
-	Intensity = "matrix"
+	RI        = "list",
+	RT        = "list",
+	Intensity = "list"
 ))
 
 setClass("tsProfile", representation(
- 	"tsMSdata",
- 	info = "data.frame"
+	"tsMSdata",
+	info    = "data.frame",
+	profInt = "matrix",
+	profRI  = "matrix",
+	profRT  = "matrix"
 ))
-

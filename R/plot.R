@@ -2,22 +2,21 @@
 # function to make a boxplot of the RI deviations of a given metabolite.
 
 plotRIdev <- function(Lib, peaks, libId = 1) {
-	tmp <- t(retIndex(peaks))
+
 	n <- length(libId)
 	j <- ceiling(sqrt(n))
 	i <- ceiling(n/j)
 	par(mfrow = c(i,j), mar = c(3,3,3,2), mgp = c(1.5,0.75,0))
 	for(id in libId) {
-	   	cls <- which(colnames(tmp) == id)
-		if(length(cls) == 0)
+		if(is.null(retIndex(peaks)[[id]]))
 		    stop(sprintf("Error: libId=%d not found", id))
 
-		x <- tmp[, cls]
+		x <- t(retIndex(peaks)[[id]])
 		lib.name <- libName(Lib)[id]
 	    mz <- selMass(Lib)[[id]]
-    	if(length(cls) != length(mz))
+    	if(any(mz != colnames(x)))
         	mz <- topMass(Lib)[[id]]
-	    if(length(cls) != length(mz))
+	    if(any(mz != colnames(x)))
     	    stop("LibraryID Error: Library object and tsMSdata object don't match.")
 
 		if(all(is.na(x))) {
@@ -87,9 +86,8 @@ plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
 	if(is.na(ptype))
 		stop("Unknown type parameter ", type)
 
-	id <- libId
-	tmp <- t(Intensity(peaks))
-	x <- tmp[, colnames(tmp) == id]
+    id <- libId
+	x <- t(Intensity(peaks)[[id]])
 
 	if(all(is.na(x))) {
 		plot.NA(main = libName(Lib)[id], xlab = "mz", ylab = "Intensity")

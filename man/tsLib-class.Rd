@@ -26,6 +26,10 @@
 \alias{RIdev}
 \alias{RIdev<-,tsLib-method}
 \alias{RIdev<-}
+\alias{quantMass,tsLib-method}
+\alias{quantMass}
+\alias{quantMass<-,tsLib-method}
+\alias{quantMass<-}
 \alias{selMass,tsLib-method}
 \alias{selMass}
 \alias{selMass<-,tsLib-method}
@@ -53,6 +57,7 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{RIdev}:}{\code{"matrix"}, the RI deviation windows, k = 1,2,3. A three column matrix}
     \item{\code{selMass}:}{\code{"list"}, every component is a numeric vector containing the selective masses. }
     \item{\code{topMass}:}{\code{"list"}, every component is a numeric vector containing the top masses. }
+    \item{\code{quantMass}:}{\code{"numeric"}, the mass used for quantification.}
     \item{\code{libData}:}{\code{"data.frame"}, additional library information. }
     \item{\code{spectra}:}{\code{"list"}, the metabolite spectra. Each component is a two column matrix: m/z and intensity. }
   }
@@ -70,6 +75,8 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{refLib}}{\code{signature(obj = "tsLib")}: Low level method to create a matrix representation of the library.}
     \item{\code{RIdev}}{\code{signature(obj = "tsLib")}: gets the RI deviations. }
     \item{\code{RIdev<-}}{\code{signature(obj = "tsLib")}: sets the RI deviations. }
+    \item{\code{quantMass}}{\code{signature(obj = "tsLib")}: gets the quantification mass. }
+    \item{\code{quantMass<-}}{\code{signature(obj = "tsLib")}: sets the quantification mass. }
     \item{\code{selMass}}{\code{signature(obj = "tsLib")}: gets the selective masses. }
     \item{\code{show}}{\code{signature(object = "tsLib")}: show method. }
     \item{\code{spectra}}{\code{signature(obj = "tsLib")}: gets the spectra. }

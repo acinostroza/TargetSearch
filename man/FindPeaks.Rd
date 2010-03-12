@@ -11,14 +11,20 @@ FindPeaks(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
 }
 \arguments{
   \item{my.files}{ A character vector naming files to be searched. }
-  \item{refLib}{ A numeric matrix with three columns. The second column contains
-    the masses and the first and third column contains the RI limits. }
+  \item{refLib}{ A numeric matrix with three columns or a list of three column
+  matrices. The second column contains the masses and the first and third column
+  contains the RI limits.}
   \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM} and
     \code{RETENTION_TIME_INDEX} or a character vector with the header names of those
     columns. }
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
 }
-
+\details{
+    The reference library parameter \code{refLib} can be either a single
+    three-column matrix or a list of such matrices. If it is a list, the length
+    must match the length of \code{my.files}. In this case, every component will
+    be used to iteratively search in the corresponding file.
+}
 \value{
     A \code{tsMSdata} object.
 }

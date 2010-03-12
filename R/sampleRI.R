@@ -26,7 +26,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 						medianNorm = medianNorm(samples, resInt),
 						none = resInt)
 
-	res_log <- log2(res)
+	res_log <- lapply(res,log2)
 
 	met_cor <- list()
 	options(warn = -1)
@@ -49,10 +49,10 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
        	next
       }
 
-      tmp <- cor(t(res_log[x,]), use="pair")
+      tmp <- cor(t(res_log[[i]]), use="pair")
       # this counts the number of pair values that were used to calculate the correlation
       # coefficient of every member of "tmp" and set to 0 the pairs with less than minPairObs
-      tmp[is.finite(res_log[x,]) %*% is.finite(t(res_log[x,])) < minPairObs] <- 0
+      tmp[is.finite(res_log[[i]]) %*% is.finite(t(res_log[[i]])) < minPairObs] <- 0
 
       tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
       tmp.sel <- tmp[tmp.max,]
@@ -63,6 +63,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 	options(warn = 0)
 	cor_RI <- matrix(ncol=length(my.files),nrow=length(Lib))
   colnames(cor_RI) <- Names
+  rownames(cor_RI) <- rownames(libData(Lib))
   
 	apply2 <- function(X, MARGIN, FUN, ...) {
 		if(is.null(dim(X)))
@@ -77,8 +78,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 	   setProgressBar(pb, value=i/length(Lib),
 				title=sprintf("Getting RIs (%d %%)",round(100*i/length(Lib))),
 						label=sprintf("Metabolite %d",i))
-        x <- which(libId == i)
-        cor_RI[i,] <- apply2(resRI[x[met_cor[[i]]],], 2, median, na.rm=T)
+       cor_RI[i,] <- apply2(resRI[[i]][met_cor[[i]],], 2, median, na.rm=T)
   }
   if(showProgressBar)  
 		close(pb)

@@ -51,8 +51,11 @@
 	\item \code{Library}: A Library (to detect metabolites) usable by \emph{TargetSearch} contains
     at least information about the metabolite 'Name', its expected 'RI' and the
     selective masses in its spectrum 'SEL_MASS'. You may \emph{Load} or \emph{Create} one
-    yourself using the respective buttons. A more detailed description of
-    the file formats can be found in \code{\link{ImportLibrary}}.
+    yourself using the respective buttons.
+    The parameter \emph{no. of top masses} is the number of most intensive masses
+    that will be taken from the spectrum, and \emph{excluded masses} is a list of
+    masses that will be excluded.
+    A more detailed description of the file formats can be found in \code{\link{ImportLibrary}}.
 
 	\item \code{Normalization}: This selects how the data will be normalized during
     the metabolite search. Options are \code{"dayNorm"}, a day based median

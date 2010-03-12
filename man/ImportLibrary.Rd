@@ -47,7 +47,8 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
         steps. A RI window required for each one of them.
     \item \code{SPECTRUM} - The metabolite spectrum. m/z and intensity are separated by
         spaces and colons.
-
+    \item \code{QUANT_MASS} - A list of masses that might be used for quantification.
+    One value per metabolite and it must be one of the selective masses. (optional)
     }
 
     The columns \code{Name} and \code{RI} are mandatory. At least one of columns \code{SEL_MASSES},

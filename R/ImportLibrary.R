@@ -92,9 +92,10 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 	if(is.null(M$Win_1)) w1 <- rep(RI_dev[1], length(M$RI)) else w1 <- M$Win_1
 	if(is.null(M$Win_2)) w2 <- rep(RI_dev[2], length(M$RI)) else w2 <- M$Win_2
 	if(is.null(M$Win_3)) w3 <- rep(RI_dev[3], length(M$RI)) else w3 <- M$Win_3
-
+	qM <- if(is.null(M$QUANT_MASS)) numeric(nrow(M)) else as.numeric(M$QUANT_MASS)
+	
 	new("tsLib", Name = M$Name, RI = M$RI, medRI = M$RI, RIdev = cbind(w1,w2,w3),
-		selMass = selMass, topMass = topMass, spectra = spectra, libData = M)
+		selMass = selMass, topMass = topMass, quantMass=qM, spectra = spectra, libData = M)
 	
 }
 

@@ -1,59 +1,57 @@
 Profile <- 
 function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
-	my.files <- RIfiles(samples)
-	my.names <- sampleNames(samples)
+    my.files <- RIfiles(samples)
+    my.names <- sampleNames(samples)
 
-  resInt <- Intensity(peakData)
-  resRI  <- retIndex(peakData)
-  libId  <- libId(Lib, sel = FALSE)
+    resInt <- Intensity(peakData)
+    resRI  <- retIndex(peakData)
+    libId  <- libId(Lib, sel = FALSE)
   
-  # extract addictonal information
-  addiData  <- libData(Lib)
-  addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
+    # extract addictonal information
+    addiData  <- libData(Lib)
+    addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
 
-  searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
-  rownames(searchData) <- 1:length(Lib)
-  colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_count", "Masses",
-		"RI", "Score_all_masses", "Score_cor_masses")
-		
-  medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
-  colnames(medInt) <- my.names
-  rownames(medInt) <- 1:length(Lib)
-  medRI <- medInt
-  
-  res <- switch(method, 
-						dayNorm = dayNorm(samples, resInt),
-						medianNorm = medianNorm(samples, resInt),
-						none = resInt)
-  res_log <- log2(res)
-  
-  options(warn=(-1))
-  for(i in 1:length(Lib)){
+    searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
+    rownames(searchData) <- 1:length(Lib)
+    colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_count", "Masses",
+        "RI", "Score_all_masses", "Score_cor_masses")
 
-    x     <- which(libId == i)
-    x.sel <- x[1:length(selMass(Lib)[[i]])]
-    
- 	  score_all <- NA
- 	  score_cor <- NA
+    medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
+    colnames(medInt) <- my.names
+    rownames(medInt) <- 1:length(Lib)
+    medRI <- medInt
 
-    # don't perform calculation with 1 mass
-    if (length(x) > 1) {
+    res <- switch(method,
+                dayNorm = dayNorm(samples, resInt),
+                medianNorm = medianNorm(samples, resInt),
+                none = resInt)
+    res_log <- lapply(res,log2)
+
+    options(warn=(-1))
+    for(i in 1:length(Lib)){
+
+        x <- as.character(selMass(Lib)[[i]])
+
+ 	    score_all <- NA
+ 	    score_cor <- NA
+
+        # don't perform calculation with 1 mass
+        if (length(x) > 1) {
  
-	    M <- res_log[x.sel,]
-  	  tmp <- cor(t(M), use="pair")
-    	# this counts the number of pair values that were used to calculate the correlation
-	    # coefficient of every member of "tmp" and sets to 0 the cor.coef. with less than minPairObs 
+            M <- res_log[[i]][x,]
+  	        tmp <- cor(t(M), use="pair")
+    	    # this counts the number of pair values that were used to calculate the correlation
+	        # coefficient of every member of "tmp" and sets to 0 the cor.coef. with less than minPairObs
 			tmp[is.finite(M) %*% is.finite(t(M)) <= minPairObs] <- 0
     
-    	tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
+            tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
     
-	    M <- res_log[x,]
-  	  tmp <- cor(t(M), use="pair")
+	        M <- res_log[[i]]
+  	        tmp <- cor(t(M), use="pair")
  			tmp[is.finite(M) %*% is.finite(t(M)) < minPairObs] <- 0
     
-	    tmp.sel <- tmp[tmp.max,]
-    
-  	  y <- which(tmp.sel > r_thres)
+	        tmp.sel <- tmp[tmp.max,]
+            y <- which(tmp.sel > r_thres)
   	  
  	  } else { # only 1 mass (no correlation)
 			y <- 1 	  
@@ -61,7 +59,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
 		# calculates scores 	  
  	  if(length(spectra(Lib)) > 0 & length(x) >= 3) {
- 	  	M <- apply(resInt[x, ], 1, median, na.rm = T)
+ 	  	M <- apply(resInt[[i]], 1, median, na.rm = T)
  	  	M[is.na(M)] <- 0
  	  	score_all   <- Score(cbind(topMass(Lib)[[i]], M), spectra(Lib)[[i]])
  	  	if(length(y) >= 3) {
@@ -72,18 +70,18 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
  	  
     searchData$Mass_count[i]                 <- length(y)
     searchData$Non_consecutive_Mass_count[i] <- length(y) - sum(diff(sort(topMass(Lib)[[i]][y])) == 1)
-		searchData$Sample_count[i]               <- sum(is.finite(res[x[y],]))
+		searchData$Sample_count[i]               <- sum(is.finite(res[[i]][y,]))
     searchData$Masses[i] <- paste(topMass(Lib)[[i]][y], collapse=";")
-    searchData$RI[i]     <- median(resRI[x[y],], na.rm=T)
+    searchData$RI[i]     <- median(resRI[[i]][y,], na.rm=T)
     searchData$Score_all_masses[i] <- score_all
     searchData$Score_cor_masses[i] <- score_cor
     
 		if(length(y) == 1) {
-        medInt[i,] <- res[x[y],]
-        medRI[i,] <- resRI[x[y],]
+        medInt[i,] <- res[[i]][y,]
+        medRI[i,] <- resRI[[i]][y,]
     } else {
-        medInt[i,] <- apply(res[x[y],],2,median, na.rm=T)
-        medRI[i,] <- apply(resRI[x[y],],2,median, na.rm=T)
+        medInt[i,] <- apply(res[[i]][y,],2,median, na.rm=T)
+        medRI[i,] <- apply(resRI[[i]][y,],2,median, na.rm=T)
     }
   }
 
@@ -95,11 +93,11 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
             addiTemp <- addiData[,addiNames]
         }
         searchData <- cbind(searchData, addiTemp)
-    } 
+    }
 
   options(warn=0)
-	tmp <- new("tsMSdata", RI = medRI, Intensity = medInt)  
-  return(new("tsProfile", tmp, info = cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData)))
+  return(new("tsProfile", peakData, info = cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData),
+    profInt=medInt, profRI=medRI))
 }
 
 # calculate scores. Inputs: two matrices with two columns. First and second

@@ -49,6 +49,13 @@ setGeneric("topMass<-", function(obj, value) standardGeneric("topMass<-"))
 setReplaceMethod("topMass", "tsLib", function(obj, value) { obj@topMass <- value
  obj })
 
+setGeneric("quantMass", function(obj) standardGeneric("quantMass"))
+setMethod("quantMass", "tsLib", function(obj) obj@quantMass)
+setGeneric("quantMass<-", function(obj, value) standardGeneric("quantMass<-"))
+setReplaceMethod("quantMass", "tsLib", function(obj, value) { obj@quantMass <- as.numeric(value)
+ obj })
+
+
 setGeneric("spectra", function(obj) standardGeneric("spectra"))
 setMethod("spectra", "tsLib", function(obj) obj@spectra)
 setGeneric("spectra<-", function(obj, value) standardGeneric("spectra<-"))
@@ -128,25 +135,37 @@ setMethod("initialize",
           function(.Object, Name    = character(0), RI      = numeric(0),
                             medRI   = numeric(0),   RIdev   = matrix(0,0,3),
                             selMass = list(),       topMass = list(),
+                            quantMass = numeric(0),
                             spectra = list(),       libData = data.frame()) {
             if (length(Name) > 0) {
                 if(length(medRI) == 0)
                     medRI   <- RI
                 if(length(topMass) == 0)
                     topMass <- selMass
+                if(length(quantMass) == 0)
+                    quantMass <- numeric(length(Name))
                 if(all(dim(libData) == 0))
                     libData <- data.frame(Name = Name, RI = RI)
                 if(is.matrix(RIdev) == FALSE & length(RIdev) == 3)
                     RIdev   <- matrix(rep(RIdev, length(Name)), length(Name), 3, byrow = T)
             }
-                    
+            ids <- as.character(1:length(Name))
             .Object@Name     <- Name
             .Object@RI       <- RI
             .Object@medRI    <- medRI
             .Object@RIdev    <- RIdev
             .Object@selMass  <- selMass
             .Object@topMass  <- topMass
+            .Object@quantMass <- quantMass
             .Object@spectra  <- spectra
             .Object@libData  <- libData
+            names(.Object@Name)     <- ids
+            names(.Object@RI)       <- ids
+            names(.Object@medRI)    <- ids
+            rownames(.Object@RIdev) <- ids
+            names(.Object@selMass)  <- ids
+            names(.Object@topMass)  <- ids
+            if(length(.Object@spectra) > 0) names(.Object@spectra)  <- ids
+            if(length(.Object@quantMass) > 0) names(.Object@quantMass)  <- ids
             .Object
           })

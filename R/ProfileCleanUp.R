@@ -6,19 +6,26 @@ function(Profile, timeSplit=500, r_thres=0.95){
 
   o <- order(profileInfo(Profile)$RI)
   searchData2 <- profileInfo(Profile)[o,]
-  medInt2 <-  Intensity(Profile)[o,]
-  medRI2 <-  retIndex(Profile)[o,]
+  medInt2     <- profileInt(Profile)[o,]
+  medRI2      <- profileRI(Profile)[o,]
+  intensity   <- Intensity(Profile)[o]
+  RI          <- retIndex(Profile)[o]
  
   if(sum(is.na(searchData2$RI) == FALSE) > 1) {
-    medInt2 <-  medInt2[is.na(searchData2$RI) == F,]
-    medRI2 <-  medRI2[is.na(searchData2$RI) == F,]
-    searchData2 <- searchData2[is.na(searchData2$RI) == F,]
+    medInt2 <-  medInt2[is.na(searchData2$RI) == FALSE,]
+    medRI2  <-  medRI2[is.na(searchData2$RI) == FALSE,]
+    intensity   <- intensity[is.na(searchData2$RI) == FALSE]
+    RI          <- RI[is.na(searchData2$RI) == FALSE]
+    searchData2 <- searchData2[is.na(searchData2$RI) == FALSE,]
+
   } else if(sum(is.na(searchData2$RI) == FALSE) == 1) {
-    medInt2 <- t( medInt2[is.na(searchData2$RI) == F,] )
-    medRI2 <-  t( medRI2[is.na(searchData2$RI) == F,] )
-    searchData2 <- searchData2[is.na(searchData2$RI) == F,]
+    medInt2 <- t( medInt2[is.na(searchData2$RI) == FALSE,] )
+    medRI2 <-  t( medRI2[is.na(searchData2$RI) == FALSE,] )
+    intensity   <- intensity[is.na(searchData2$RI) == FALSE]
+    RI          <- RI[is.na(searchData2$RI) == FALSE]
+    searchData2 <- searchData2[is.na(searchData2$RI) == FALSE,]
     searchData2$final_sample_count <- sum(is.finite(medInt2))
-    return(new("tsProfile", info = searchData2, Intensity = medInt2, RI = medRI2))    
+    return(new("tsProfile", RI=RI, Intensity=intensity, info = searchData2, profInt = medInt2, profRI = medRI2))
   } else {
     return(Profile)
   }
@@ -30,6 +37,7 @@ function(Profile, timeSplit=500, r_thres=0.95){
   if(foo < ncol(searchData2)) {
     addiInfo <- colnames(searchData2)[(foo+1):ncol(searchData2)]
   }
+
   # as long as only consider MSTs with >=3 then quite robust against changing timeSplit
   # timeSplit <- 500
   
@@ -62,6 +70,8 @@ function(Profile, timeSplit=500, r_thres=0.95){
   corData <- corData2[o,]
   medInt2 <- medInt2[o,]
   medRI2 <- medRI2[o,]
+  RI     <- RI[o]
+  intensity <- intensity[o]
   d <- duplicated(cbind(tmGroups,corGroups))
   MET_info <- cbind(searchData2[d == F,],corData[d == F,])
   MET <- medInt2[d == F,]
@@ -69,7 +79,9 @@ function(Profile, timeSplit=500, r_thres=0.95){
   MET_info$final_sample_count <- apply(MET, 1, function(x) sum(is.finite(x)))
   rownames(MET) <- MET_info$Name
 	rownames(MET_RI) <- MET_info$Name
-  return(new("tsProfile", info = MET_info, Intensity = MET, RI = MET_RI))
+  RI <- RI[d == FALSE]
+  intensity <- intensity[d == FALSE]
+  return(new("tsProfile", RI=RI, Intensity=intensity, info = MET_info, profInt = MET, profRI = MET_RI))
 }
 
 timeGroups <- function(x, d) {
