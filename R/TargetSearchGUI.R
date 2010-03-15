@@ -50,6 +50,26 @@ TargetSearchGUI <- function() {
                         multiple = TRUE))
         tclvalue(valFileNum) <- length(fncSplitTclStrg(tclvalue(valFiles)))
         tkconfigure(labData, "-text", paste("File Import (", tclvalue(valFileNum), " Files)", sep=""))
+        
+        if(as.character(tclvalue(rbValue))=="Apex Data") {
+            tkconfigure(ebxBaseline, "-state", "disabled")
+            tkconfigure(cbxBaseline, "-state", "disabled")
+            tkconfigure(ebxPDthr, "-state", "disabled")
+            tkconfigure(ebxPDmin, "-state", "disabled")
+            tkconfigure(ebxPDmax, "-state", "disabled")
+            tkconfigure(ebxPDSmoothing, "-state", "disabled")
+            tkconfigure(butRILoad, "-state", "disabled")
+            tkconfigure(butRICreate, "-state", "disabled")
+        } else {
+            tkconfigure(ebxBaseline, "-state", "normal")
+            tkconfigure(cbxBaseline, "-state", "normal")
+            tkconfigure(ebxPDthr, "-state", "normal")
+            tkconfigure(ebxPDmin, "-state", "normal")
+            tkconfigure(ebxPDmax, "-state", "normal")
+            tkconfigure(ebxPDSmoothing, "-state", "normal")
+            tkconfigure(butRILoad, "-state", "normal")
+            tkconfigure(butRICreate, "-state", "normal")
+        }
         invisible()
       }
       rbtCDF <- tkradiobutton(parent=f2z2, variable=rbValue, command=fncGetFiles, value="NetCDF Data")
@@ -104,16 +124,16 @@ TargetSearchGUI <- function() {
   f3 <- tkframe(TS_GUI, borderwidth=2, relief="groove")
     # set number of parameter lines and main label
       #for (i in 1:11) { eval(substitute(x <- tkframe(f3, borderwidth=2), list(x=paste("f3z", i, sep="")))) }
-      f3z1 <- tkframe(f3, borderwidth=2)
-      f3z2 <- tkframe(f3, borderwidth=2)
-      f3z3 <- tkframe(f3, borderwidth=2)
-      f3z4 <- tkframe(f3, borderwidth=2)
-      f3z5 <- tkframe(f3, borderwidth=2)
-      f3z6 <- tkframe(f3, borderwidth=2)
-      f3z7 <- tkframe(f3, borderwidth=2)
-      f3z7b <- tkframe(f3, borderwidth=2) # frame for top masses
-      f3z7c <- tkframe(f3, borderwidth=2) # frame for excluded masses
-      f3z8 <- tkframe(f3, borderwidth=2)
+
+      f3zBL <- tkframe(f3, borderwidth=2)  # Baseline
+      f3zRI <- tkframe(f3, borderwidth=2)  # RI correction
+      f3zPD1 <- tkframe(f3, borderwidth=2) # Peak Detection
+      f3zPD2 <- tkframe(f3, borderwidth=2)
+      f3zPD3 <- tkframe(f3, borderwidth=2)
+      f3zLib <- tkframe(f3, borderwidth=2) # Library
+      f3zLib2 <- tkframe(f3, borderwidth=2)
+      f3zLib3 <- tkframe(f3, borderwidth=2)
+      f3zLib4 <- tkframe(f3, borderwidth=2)
       f3z9 <- tkframe(f3, borderwidth=2)
       f3z10 <- tkframe(f3, borderwidth=2)
       f3z11 <- tkframe(f3, borderwidth=2)
@@ -129,11 +149,12 @@ TargetSearchGUI <- function() {
         invisible()
       }
       valCBBaseline <- tclVar(0)
-      cbxBaseline <- tkcheckbutton(parent=f3z2, command=fncCBBaseline, variable=valCBBaseline)
-      labBaselineOnOff <- tklabel(parent=f3z2, text="on/off")
+      cbxBaseline <- tkcheckbutton(parent=f3zBL, command=fncCBBaseline, variable=valCBBaseline)
+      labBaselineOnOff <- tklabel(parent=f3zBL, text="on/off")
       valBaseline <- tclVar(0.5)
-      ebxBaseline <- tkentry(parent=f3z2, width=4, textvariable=valBaseline)
-      labBaselineEBX <- tklabel(parent=f3z2, text="threshold (0..1)")
+      ebxBaseline <- tkentry(parent=f3zBL, width=4, textvariable=valBaseline)
+      tkconfigure(ebxBaseline, "-state", "disabled")
+      labBaselineEBX <- tklabel(parent=f3zBL, text="threshold (0..1)")
     # Retention Index
       labRI <- tklabel(parent=f3, text="    Retention Index Corr.")
       valRIData <- tclVar("")
@@ -176,55 +197,27 @@ TargetSearchGUI <- function() {
           write.table(TSPar$RI_SearchFrames, file=tclvalue(valRIData), sep="\t", col.names=TRUE, row.names=TRUE, quote = FALSE)
         }
       }
-      butRILoad <- tkbutton(parent=f3z3, text="Load", command=fncRILoad, width=7)
-      butRICreate <- tkbutton(parent=f3z3, text="Create", command=fncRICreate, width=7)
-      butRIEdit <- tkbutton(parent=f3z3, text="Edit/View", command=fncRIEdit, width=7)
-      butRISave <- tkbutton(parent=f3z3, text="Save", command=fncRISave, width=7)
+      butRILoad <- tkbutton(parent=f3zRI, text="Load", command=fncRILoad, width=7)
+      butRICreate <- tkbutton(parent=f3zRI, text="Create", command=fncRICreate, width=7)
+      butRIEdit <- tkbutton(parent=f3zRI, text="Edit/View", command=fncRIEdit, width=7)
+      butRISave <- tkbutton(parent=f3zRI, text="Save", command=fncRISave, width=7)
     # Peak Detection
       labPD <- tklabel(parent=f3, text="    Peak Detection")
-      valPDW1 <- tclVar(2000); valPDW2 <- tclVar(1000); valPDW3 <- tclVar(500)
-      ebxPDW1 <- tkentry(parent=f3z4, width=4, textvariable=valPDW1)
-      ebxPDW2 <- tkentry(parent=f3z4, width=4, textvariable=valPDW2)
-      ebxPDW3 <- tkentry(parent=f3z4, width=4, textvariable=valPDW3)
-      labPDW <- tklabel(parent=f3z4, text="Search Windows")
-      labPDz5 <- tklabel(parent=f3, text="")
       valPDthr <- tclVar(10)
-      ebxPDthr <- tkentry(parent=f3z5, width=4, textvariable=valPDthr)
-      labPDthr <- tklabel(parent=f3z5, text="threshold [Intensity Counts]")
-      labPDz6 <- tklabel(parent=f3, text="")
+      ebxPDthr <- tkentry(parent=f3zPD1, width=4, textvariable=valPDthr)
+      labPDthr <- tklabel(parent=f3zPD1, text="threshold [Intensity Counts]")
+      labPD2 <- tklabel(parent=f3, text="")
       valPDmin <- tclVar(85); valPDmax <- tclVar(500)
-      ebxPDmin <- tkentry(parent=f3z6, width=4, textvariable=valPDmin)
-      ebxPDmax <- tkentry(parent=f3z6, width=4, textvariable=valPDmax)
-      labPDmass <- tklabel(parent=f3z6, text="mass range (min/max))")
-      labPDz7 <- tklabel(parent=f3, text="")
+      ebxPDmin <- tkentry(parent=f3zPD2, width=4, textvariable=valPDmin)
+      ebxPDmax <- tkentry(parent=f3zPD2, width=4, textvariable=valPDmax)
+      labPDmass <- tklabel(parent=f3zPD2, text="mass range (min/max))")
+      labPD3 <- tklabel(parent=f3, text="")
       valPDSmoothing <- tclVar(7)
-      ebxPDSmoothing <- tkentry(parent=f3z7, width=4, textvariable=valPDSmoothing)
-      labPDSmoothing <- tklabel(parent=f3z7, text="smoothing (Data Points)")
-      
-    # top Massses section and exclude Masses
-      labPDz7b <- tklabel(parent=f3, text="")
-      valPDtopMass <- tclVar(10)
-      ebxPDtopMass <- tkentry(parent=f3z7b, width=4, textvariable=valPDtopMass)
-      labPDtopMass <- tklabel(parent=f3z7b, text="# of top masses")
-      labPDz7c <- tklabel(parent=f3, text="")
-      valPDexcludeMass <- tclVar("147:149")
-      ebxPDexcludeMass <- tkentry(parent=f3z7c, width=20, textvariable=valPDexcludeMass)
-      labPDexcludeMass <- tklabel(parent=f3z7c, text="excluded masses")
-    
-    # A function to read a masses range to an R-vector
-    # Example:  fcnMzRangeToVector("126,147:149,160") = 126, 147, 148, 149, 160.
-      fcnMzRangeToVector <- function(x) {
-        x <- gsub(" ", "",x[1]) # remove spaces
-        if(grepl("^(\\d+[,:]?)+$", x, perl=TRUE)) {
-            x <- sub("[,:]$","",x)
-            x <- strsplit(unlist(strsplit(x, ",")), ":")
-            x <- lapply(x, as.numeric)
-            unlist(lapply(x, function(z) if(length(z)==1) z else seq(z[1],z[2])))
-        } else {
-            return(NULL)
-        }
-      }
+      ebxPDSmoothing <- tkentry(parent=f3zPD3, width=4, textvariable=valPDSmoothing)
+      labPDSmoothing <- tklabel(parent=f3zPD3, text="smoothing (Data Points)")
 
+    # End of peak detection
+    
     # Library
       labLib <- tklabel(parent=f3, text="    Library")
       valLibData <- tclVar("")
@@ -267,10 +260,30 @@ TargetSearchGUI <- function() {
           write.table(TSPar$Library_Data, file=tclvalue(valLibData), sep="\t", col.names=TRUE, row.names=TRUE, quote = FALSE)
         }
       }
-      butLibLoad <- tkbutton(parent=f3z8, text="Load", command=fncLibLoad, width=7)
-      butLibCreate <- tkbutton(parent=f3z8, text="Create", command=fncLibCreate, width=7)
-      butLibEdit <- tkbutton(parent=f3z8, text="Edit/View", command=fncLibEdit, width=7)
-      butLibSave <- tkbutton(parent=f3z8, text="Save", command=fncLibSave, width=7)
+      butLibLoad <- tkbutton(parent=f3zLib, text="Load", command=fncLibLoad, width=7)
+      butLibCreate <- tkbutton(parent=f3zLib, text="Create", command=fncLibCreate, width=7)
+      butLibEdit <- tkbutton(parent=f3zLib, text="Edit/View", command=fncLibEdit, width=7)
+      butLibSave <- tkbutton(parent=f3zLib, text="Save", command=fncLibSave, width=7)
+      
+    # Library Search Options
+      labLib2 <- tklabel(parent=f3, text="")
+      valPDW1 <- tclVar(2000); valPDW2 <- tclVar(1000); valPDW3 <- tclVar(500)
+      ebxPDW1 <- tkentry(parent=f3zLib2, width=4, textvariable=valPDW1)
+      ebxPDW2 <- tkentry(parent=f3zLib2, width=4, textvariable=valPDW2)
+      ebxPDW3 <- tkentry(parent=f3zLib2, width=4, textvariable=valPDW3)
+      labPDW <- tklabel(parent=f3zLib2, text="Search Windows")
+
+    # top Massses section and exclude Masses
+      labLib3 <- tklabel(parent=f3, text="")
+      valPDtopMass <- tclVar(10)
+      ebxPDtopMass <- tkentry(parent=f3zLib3, width=4, textvariable=valPDtopMass)
+      labPDtopMass <- tklabel(parent=f3zLib3, text="# of top masses")
+      labLib4 <- tklabel(parent=f3, text="")
+      valPDexcludeMass <- tclVar("147:149")
+      ebxPDexcludeMass <- tkentry(parent=f3zLib4, width=20, textvariable=valPDexcludeMass)
+      labPDexcludeMass <- tklabel(parent=f3zLib4, text="excluded masses")
+
+
     # Normalization
       labNorm <- tklabel(parent=f3, text="    Normalization")
       rbNorm <- tclVar("dayNorm")
@@ -305,15 +318,16 @@ TargetSearchGUI <- function() {
       tkpack(ebxProfTS, labProfTS, ebxProfthr, labProfthr, side="left", padx=1, anchor="w") 
       tkpack(ebxProfSNr, labProfSNr, side="left", padx=1, anchor="w")
       tkgrid(labPar, sticky="w")
-      tkgrid(labBaseline, f3z2, sticky="w")
-      tkgrid(labRI, f3z3, sticky="w")
-      tkgrid(labPD, f3z4, sticky="w")
-      tkgrid(labPDz5, f3z5, sticky="w")
-      tkgrid(labPDz6, f3z6, sticky="w")
-      tkgrid(labPDz7, f3z7, sticky="w")
-      tkgrid(labPDz7b, f3z7b, sticky="w")
-      tkgrid(labPDz7c, f3z7c, sticky="w")            
-      tkgrid(labLib, f3z8, sticky="w")
+      tkgrid(labBaseline, f3zBL, sticky="w")
+      tkgrid(labPD, f3zPD1, sticky="w")
+      tkgrid(labPD2, f3zPD2, sticky="w")
+      tkgrid(labPD3, f3zPD3, sticky="w")
+      tkgrid(labRI, f3zRI, sticky="w")
+      tkgrid(labLib, f3zLib, sticky="w")
+      tkgrid(labLib2, f3zLib2, sticky="w")
+      tkgrid(labLib3, f3zLib3, sticky="w")
+      tkgrid(labLib4, f3zLib4, sticky="w")
+
       tkgrid(labNorm, f3z9, sticky="w")
       tkgrid(labProf, f3z10, sticky="w")
       tkgrid(labProfz11, f3z11, sticky="w")
@@ -420,16 +434,33 @@ TargetSearchGUI <- function() {
         }
         UpdateTextGUI("Running... (Please wait!)", "Reading Parameters")
         cat("\nTargetSearch", ts.version, "is processing your data...\nYou may continue working.\n\n")
+        
+      # A function to read a masses range to an R-vector
+      # Example:  fcnMzRangeToVector("126,147:149,160") = 126, 147, 148, 149, 160.
+      fcnMzRangeToVector <- function(x) {
+        x <- gsub(" ", "",x[1]) # remove spaces
+        if(grepl("^(\\d+[,:]?)+$", x, perl=TRUE)) {
+            x <- sub("[,:]$","",x)
+            x <- strsplit(unlist(strsplit(x, ",")), ":")
+            x <- lapply(x, as.numeric)
+            unlist(lapply(x, function(z) if(length(z)==1) z else seq(z[1],z[2])))
+        } else {
+            return(NULL)
+        }
+      }
+
         # Start 'RUN'
         CDFdir <- tclvalue(valWD)
         RIdir  <- tclvalue(valWD)
         setwd(CDFdir)
         if (as.character(tclvalue(rbValue)) == "Apex Data") {
           RI_FILE <- basename( fncSplitTclStrg(tclvalue(valFiles)) )
+          RIdir   <- dirname( fncSplitTclStrg(tclvalue(valFiles)) )[1]
           CDF_FILE <- gsub("RI_", "", gsub("txt", "cdf", RI_FILE))
         }
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {
           CDF_FILE <- basename( fncSplitTclStrg(tclvalue(valFiles)) )
+          CDFdir   <- dirname( fncSplitTclStrg(tclvalue(valFiles)) )[1]
           RI_FILE <- gsub("cdf", "txt", paste("RI_", CDF_FILE, sep=""))
         }
         MEASUREMENT_DAY <- sub('^([0-9]+).*$','\\1', CDF_FILE)
@@ -495,7 +526,15 @@ TargetSearchGUI <- function() {
                                        r_thres = as.numeric(tclvalue(valProfthr)))
       # save your results in tabbed text format files
         Write.Results(Lib, finalProfile)
-        #save(finalProfile, file="finalProfile.RData")
+        
+      # save workspace
+        if (as.character(tclvalue(rbValue)) == "NetCDF Data") {
+            save(samples, rimLimits, RImatrix, outliers, Lib, cor_RI, peakData, MetabProfile, finalProfile,
+                file=paste("TargetSearch-", Sys.Date(), ".RData", sep = ""))
+        } else {
+            save(samples, Lib, cor_RI, peakData, MetabProfile, finalProfile,
+                file=paste("TargetSearch-", Sys.Date(), ".RData", sep = ""))
+        }
         UpdateTextGUI()
         cat(paste("\nTargetSearch ", ts.version, " finished processing your data...\nOutput was stored to ", tclvalue(valWD),"\n\n", sep=""))
       }

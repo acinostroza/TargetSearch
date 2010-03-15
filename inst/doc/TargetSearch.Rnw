@@ -492,23 +492,30 @@ parameter is a numeric value between 0 and 1. A value of one returns a baseline
 above the noise, 0.5 in the middle of the noise and 0 below the noise. See
 \Rfunction{baselineCorrection} documentation for further details.
 
+\item[Peak Detection]: \emph{Intensity Counts
+threshold} defines the minimum apex intensity incorporated in the analysis.
+A value of 1 would include all peaks. \emph{Mass Range} allows to limit the mass
+values ($m/z$) to be included in the analysis. \emph{Smoothing} averages raw data
+to eliminate some inherent noise leading to multiple peaks otherwise.
+
 \item[Retention Index Correction]: Retention Index Correction is neccessary and
 applied only if you supply NetCDF Data (Apex Data contain already Retention
 Indices). You may \emph{Load} or \emph{Create} the search windows for your RI-Markers
 here. 
-
-\item[Peak Detection]: \emph{Search Windows} refers to the allowed RI deviation of your
-metabolites which are narrowed in 3 consecutive searches. \emph{Intensity Counts
-threshold} defines the minimum apex intensity incorporated in the analysis.
-A value of 1 would include all peaks. \emph{Mass Range} allows to limit the mass
-values ($m/z$) to be included in the analysis. \emph{Smoothing} averages raw data
-to eliminate some inherent noise leading to multiple peaks otherwise. 
 
 \item[Library]: A Library (to detect metabolites) usable by \Rpackage{TargetSearch} contains
 at least information about the metabolite `Name', its expected `RI' and the
 selective masses in its spectrum `SEL\_MASS'. You may \emph{Load} or \emph{Create} one
 yourself using the respective buttons. A more detailed description of
 the file formats can be found in \Rfunction{ImportLibrary}.
+\emph{Search Windows} refers to the allowed RI deviation of your
+metabolites which are narrowed in 3 consecutive searches.
+\emph{No. of top masses} is the number of most abundant masses that will be
+selected from the spectra, besides the selected masses.
+\emph{ExcludeMasses} is only used when masses are obtained from the spectra.
+For example, "126,147:149,160" means that the masses 126, 147, 148, 149,
+and 160 will be excluded from the analysis (unless they are used as selected
+masses).
 
 \item[Normalization]: This selects how the data will be normalized during
 the metabolite search. Options are \Rfunarg{dayNorm}, a day based median

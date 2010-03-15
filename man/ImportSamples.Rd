@@ -1,5 +1,6 @@
 \name{ImportSamples}
 \alias{ImportSamples}
+\alias{ImportSamplesFromDir}
 \title{ Sample definitions }
 \description{
 	This function imports a sample list that will be processed from a tab
@@ -7,6 +8,8 @@
 }
 \usage{
 ImportSamples(sampfile, CDFpath = ".", RIpath = ".", ...)
+
+ImportSamplesFromDir(CDFpath = ".", RIfiles = FALSE, ignore.case = TRUE)
 }
 \arguments{
   \item{sampfile}{ A character string naming a sample file. See details. }
@@ -14,6 +17,9 @@ ImportSamples(sampfile, CDFpath = ".", RIpath = ".", ...)
 	located. }
   \item{RIpath}{ A character string naming a directory where the RI corrected text
 	files are/will be located. }
+  \item{RIfiles}{ Logical. If \code{TRUE}, the function will look for for RI files
+  (RI_*) instead of CDF files (the default).}
+  \item{ignore.case}{Logical. Should pattern-matching be case-insensitive?}
   \item{\dots}{ Other options passed to \code{read.delim} function. }
 }
 \details{

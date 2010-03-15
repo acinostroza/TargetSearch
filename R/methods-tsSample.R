@@ -113,7 +113,7 @@ setMethod("initialize",
                 if(length(RIfiles) == 0)
                     RIfiles <- sub("cdf$", "txt", paste("RI_", CDFfiles, sep = ""), ignore.case = T)
                 if(length(days) == 0)
-                    days <- substring(CDFfiles,1,4)
+                    days <- TargetSearch:::getDays(CDFfiles)
                 if(all(dim(data) == 0))
                     data <- data.frame(Names = Names, CDF_FILE = CDFfiles, MEASUREMENT_DAY = days , RI_FILE = RIfiles)
             }

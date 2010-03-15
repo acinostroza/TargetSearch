@@ -20,3 +20,36 @@ function(sampfile, CDFpath = ".", RIpath = ".", ...) {
 		RIfiles = RIfiles, CDFpath = CDFpath, RIpath = RIpath, data = Samples)
 }
 
+# function to extract the /measurement day/ of a set of names.
+
+getDays <- function(x) {
+    y <- regexpr('[0-9]+', x)
+
+     # check if one element doesn't have digits. If so, just return ones.
+    if(any(y== -1)) {
+        return(rep('1', length(x)))
+    }
+
+    d <- substring(x, y, y+attr(y, "match.length")-1)
+    # count number of elements per day
+    n <- sapply(unique(d), function(z) sum(z == d))
+    if(any(n == 1)) {
+        # warning TODO
+        return(rep('1', length(x)))
+    }
+    return(d)
+}
+
+ImportSamplesFromDir <- function(CDFpath=".", RIfiles = FALSE, ignore.case = TRUE) {
+    if(RIfiles == TRUE) {
+        cdffiles <- dir(path=CDFpath, pattern='^RI_', ignore.case=ignore.case)
+        cdffiles <- gsub("RI_", "", gsub("txt", "cdf", cdffiles, ignore.case=ignore.case))
+    } else {
+        cdffiles <- dir(path=CDFpath, pattern='\\.cdf$', ignore.case=ignore.case)
+    }
+    if(length(cdffiles) == 0)
+        stop('Error: No CDF files were find in the directory')
+
+    days <- TargetSearch:::getDays(cdffiles)
+    new('tsSample', CDFfiles=cdffiles,RIpath=CDFpath,CDFpath=CDFpath)
+}
