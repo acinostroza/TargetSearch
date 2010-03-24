@@ -40,6 +40,32 @@ TargetSearchGUI <- function() {
       labData <- tklabel(parent=f2z1, text="File Import")
       tkconfigure(labData, "-text", paste("File Import (", tclvalue(valFileNum), " Files)", sep=""))
       rbValue <- tclVar("NetCDF Data")
+      
+      fncGrayParApex <- function(ApexVal) {
+        if(ApexVal == "Apex Data") {
+            tkconfigure(ebxBaseline, "-state", "disabled")
+            tkconfigure(cbxBaseline, "-state", "disabled")
+            tkconfigure(ebxPDthr, "-state", "disabled")
+            tkconfigure(ebxPDmin, "-state", "disabled")
+            tkconfigure(ebxPDmax, "-state", "disabled")
+            tkconfigure(ebxPDSmoothing, "-state", "disabled")
+            tkconfigure(butRILoad, "-state", "disabled")
+            tkconfigure(butRICreate, "-state", "disabled")
+            tkconfigure(butRIEdit, "-state", "disabled")
+            tkconfigure(butRISave, "-state", "disabled")
+        } else {
+            tkconfigure(cbxBaseline, "-state", "normal")
+            fncCBBaseline()
+            tkconfigure(ebxPDthr, "-state", "normal")
+            tkconfigure(ebxPDmin, "-state", "normal")
+            tkconfigure(ebxPDmax, "-state", "normal")
+            tkconfigure(ebxPDSmoothing, "-state", "normal")
+            tkconfigure(butRILoad, "-state", "normal")
+            tkconfigure(butRICreate, "-state", "normal")
+            fncRIGrayEditSave()
+        }
+      }
+      
       fncGetFiles <- function() {
         tmp.filetype <- ifelse(tclvalue(rbValue)=="Apex Data",
                                "{{Peak Apex Files} {.txt}} {{All files} *}",
@@ -51,25 +77,7 @@ TargetSearchGUI <- function() {
         tclvalue(valFileNum) <- length(fncSplitTclStrg(tclvalue(valFiles)))
         tkconfigure(labData, "-text", paste("File Import (", tclvalue(valFileNum), " Files)", sep=""))
         
-        if(as.character(tclvalue(rbValue))=="Apex Data") {
-            tkconfigure(ebxBaseline, "-state", "disabled")
-            tkconfigure(cbxBaseline, "-state", "disabled")
-            tkconfigure(ebxPDthr, "-state", "disabled")
-            tkconfigure(ebxPDmin, "-state", "disabled")
-            tkconfigure(ebxPDmax, "-state", "disabled")
-            tkconfigure(ebxPDSmoothing, "-state", "disabled")
-            tkconfigure(butRILoad, "-state", "disabled")
-            tkconfigure(butRICreate, "-state", "disabled")
-        } else {
-            tkconfigure(ebxBaseline, "-state", "normal")
-            tkconfigure(cbxBaseline, "-state", "normal")
-            tkconfigure(ebxPDthr, "-state", "normal")
-            tkconfigure(ebxPDmin, "-state", "normal")
-            tkconfigure(ebxPDmax, "-state", "normal")
-            tkconfigure(ebxPDSmoothing, "-state", "normal")
-            tkconfigure(butRILoad, "-state", "normal")
-            tkconfigure(butRICreate, "-state", "normal")
-        }
+        fncGrayParApex(as.character(tclvalue(rbValue)))
         invisible()
       }
       rbtCDF <- tkradiobutton(parent=f2z2, variable=rbValue, command=fncGetFiles, value="NetCDF Data")
@@ -184,6 +192,16 @@ TargetSearchGUI <- function() {
           tkconfigure(butRISave, "-state", "disabled")
         }
       }
+      fncRIGrayEditSave <- function() {
+        TSPar <- get("TSPar", envir = envirGUI)
+        if(all(TSPar$RI_SearchFrames == "")) {
+          tkconfigure(butRIEdit, "-state", "disabled")
+          tkconfigure(butRISave, "-state", "disabled")
+        } else {
+          tkconfigure(butRIEdit, "-state", "normal")
+          tkconfigure(butRISave, "-state", "normal")
+        }
+      }
       fncRIEdit <- function() {
         TSPar <- get("TSPar", envir = envirGUI)
         TSPar$RI_SearchFrames <- edit(TSPar$RI_SearchFrames)
@@ -245,6 +263,16 @@ TargetSearchGUI <- function() {
         } else {
           tkconfigure(butLibEdit, "-state", "disabled")
           tkconfigure(butLibSave, "-state", "disabled")
+        }
+      }
+      fncLibGrayEditSave <- function() {
+        TSPar <- get("TSPar", envir = envirGUI)
+        if (all(TSPar$"Library_Data" == "")) {
+          tkconfigure(butLibEdit, "-state", "disabled")
+          tkconfigure(butLibSave, "-state", "disabled")
+        } else {
+          tkconfigure(butLibEdit, "-state", "normal")
+          tkconfigure(butLibSave, "-state", "normal")
         }
       }
       fncLibEdit <- function() {
@@ -343,6 +371,7 @@ TargetSearchGUI <- function() {
         tclvalue(valWD) <- TSPar$"WorkingDirectory"
         tclvalue(valFileNum) <- TSPar$"Files"$"FileNum"
         tclvalue(rbValue) <- TSPar$"Files"$"FileType"
+        fncGrayParApex(TSPar$"Files"$"FileType")
         tclvalue(valFiles) <- TSPar$"Files"$"FilePath"
           tkconfigure(labData, "-text", paste("File Import (", tclvalue(valFileNum), " Files)", sep=""))
         tclvalue(valCBBaseline) <- TSPar$"Baseline"$"On"
@@ -378,7 +407,7 @@ TargetSearchGUI <- function() {
             "Threshold" = as.numeric(tclvalue(valBaseline))
           ),
           "RI" = tclvalue(valRIData),
-          "RI_SearchFrames" = "", 
+          "RI_SearchFrames" = "",
           "PeakDetection" = list(
             "SearchWin" = as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
             "Threshold" = as.numeric(tclvalue(valPDthr)),
@@ -407,20 +436,8 @@ TargetSearchGUI <- function() {
         } else {
           assign("TSPar", TSPar, envir=envirGUI)
         }
-        if (all(TSPar$"RI_SearchFrames" == "")) {
-          tkconfigure(butRIEdit, "-state", "disabled")
-          tkconfigure(butRISave, "-state", "disabled")
-        } else {
-          tkconfigure(butRIEdit, "-state", "normal")
-          tkconfigure(butRISave, "-state", "normal")
-        } 
-        if (all(TSPar$"Library_Data" == "")) {
-          tkconfigure(butLibEdit, "-state", "disabled")
-          tkconfigure(butLibSave, "-state", "disabled")
-        } else {
-          tkconfigure(butLibEdit, "-state", "normal")
-          tkconfigure(butLibSave, "-state", "normal")
-        } 
+        fncRIGrayEditSave()
+        fncLibGrayEditSave()
         fncPutParameters(TSPar)
       }
       fncMainRun <- function() {
@@ -470,7 +487,7 @@ TargetSearchGUI <- function() {
           Lib <- ImportLibrary(libfile = tclvalue(valLibData),
                                RI_dev = as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))))
         } else {
-          Lib <- get("TSPar", envir=envirGUI)$Library_Data
+          Lib <- as.data.frame(get("TSPar", envir=envirGUI)$Library_Data, stringsAsFactors=FALSE)
 ##          print(tclvalue(valPDtopMass))
 ##          print(tclvalue(valPDexcludeMass))
           selMass <- sapply(as.character(Lib[,"SEL_MASS"]), function(x) as.numeric(unlist(strsplit(x, ";"))), simplify=FALSE)
@@ -485,7 +502,7 @@ TargetSearchGUI <- function() {
                               RIdev = matrix(rep(as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
                                       each=nrow(Lib)), ncol=3, dimnames=list(NULL, c("w1", "w2", "w3"))),
                               selMass = selMass, topMass = topMass, spectra = spectra,
-                              libData = data.frame(Met = Lib[,"Name"], RI = as.numeric(Lib[,"RI"])))
+                              libData = data.frame(Name = Lib[,"Name"], RI = as.numeric(Lib[,"RI"])))
         }
       # RI correction can be ommited in case that RI_..txt Files are already existent
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {

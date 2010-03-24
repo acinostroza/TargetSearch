@@ -1,4 +1,61 @@
-CHANGES IN VERSION 1.3.2
+		CHANGES IN VERSION 1.3.4:
 
-    o	TODO
+BUG FIXES
+
+    o	Fixed GUI error that occurred when creating/editing a library.
+
+    o	Fixed Write.Result() file format output: columns were missing and
+	column names were wrong. The file format should be compatible with older
+	versions.
+
+		CHANGES IN VERSION 1.3.3:
+
+    o	New function ImportSamplesFromDir. It makes easier to create a
+	tsSample object from CDF files in a directory.
+
+    o	A new GUI layout and new features: Now it is not required to
+	have all the files in the working directory. Basline, Peak detection,
+	and RI correction options gray out when 'Apex data' is selected.
+
+		CHANGES IN VERSION 1.3.2:
+
+    o	New 'tsProfile' and 'tsMSdata' definitions. Many functions were
+	internaly changed to conform to the changes, however, the changes
+	should be (more or less) transparent for the user.
+
+    o	classes.R:
+	- new 'quantMass' slot in class 'tsLib'
+	- class 'tsMSdata': slots changed from matrix to list
+	- class 'tsProfile': new slots profInt, profRI and ProfRT
+
+    o	Function FindPeaks: Now the parameter refLib can be either a list
+	or a 3-column matrix. If it is a list, the function will iterate for
+	every component, given that the components are 3-column matrices.
+
+    o	Function ImportLibrary: code changed to incorporate the 'quantMass'
+	slot.
+
+    o	methods-tsLib.R: new methods to access quantMass slot. Also, new
+	methods profileInt, profileRI and profileRT to access slots profInt,
+	profRI and ProfRT. New method as.list
+
+    o	Write.Results: Same as before, but the parameter peakData was
+	removed, since the raw data is now included in the 'tsProfile' object.
+
+    o	The following files were changed to conform to the new definicions.
+	No changes in terms of functionality: dayNorm.R, peakFind.R, plot.R,
+	profile.R, profileCleanUp.R, and sampleRI.R.
+
+    o	new function quantMatrix.
+
+    o	Changes in the GUI. Now two new parameters are accepted: topMasses
+	and ExcludedMasses.
+
+		CHANGES IN VERSION 1.3.1:
+
+    o	Fixed NetCDFPeakFinding and tsSample-class manpages because
+	of an error caused by wrong regular expressions in the example
+	section at check.
+
+    o	CITATION file of TargetSearch paper at BMC bioinformatics.
 

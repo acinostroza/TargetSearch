@@ -17,6 +17,7 @@ Write.Results <- function(Lib, metabProfile, prefix = NA) {
     metPrf    <- as.list(metabProfile)
     libIndex  <- attr(metPrf$RI, "index")
     libId     <- rownames(metInfo)
+    med_RI    <- format(apply(metPrf$RI, 1, median, na.rm = T), digits = 3)
 
     Name      <- as.character(metInfo[libIndex, "Name"])
     libRI     <- metInfo[libIndex, "Lib_RI"]
@@ -25,7 +26,8 @@ Write.Results <- function(Lib, metabProfile, prefix = NA) {
     corMass   <- lapply(strsplit(metInfo$Masses, ";"), function(x) as.numeric(x))
     is_cor    <- unlist(lapply(seq(libId), function(x) topMass(Lib)[[libId[x]]] %in% corMass[[x]]))
     
-    Out <- data.frame(libIndex=libIndex, Name= Name, Mass = mass, IS_SEL = is_sel, IS_COR=is_cor)
+    Out <- data.frame(libId=libIndex, Name= Name, Lib_RI=libRI, Mass = mass,
+         med_RI, IS_SEL = is_sel, IS_COR=is_cor)
 		
 		write.table( data.frame(Out, metPrf$Intensity, row.names = NULL,
             check.names = FALSE), file = file.peak.int,	sep = "\t", quote = F, row.names = F)
