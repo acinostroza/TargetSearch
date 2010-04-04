@@ -32,6 +32,7 @@ setGeneric("medRI", function(obj) standardGeneric("medRI"))
 setMethod("medRI", "tsLib", function(obj) obj@medRI)
 setGeneric("medRI<-", function(obj, value) standardGeneric("medRI<-"))
 setReplaceMethod("medRI", "tsLib", function(obj, value) { obj@medRI <- value
+ validObject(obj)
  obj })
 
 setMethod("length", "tsLib", function(x) length(x@medRI))
@@ -40,6 +41,7 @@ setGeneric("selMass", function(obj) standardGeneric("selMass"))
 setMethod("selMass", "tsLib", function(obj) obj@selMass)
 setGeneric("selMass<-", function(obj, value) standardGeneric("selMass<-"))
 setReplaceMethod("selMass", "tsLib", function(obj, value) { obj@selMass <- value
+ validObject(obj)
  obj })
 
 
@@ -47,12 +49,14 @@ setGeneric("topMass", function(obj) standardGeneric("topMass"))
 setMethod("topMass", "tsLib", function(obj) obj@topMass)
 setGeneric("topMass<-", function(obj, value) standardGeneric("topMass<-"))
 setReplaceMethod("topMass", "tsLib", function(obj, value) { obj@topMass <- value
+ validObject(obj)
  obj })
 
 setGeneric("quantMass", function(obj) standardGeneric("quantMass"))
 setMethod("quantMass", "tsLib", function(obj) obj@quantMass)
 setGeneric("quantMass<-", function(obj, value) standardGeneric("quantMass<-"))
 setReplaceMethod("quantMass", "tsLib", function(obj, value) { obj@quantMass <- as.numeric(value)
+ validObject(obj)
  obj })
 
 
@@ -60,28 +64,39 @@ setGeneric("spectra", function(obj) standardGeneric("spectra"))
 setMethod("spectra", "tsLib", function(obj) obj@spectra)
 setGeneric("spectra<-", function(obj, value) standardGeneric("spectra<-"))
 setReplaceMethod("spectra", "tsLib", function(obj, value) { obj@spectra <- value
+ validObject(obj)
  obj })
 
 setGeneric("libName", function(obj) standardGeneric("libName"))
 setMethod("libName", "tsLib", function(obj) obj@Name)
 setGeneric("libName<-", function(obj, value) standardGeneric("libName<-"))
 setReplaceMethod("libName", "tsLib", function(obj, value) { obj@Name <- value
+ validObject(obj)
  obj })
 
 setGeneric("libRI", function(obj) standardGeneric("libRI"))
 setMethod("libRI", "tsLib", function(obj) obj@RI)
 setGeneric("libRI<-", function(obj, value) standardGeneric("libRI<-"))
 setReplaceMethod("libRI", "tsLib", function(obj, value) { obj@RI <- value
+ validObject(obj)
  obj })
 
 setGeneric("libData", function(obj) standardGeneric("libData"))
 setMethod("libData", "tsLib", function(obj) obj@libData)
+setGeneric("libData<-", function(obj, value) standardGeneric("libData<-"))
+setReplaceMethod("libData", "tsLib", function(obj, value) {
+	obj@libData <- value
+	validObject(obj)
+	obj
+})
+
 
 setGeneric("RIdev", function(obj) standardGeneric("RIdev"))
 setMethod("RIdev", "tsLib", function(obj) obj@RIdev)
 setGeneric("RIdev<-", function(obj, value) standardGeneric("RIdev<-"))
 setReplaceMethod("RIdev", "tsLib", function(obj, value) {
  obj@RIdev <- value
+ validObject(obj)
  obj
 })
 
@@ -119,6 +134,8 @@ setValidity("tsLib", function(object) {
 		paste("Unequal number of Names and selMass: ", n,", ", length(object@selMass), sep = "")
 	else if(length(object@topMass) != n)
 		paste("Unequal number of Names and topMass: ", n,", ", length(object@topMass), sep = "")
+	else if(length(object@quantMass) != n)
+		paste("Unequal number of Names and quantMass: ", n,", ", length(object@quantMass), sep = "")
 	else if(length(object@spectra) != n & length(object@spectra) != 0)
 		paste("Unequal number of Names and spectra: ", n,", ", length(object@spectra), sep = "")
 	else if(nrow(object@libData) != n)

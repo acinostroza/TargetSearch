@@ -8,6 +8,8 @@
 \alias{length,tsLib-method}
 \alias{libData,tsLib-method}
 \alias{libData}
+\alias{libData<-,tsLib-method}
+\alias{libData<-}
 \alias{libName,tsLib-method}
 \alias{libName}
 \alias{libName<-,tsLib-method}
@@ -68,7 +70,7 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{$name}}{\code{signature(x = "tsLib")}: Access column \code{name} of \code{libData} slot. }
     \item{\code{libId}}{\code{signature(obj = "tsLib")}: Returns a vector of indices. }
     \item{\code{length}}{\code{signature(x = "tsLib")}: returns the length of the library. i.e., number of metabolites.}
-    \item{\code{libData}}{\code{signature(obj = "tsLib")}: gets the \code{libData} slot.}
+    \item{\code{libData}}{\code{signature(obj = "tsLib")}: gets/sets the \code{libData} slot.}
     \item{\code{libName}}{\code{signature(obj = "tsLib")}: gets the \code{Name} slot. }
     \item{\code{libRI}}{\code{signature(obj = "tsLib")}: gets the \code{RI} slot.  }
     \item{\code{medRI}}{\code{signature(obj = "tsLib")}: gets the \code{medRI} slot.  }

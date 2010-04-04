@@ -26,6 +26,7 @@
 \evensidemargin=.1in
 \headheight=-.3in 
 
+\SweaveOpts{keep.source=TRUE}
 
 \title{The TargetSearch Package}
 \author{Alvaro Cuadros-Inostroza, Jan Lisec,\\Henning Redestig and Matthew A Hannah\\
@@ -35,12 +36,20 @@
 }
 
 \begin{document}
+% Sweave options
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
 \maketitle
 
 This document describes how to use \Rpackage{TargetSearch} to preprocess
 GC-MS data.
 
 <<LibraryPreload, echo = FALSE, results = hide>>=
+options(width=60)
 library(xcms)
 library(TargetSearch)
 library(TargetSearchData)
@@ -49,23 +58,23 @@ library(TargetSearchData)
 \section{Supplied Files}
 
 This section describes the files that have to be prepared before running 
-\Rpackage{TargetSearch}. They are the sample file, the reference library 
-file and the retention marker definition. For example purposes, we will 
-use the example files provided by the package 
-\Rpackage{TargetSearchData}. 
+\Rpackage{TargetSearch}. These comprise a sample definition file, a reference library
+file and a retention marker definition file. Throughout this manual, we will
+use the example files provided by the package \Rpackage{TargetSearchData}.
 
 \subsection{NetCDF Files and Sample File} 
 
 \Rpackage{TargetSearch} can currently read only NetCDF files. Many GC-MS 
-software packages are able to convert raw chromatograms to NetCDF. It is 
-also recommended to baseline correct your chromatograms before exporting 
-to NetCDF. Please refer to your software documentation for details. 
+software packages are able to convert raw chromatograms to NetCDF. Although some
+baseline correction functionality is included in \Rpackage{TargetSearch}, it is
+recommended to baseline correct your chromatograms before exporting
+to NetCDF to increase processing speed. Please refer to your software documentation
+for further details.
 
-After exporting the NetCDF files, please place them in a convenient 
-location. Then prepare a text file to describe your samples. It must be 
-tab-delimited and have at least two columns: ``CDF\_FILE'' and 
-``MEASUREMENT\_DAY''. Other columns such as sample name, sample group, 
-treatment, etc. may be additionally included to aid sample sub-setting 
+Export the NetCDF files into a convenient location. Then prepare a tab-delimited
+text file describing your samples. It must be contain (at least) the two columns
+entitled: ``CDF\_FILE'' and ``MEASUREMENT\_DAY''. Other columns such as sample name,
+sample group, treatment, etc. may be additionally included to aid sample sub-setting
 and downstream analyses. An example is shown in table~\ref{sample:file}. 
 
 
@@ -88,11 +97,10 @@ CDF\_FILE & MEASUREMENT\_DAY & TIME\_POINT \\
 \label{sample:file}
 \end{table}
 
-To import the sample list into R, use the function 
-\Rfunction{ImportSamples()}. You also need to specify the directory 
-where the NetCDF files are (\Rfunarg{CDFpath}) and a directory where the 
-transformed cdf files, the so called RI files, will be saved 
-(\Rfunarg{RIpath}). 
+To import the sample list into R, use the function \Rfunction{ImportSamples()}
+specifying the options \Rfunarg{CDFpath} (directory containing the NetCDF files)
+and \Rfunarg{RIpath} (directory where the transformed cdf files, containing the
+retention index corrected apex data, also called RI-files, will be saved).
 
 
 <<ImportSample>>=
@@ -100,11 +108,10 @@ library(TargetSearchData)
 library(TargetSearch)
 cdf.path <- system.file("gc-ms-data", package = "TargetSearchData")
 sample.file <- file.path(cdf.path, "samples.txt")
-samples <- ImportSamples(sample.file, CDFpath = cdf.path,
-                         RIpath = ".")
+samples <- ImportSamples(sample.file, CDFpath = cdf.path, RIpath = ".")
 @
 
-You could alternatively create a \Robject{tsSample} object by using the sample class
+Alternatively, you could create a \Robject{tsSample} object by using the sample class
 methods.
 
 <<ImportSample2>>=
@@ -112,7 +119,7 @@ cdffiles <- dir(cdf.path, pattern="cdf$")
 # define the RI file names
 rifiles  <- paste("RI_", sub("cdf","txt", cdffiles), sep = "")
 # take the measurement day info from the cdf file names.
-days <- substring(cdffiles, 1, 4)
+days <- sub("^([[:digit:]]+).*$","\\1",cdffiles)
 # sample names 
 smp_names <- sub("\\.cdf", "", cdffiles)
 # add some sample info
@@ -123,13 +130,22 @@ samples <- new("tsSample", Names = smp_names, CDFfiles = cdffiles,
                RIfiles = rifiles, data = smp_data)
 @
 
-\subsection{Retention Time Markers}
+\subsection{Retention Time (RI) Markers}
 
-The RI markers time definition, time window and $m/z$ values has to be provided
-in a tab-delimited text file. The first two columns indicate the lower and
-upper window limits where the retention marker will be searched. The third
-column is the RI of that particular marker. An example is shown in
-table \ref{rim:file}.
+To align different chromatograms using RI markers, a tab-delimited definition file
+for these markers has to be provided. At a minimum it should contain three columns
+specifying the search window (lower and upper threshod) and the fixed standard value
+for each marker (table \ref{rim:file}). Further, a characteristic ion mass ($m/z$)
+has to be provided either in an additional column or as an argument \Rfunarg{mass}
+to function \Rfunction{ImportFameSettings()}.
+
+<<ImportFameSettings>>=
+rim.file  <- file.path(cdf.path, "rimLimits.txt")
+rimLimits <- ImportFameSettings(rim.file, mass = 87)
+@
+
+This will import the limits in ``rimLimits.txt'' file and set the
+marker mass to 87 for all markers.
 
 \begin{table}[ht]
 \centering
@@ -146,18 +162,6 @@ LowerLimit & UpperLimit & RIstandard \\
 \label{rim:file}
 \end{table}
 
-Use the function \Rfunction{ImportFameSettings()} to import the limits and
-to set the $mz/z$ markers. Alternatively, the markers could be specified
-by an additional column in the RI markers file.
-
-<<ImportFameSettings>>=
-rim.file  <- file.path(cdf.path, "rimLimits.txt")
-rimLimits <- ImportFameSettings(rim.file, mass = 87)
-@
-
-This will import the limits in ``rimLimits.txt'' file and set the
-marker mass to 87.
-
 If you do not use RI markers, you can skip this part by setting the parameter
 \Rfunarg{rimLimits} to \Robject{NULL} in \Rfunction{RIcorrect} function.
 Please note that in this case, no retention time correction will be performed.
@@ -165,16 +169,16 @@ Please note that in this case, no retention time correction will be performed.
 \section{Baseline correction, peak identification and RI correction}
 
 Initially, \Rpackage{TargetSearch} identifies the local apex intensities 
-in all chromatograms, finds the retention time of the RI markers and converts
-the retention time to RI using linear interpolation \citep{VandenDool1963}.
-This is done by the function \Rfunction{RIcorrect()}. It takes as parameter the
+in all chromatograms, finds the retention time (RT) of the RI markers and converts
+RT to RI using linear interpolation \citep{VandenDool1963}.
+This is done by the function \Rfunction{RIcorrect()}. Parameter to this function are
 sample and retention time limits objects, the mass range to extract (\Rfunarg{
 MassRange = c(85,500)}), the intensity threshhold (\Rfunarg{IntThreshold = 10}),
 the peak picking method (\Rfunarg{pp.method}) and a \Rfunarg{Window} parameter
 that will be used by said method. The function will return a matrix
-with the retention times of the retention time markers and creates a
-tab-delimited file (RI file) per every chromatogram in the selected directory.
-These files contein the extracted peak list of the respective NetCDF file.
+with the retention times of all RI markers and create a tab-delimited file (RI file)
+for each chromatogram in the specified directory.
+These files contain the extracted peak list of the respective NetCDF file.
 
 
 <<RIcorrection>>=
@@ -183,34 +187,34 @@ RImatrix <- RIcorrect(samples, rimLimits, massRange = c(85,500),
 @
 
 
-There are two peak picking methods available. ``smoothing'' implements the
-algorithm used by Tagfinder \citet{Luedemann2008}. The ``ppc'' algorithm is a
-port from the package \Rpackage{ppc} function \Rfunction{ppc.peaks}. It looks for
-the local maxima within a given time window. The \Rfunarg{Window} parameter
-sets the window size of the chosen peak picking method.
+There are two peak picking methods available: ``smoothing'' implements the
+algorithm used by Tagfinder \citet{Luedemann2008}, while the ``ppc'' algorithm is a
+adapted based on the function \Rfunction{ppc.peaks} from the package \Rpackage{ppc}.
+\Rfunction{ppc.peaks} searches for local maxima within a given time window.
+Therefore the \Rfunarg{Window} parameter sets the window size of the chosen
+peak picking method.
 
-In case that the chromatograms were not baseline corrected by the platform
-specific GC-MS software, it is possible to do so with the function
-\Rfunction{RIcorrect()} as well. There are to extra arguments you have
-to include: \Rfunarg{baseline} is a logical value that tells \Rfunction{RIcorrect()}
-whether to baseline correct the chromatograms or not. \Rfunarg{baseline.opts}
-is a list of options passed to \Rfunction{baselineCorrection()} function.
-This algorithm is based on the work of \citet{chang07} and a description
-is found in \Rfunction{baselineCorrection()} documentation.
+In case the chromatograms were not baseline corrected by the platform
+specific GC-MS software, it is possible to achieve that in \Rpackage{TargetSearch}
+by setting \Rfunarg{baseline} to TRUE in function \Rfunction{RIcorrect()} which
+calls the function \Rfunction{baselineCorrection()}. This algorithm is based on the
+work of \citet{chang07} and a description is found in the
+\Rfunction{baselineCorrection()} documentation. Some options can be passed to
+\Rfunction{baselineCorrection()} via \Rfunarg{baseline.opts}.
 
 After that, it is possible to check for outliers in the samples by using
 the function \Rfunction{FAMEoutliers()}. It creates a PDF report
-of the retention time markers informing of possible outliers that the
-user can remove or not. Alternatively, retention index markers can
-be checked manually by the function \Rfunction{plotFAME}. Figure~\ref{fig:01}
-shows the retention times of the marker 1.
+of the RI markers including information about possible outliers that the
+user can remove or not. Alternatively, RI markers can % how do we remove outliers
+be checked manually using the function \Rfunction{plotFAME} (Figure~\ref{fig:01}).
 
 <<PeakIdentification>>=
 outliers <- FAMEoutliers(samples, RImatrix, threshold = 3)
 @
 
-Here \Rfunarg{threshold} sets the number of standard deviation a sample will
-be considered outlier. In this example, no outliers were detected. 
+Here, \Rfunarg{threshold} sets the number of standard deviations a value has to be
+away from the mean before it will be considered an outlier. In this example, however,
+no outliers were detected.
 
 \begin{figure}[htp]
 \centering
@@ -336,13 +340,17 @@ peakData <- peakFind(samples, lib, cor_RI)
 @
 
 
-The intensity and RI matrices can be accessed by using the \Rmethod{Intensity}
-and \Rmethod{retIndex} methods.
-
+The intensity and RI slots can be accessed by using the \Rmethod{Intensity}
+and \Rmethod{retIndex} methods. Each slot is a list, where every component of the list
+is a matrix, which is related to a metabolite in the library. There should be as
+many components as metabolites in the library. In every matrix, columns are
+samples and rows are masses.
 
 <<LibrarySearch4>>=
 met.RI        <- retIndex(peakData)
 met.Intensity <- Intensity(peakData)
+# show the intensity values of the first metabolite.
+met.Intensity[[1]]
 @
 
 

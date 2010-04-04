@@ -35,6 +35,8 @@ RI.path <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
 refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
 # update RI file path
 RIpath(sampleDescription) <- RI.path
+# Import Library
+refLibrary        <- ImportLibrary(file.path(RI.path,'library.txt'))
 # update median RI
 refLibrary        <- medianRILib(sampleDescription, refLibrary)
 # get the sample RI

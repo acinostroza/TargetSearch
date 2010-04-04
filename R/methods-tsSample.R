@@ -12,6 +12,7 @@ setMethod("CDFfiles", "tsSample", function(obj) {
 setGeneric("CDFfiles<-", function(obj, value) standardGeneric("CDFfiles<-"))
 setReplaceMethod("CDFfiles", "tsSample", function(obj, value) {
 	obj@CDFfiles <- basename(value)
+	validObject(obj)
 	obj			
 })
 
@@ -26,6 +27,7 @@ setMethod("RIfiles", "tsSample", function(obj) {
 setGeneric("RIfiles<-", function(obj, value) standardGeneric("RIfiles<-"))
 setReplaceMethod("RIfiles", "tsSample", function(obj, value) {
 	obj@RIfiles <- basename(value)
+	validObject(obj)
 	obj			
 })
 
@@ -34,6 +36,7 @@ setMethod("sampleNames", "tsSample", function(obj) obj@Names )
 setGeneric("sampleNames<-", function(obj, value) standardGeneric("sampleNames<-"))
 setReplaceMethod("sampleNames", "tsSample", function(obj, value) {
 	obj@Names <- value
+	validObject(obj)
 	obj
 })
 
@@ -42,6 +45,7 @@ setMethod("sampleDays", "tsSample", function(obj) obj@days )
 setGeneric("sampleDays<-", function(obj, value) standardGeneric("sampleDays<-"))
 setReplaceMethod("sampleDays", "tsSample", function(obj, value) {
 	obj@days <- value
+	validObject(obj)
 	obj
 })
 
@@ -63,6 +67,13 @@ setReplaceMethod("RIpath", "tsSample", function(obj, value) {
 
 setGeneric("sampleData", function(obj) standardGeneric("sampleData"))
 setMethod("sampleData", "tsSample", function(obj) obj@data )
+setGeneric("sampleData<-", function(obj, value) standardGeneric("sampleData<-"))
+setReplaceMethod("sampleData", "tsSample", function(obj, value) {
+	obj@data <- value
+	validObject(obj)
+	obj
+})
+
 
 setMethod("length", "tsSample", function(x) length(x@CDFfiles))
 setMethod("show", "tsSample", function(object) {

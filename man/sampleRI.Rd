@@ -43,6 +43,8 @@ data(TargetSearchData)
 RI.path <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
 # update RI file path
 RIpath(sampleDescription) <- RI.path
+# Import Library
+refLibrary        <- ImportLibrary(file.path(RI.path,'library.txt'))
 
 # get the sample RI
 corRI <- sampleRI(sampleDescription, refLibrary, r_thres = 0.95)

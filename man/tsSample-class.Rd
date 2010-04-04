@@ -22,6 +22,8 @@
 \alias{length,tsSample-method}
 \alias{sampleData,tsSample-method}
 \alias{sampleData}
+\alias{sampleData<-,tsSample-method}
+\alias{sampleData<-}
 \alias{sampleDays,tsSample-method}
 \alias{sampleDays}
 \alias{sampleDays<-,tsSample-method}
@@ -65,7 +67,7 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{RIpath}}{\code{signature(obj = "tsSample")}: The RI file path. }
     \item{\code{CDFpath}}{\code{signature(obj = "tsSample")}: The CDF file path. }
     \item{\code{length}}{\code{signature(x = "tsSample")}: number of samples.}
-    \item{\code{sampleData}}{\code{signature(obj = "tsSample")}: additiona sample information. }
+    \item{\code{sampleData}}{\code{signature(obj = "tsSample")}: additional sample information. }
     \item{\code{sampleDays}}{\code{signature(obj = "tsSample")}: measurement days. }
     \item{\code{sampleNames}}{\code{signature(obj = "tsSample")}: sample names.}
     \item{\code{show}}{\code{signature(object = "tsSample")}: the show funtion. }
