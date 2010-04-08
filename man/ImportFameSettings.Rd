@@ -10,7 +10,7 @@ ImportFameSettings(tmp.file = NA, mass = NA, ...)
 \arguments{
   \item{tmp.file}{ A character string naming a file with standard markers. }
   \item{mass}{ The m/z standard marker.  }
-  \item{\dots}{ Other options passed to \code{read.delim} function. }
+  \item{\dots}{ Other options passed to \code{\link[utils]{read.delim}} function. }
 }
 \details{
     The standard marker file is a tab-delimited text file with 3 or 4 columns.

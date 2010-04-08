@@ -490,19 +490,11 @@ TargetSearchGUI <- function() {
           Lib <- as.data.frame(get("TSPar", envir=envirGUI)$Library_Data, stringsAsFactors=FALSE)
 ##          print(tclvalue(valPDtopMass))
 ##          print(tclvalue(valPDexcludeMass))
-          selMass <- sapply(as.character(Lib[,"SEL_MASS"]), function(x) as.numeric(unlist(strsplit(x, ";"))), simplify=FALSE)
-          spectra <- if(is.null(Lib$SPECTRUM)) list() else TargetSearch:::Spectra(Lib$SPECTRUM)
           # insert the options from the GUI
           tM  <- as.numeric(tclvalue(valPDtopMass))
-          eM  <- fcnMzRangeToVector(tclvalue(valPDtopMass))
-          topMass <- if(length(spectra)==0) selMass else mapply(union, selMass, lapply(spectra, TargetSearch:::Top.Masses, tM, eM), SIMPLIFY=FALSE)
-          Lib <- new("tsLib", Name = Lib[,"Name"],
-                              RI = as.numeric(Lib[,"RI"]),
-                              medRI = as.numeric(Lib[,"RI"]),
-                              RIdev = matrix(rep(as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
-                                      each=nrow(Lib)), ncol=3, dimnames=list(NULL, c("w1", "w2", "w3"))),
-                              selMass = selMass, topMass = topMass, spectra = spectra,
-                              libData = data.frame(Name = Lib[,"Name"], RI = as.numeric(Lib[,"RI"])))
+          eM  <- fcnMzRangeToVector(tclvalue(valPDexcludeMass))
+          Lib <- ImportLibrary.tab(libdata=Lib, RI_dev=as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))),
+                                   TopMasses=tM, ExcludeMasses=eM)
         }
       # RI correction can be ommited in case that RI_..txt Files are already existent
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {

@@ -38,18 +38,31 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	rownames(RI_out) <- rownames(RImatrix)
 	for(i in 1:max(day.groups)) {
 		RI_tmp <- RImatrix[, days %in% days.unique[day.groups == i]]
-		RI_tmp.mean <- apply(RI_tmp, 1, mean)
-	  RI_tmp.sd <- apply(RI_tmp, 1, sd)
+		RI_tmp.mean <- rowMeans(RI_tmp, na.rm=TRUE)
+		RI_tmp.sd <- apply(RI_tmp, 1, sd, na.rm=TRUE)
 		RI_out[, days %in% days.unique[day.groups == i]] <-
 		RI_tmp < RI_tmp.mean - threshold*RI_tmp.sd | RI_tmp > RI_tmp.mean + threshold*RI_tmp.sd
+	}
+
+	# find missing markes
+	missingMarkers <- missingIndex <- NULL
+	if(any(is.na(RI_out))) {
+		message("\n Missing Markers: \n ===============\n\n")
+		missingIndex   <- which(is.na(RI_out))
+		for(j in 1:nrow(RI_out)) {
+			missingMarkers <- append(missingMarkers, sprintf(" RT standard: %2d | Sample: %s", j, manyFiles[is.na(RI_out[j,])]))
+		}
+		cat(missingMarkers, sep="\n")
+		# set missing markers temporaly to FALSE
+		RI_out[missingIndex] <- FALSE
 	}
 
 	# print the outliers:
 	cat("\n Outliers Report: \n ===============\n\n")
 	outliers <- NULL
 	for(j in 1:nrow(RI_out)) {
-  	if(any(RI_out[j,])) {
-  		outliers <- append(outliers, sprintf(" RT standard: %2d | Sample: %s", j, manyFiles[RI_out[j,]]))
+		if(any(RI_out[j,])) {
+			outliers <- append(outliers, sprintf(" RT standard: %2d | Sample: %s", j, manyFiles[RI_out[j,]]))
 		}
 	}
 	cat(outliers, sep = "\n")
@@ -58,13 +71,13 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
  	if(is.na(pdffile))
 		pdffile <- paste("TargetSearch-", Sys.Date(), ".FAME-report.pdf", sep = "")
 
-	new.page <- function() {
+	new.page <- function(x="Outliers Report") {
 	  plot.new()
-	  title("Outliers Report")
+	  title(x)
 	}	
 	# print outliers in FAME report file
 	pdf(pdffile, width = 8, height = 8)
-	if(length(outliers) > 0) {	
+	if(length(outliers) > 0) {
 		npages <- ceiling(length(outliers)/45)
 		op <- par(mar = c(3,3,3,2))
 			for(j in 1:length(outliers)) {
@@ -73,7 +86,18 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 			}
 		par(op)
 	}
-  		
+
+	# print missing RI markers, if any.
+	if(length(missingMarkers) > 0) {
+		npages <- ceiling(length(missingMarkers)/45)
+		op <- par(mar = c(3,3,3,2))
+			for(j in 1:length(missingMarkers)) {
+				if(j %% 45 == 1) new.page('Missing RI Markers')
+				text(-0.03, 1.05-((j-1) %% 45 + 1)/45 , missingMarkers[j], adj = 0, cex = 0.8)
+			}
+		par(op)
+	}
+
 	for(i in 1:nrow(RImatrix)) {
 		plotFAME(samples, RImatrix, i)
 		points(which(RI_out[i,]), RImatrix[i,RI_out[i,]], cex = 2, col = "blue")
@@ -81,6 +105,10 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	dev.off()
 	message("FAMEs were saved in ", pdffile)
 	
+	# set missing markers to NA
+	if(length(missingIndex) > 0)
+		RI_out[missingIndex] <- NA
+		
 	return(RI_out)
 }
 

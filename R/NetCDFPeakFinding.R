@@ -18,7 +18,16 @@ NetCDFPeakFinding <- function(cdfFile, massRange =c(85,500), Window = 5, IntThre
 	nc     <- xcms:::netCDFOpen(cdfFile)
 	ncData <- xcms:::netCDFRawData(nc)
 	xcms:::netCDFClose(nc)
-
+	
+    if(any(ncData$scanindex < 0)) {
+        message('Warning:')
+        message('  The following file seems to be corrupted. TargetSearch will attempt to process it anyway...')
+        message(paste('  ->', cdfFile))
+        # removing negative values
+        tmp <- ncData$scanindex >= 0
+        ncData$scanindex <- ncData$scanindex[tmp]
+        ncData$rt        <- ncData$rt[tmp]
+    }
 	ncData$point_count <- diff(c(ncData$scanindex, length(ncData$mz)))
 	
 	if(baseline)
@@ -34,4 +43,3 @@ NetCDFPeakFinding <- function(cdfFile, massRange =c(85,500), Window = 5, IntThre
 
 	return( list(Time = ncData$rt, Peaks = peaks) )
 }
-

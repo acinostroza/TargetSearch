@@ -1,3 +1,18 @@
+		CHANGES IN VERSION 1.3.6:
+
+NEW FEATURES
+
+    o	ImportLibrary.tab() now have a new parameter 'libdata'.
+
+BUG FIXES
+
+    o	Fixed bug with corrupted CDF files. Now TS will try to process it
+	and issue a warning to the user.
+
+    o	Fixed bugs in the GUI:
+	- Quantitative masses were not loaded into the tsLib object.
+	- Fixed bug ExcludedMasses parameter.
+
 		CHANGES IN VERSION 1.3.5:
 
 NEW FEATURES
@@ -15,7 +30,7 @@ BUG FIXES
     o	plotFAME(): plot title changed to 'RI marker' to be consistent
 	with the manual.
 
-    o	Fixed examples that did not pass R CMD check.	
+    o	Fixed examples that did not pass R CMD check.
 	
     o	Object validation bug fixes and new checks (all classes).
 

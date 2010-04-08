@@ -20,7 +20,7 @@ ImportSamplesFromDir(CDFpath = ".", RIfiles = FALSE, ignore.case = TRUE)
   \item{RIfiles}{ Logical. If \code{TRUE}, the function will look for for RI files
   (RI_*) instead of CDF files (the default).}
   \item{ignore.case}{Logical. Should pattern-matching be case-insensitive?}
-  \item{\dots}{ Other options passed to \code{read.delim} function. }
+  \item{\dots}{ Other options passed to \code{\link[utils]{read.delim}} function. }
 }
 \details{
 	The sample file is a tab-delimited text file with at least two columns:

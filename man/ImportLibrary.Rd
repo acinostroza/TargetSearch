@@ -12,7 +12,7 @@
 ImportLibrary(libfile, type = "auto", ...)
 
 ImportLibrary.tab(libfile, fields = NULL, RI_dev = c(2000,1000,200),
-    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL)
+    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata)
 
 ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL)
@@ -31,6 +31,9 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
   \item{TopMasses}{ The number of most intensive masses that will be taken from the spectrum,
     if no \code{TOP_MASSES} is provided.}
   \item{ExcludeMasses}{ Optional. A vector containing a list of masses that will be excluded.}
+  \item{libdata}{Optional. A data frame with library data. The format is the same
+    as the library file. It is equivalent to loading the library file first with \code{\link[utils]{read.delim}} and
+    calling \code{ImportLibrary.tab} after.}
   \item{\dots}{Further arguments passed to \code{ImportLibrary.tab} or \code{ImportLibrary.msp}}
 }
 \details{

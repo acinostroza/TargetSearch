@@ -37,14 +37,22 @@ ImportLibrary <- function(libfile, type = "auto", ...) {
 #               Masses are taken from the TopMasses
 #  - TopMasses: How many masses from the spectra should be uses as top Masses.                                                                                  
 #  - ExcludeMasses: Don't take this masses as TopMasses automatically.
+#  - libdata: A data frame containing the data from a library file (optional)
 
 ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
-	SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL) {
+	SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata) {
 
-	if(missing(libfile))
-		stop("argument \"libfile\" is missing, with no default")
-		
-	M <- read.delim(libfile, as.is = T)
+	if(missing(libfile)) {
+		if(missing(libdata)) {
+			stop("argument \"libfile\" and \"libdata\" are missing, with no default")
+		} else if(class(libdata) == 'data.frame'){
+			M <- libdata
+		} else {
+			stop("argument \"libdata\" should be a 'data.frame'")
+		}
+	} else {
+		M <- read.delim(libfile, as.is = T)
+	}
 
   if(is.null(M$Name))     stop("Column 'Name' is missing!!")
 	if(is.null(M$RI))       stop("Column 'RI' is missing!!")
