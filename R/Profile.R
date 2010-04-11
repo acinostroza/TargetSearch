@@ -13,7 +13,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
     searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
     rownames(searchData) <- 1:length(Lib)
-    colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_count", "Masses",
+    colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_Count_per_Mass", "Masses",
         "RI", "Score_all_masses", "Score_cor_masses")
 
     medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
@@ -66,11 +66,17 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
  	  		score_cor <- Score(cbind(topMass(Lib)[[i]][y], M[y]), spectra(Lib)[[i]])
  	  	}
  	  }
- 	  
- 	  
+
     searchData$Mass_count[i]                 <- length(y)
     searchData$Non_consecutive_Mass_count[i] <- length(y) - sum(diff(sort(topMass(Lib)[[i]][y])) == 1)
-		searchData$Sample_count[i]               <- sum(is.finite(res[[i]][y,]))
+
+        sampCountPerMass <- function(z) {
+            tmp <- apply(z, 1, function(x) sum(is.finite(x)))
+            tmp <- if(length(unique(tmp)) == 1) unique(tmp) else tmp
+            paste(tmp, collapse=";")
+        }
+
+        searchData$Sample_Count_per_Mass[i] <- sampCountPerMass(res[[i]][y,,drop=FALSE])
     searchData$Masses[i] <- paste(topMass(Lib)[[i]][y], collapse=";")
     searchData$RI[i]     <- median(resRI[[i]][y,], na.rm=T)
     searchData$Score_all_masses[i] <- score_all

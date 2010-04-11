@@ -23,8 +23,10 @@ ProfileCleanUp(Profile, timeSplit = 500, r_thres = 0.95)
 	were searched and correlated, and intensity and RI matrices of the correlating masses.
 	\item{slot "Info"}{A data frame with a profile of all masses that correlate and the metabolites
 		that correlate in a \code{timeSplit} window.}
-	\item{slot "Intensity"}{A matrix with the averaged intensities of the correlating masses.}
-	\item{slot "RI"}{A matrix with the averaged RI of the correlating masses.}
+	\item{slot "profInt"}{A matrix with the averaged intensities of the correlating masses.}
+	\item{slot "profRI"}{A matrix with the averaged RI of the correlating masses.}
+	\item{slot "Intensity"}{A list containing peak-intensity matrices, one matrix per metabolite.}
+	\item{slot "RI"}{A list containing RI matrices, one matrix per metabolite.}
 }
 \examples{
 # load example data

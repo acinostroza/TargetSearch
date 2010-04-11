@@ -24,8 +24,10 @@ Profile(samples, Lib, peakData, r_thres = 0.95, method = "dayNorm", minPairObs =
 \value{
 	A \code{tsProfile} object. The slots are:
 	\item{Info}{A data frame with a profile of all masses that correlate.}
-	\item{Intensity}{A matrix with the averaged intensities of the correlating masses.}
-	\item{RI}{A matrix with the averaged RI of the correlating masses.}
+	\item{Intensity}{A list containing peak-intensity matrices, one matrix per metabolite.}
+	\item{RI}{A list containing RI matrices, one matrix per metabolite.}
+	\item{profInt}{A matrix with the averaged intensities of the correlating masses.}
+	\item{profRI}{A matrix with the averaged RI of the correlating masses.}
 }
 \examples{
 require(TargetSearchData)

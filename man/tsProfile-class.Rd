@@ -33,9 +33,9 @@ new("tsMSdata", RI = [retention time index matrix], RT = [retention time matrix]
 \section{Slots}{
 	 \describe{
     \item{\code{info}:}{\code{"data.frame"}, the profile information. }
-    \item{\code{RI}:}{\code{"list"}, a list containing an RI matrix, one matrix per metabolite}
-    \item{\code{RT}:}{\code{"list"}, a list containing an RT matrix, one matrix per metabolite}
-    \item{\code{Intensity}:}{\code{"list"}, a list containing a peak intensity matrix, one matrix per metabolite }
+    \item{\code{RI}:}{\code{"list"}, a list containing RI matrices, one matrix per metabolite}
+    \item{\code{RT}:}{\code{"list"}, a list containing RT matrices, one matrix per metabolite}
+    \item{\code{Intensity}:}{\code{"list"}, a list containing peak-intensity matrices, one matrix per metabolite }
     \item{\code{profRI}:}{\code{"matrix"}, the profile RI matrix.}
     \item{\code{profRT}:}{\code{"matrix"}, the profile RT matrix.}
     \item{\code{profInt}:}{\code{"matrix"}, the profile Intensity matrix.}
