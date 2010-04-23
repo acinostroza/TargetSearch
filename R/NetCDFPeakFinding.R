@@ -14,7 +14,6 @@ NetCDFPeakFinding <- function(cdfFile, massRange =c(85,500), Window = 5, IntThre
 	if(is.na(method))
 	  stop("Invalid peak picking method.")
 
-	require(xcms)
 	nc     <- xcms:::netCDFOpen(cdfFile)
 	ncData <- xcms:::netCDFRawData(nc)
 	xcms:::netCDFClose(nc)

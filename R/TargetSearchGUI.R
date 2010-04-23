@@ -1,6 +1,4 @@
 TargetSearchGUI <- function() {
-  require(tcltk)
-  require(TargetSearch)
   envirGUI <- new.env()
   TS_GUI <- tktoplevel()
   tkwm.deiconify(TS_GUI)

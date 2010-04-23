@@ -8,8 +8,8 @@ Author: Alvaro Cuadros-Inostroza <inostroza@mpimp-golm.mpg.de>,
         Henning Redestig <henning.red@googlemail.com>,
         Matt Hannah <matthew.hannah@bayercropscience.com>
 Maintainer: Alvaro Cuadros-Inostroza <inostroza@mpimp-golm.mpg.de>
-Depends: R (>= 2.7.0), xcms, methods, tcltk
-Imports: methods
+Depends: R (>= 2.7.0), xcms, methods
+Imports: graphics, grDevices, methods, stats, tcltk, utils
 Suggests: TargetSearchData
 Description: This packages provides a targeted pre-processing method for GC-MS data. 
 biocViews: Technology,MassSpectrometry,Preprocessing

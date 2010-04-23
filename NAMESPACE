@@ -1,5 +1,25 @@
 useDynLib(TargetSearch)
+
 import("methods")
+
+importFrom("graphics", "abline", "axis", "box", "boxplot", "legend",
+           "matplot", "par", "plot", "plot.new", "points", "text",
+           "title")
+
+importFrom("grDevices", "dev.off", "pdf")
+
+importFrom("stats", "approx", "cor", "cutree", "dist", "hclust", "lm",
+           "median", "predict", "sd", "smooth.spline")
+
+importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
+           "tclVar", "tkbutton", "tkcheckbutton", "tkchooseDirectory",
+           "tkconfigure", "tkdestroy", "tkentry", "tkfocus", "tkframe",
+           "tkgetOpenFile", "tkgetSaveFile", "tkgrid", "tklabel",
+           "tkmessageBox", "tkpack", "tkradiobutton", "tktitle<-",
+           "tktoplevel", "tkwm.deiconify", "tkwm.iconbitmap")
+
+importFrom("utils", "edit", "head", "installed.packages", "read.delim",
+           "setTxtProgressBar", "txtProgressBar", "write.table")
 
 exportClasses(
 	"tsLib",

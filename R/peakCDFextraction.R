@@ -1,7 +1,6 @@
 `peakCDFextraction` <-
 function(cdfFile, massRange = c(85,500)) {
 
-	require(xcms)
 	nc     <- xcms:::netCDFOpen(cdfFile)
 	ncData <- xcms:::netCDFRawData(nc)
 	xcms:::netCDFClose(nc)
