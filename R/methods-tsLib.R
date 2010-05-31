@@ -117,6 +117,7 @@ setMethod("[", "tsLib", function(x, i, j, ..., drop) {
     x@topMass <- x@topMass[i]
     x@libData <- x@libData[i,]
     x@spectra <- x@spectra[i]
+    x@quantMass <- x@quantMass[i]
     x
 })
 
