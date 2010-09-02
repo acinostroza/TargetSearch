@@ -35,7 +35,7 @@ ImportLibrary <- function(libfile, type = "auto", ...) {
 #  - RI_dev: RI deviation
 #  - SelMasses: How many masses should be used as selective if no SelMasses are found.
 #               Masses are taken from the TopMasses
-#  - TopMasses: How many masses from the spectra should be uses as top Masses.                                                                                  
+#  - TopMasses: How many masses from the spectra should be uses as top Masses.
 #  - ExcludeMasses: Don't take this masses as TopMasses automatically.
 #  - libdata: A data frame containing the data from a library file (optional)
 
@@ -54,8 +54,15 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 		M <- read.delim(libfile, as.is = T)
 	}
 
-  if(is.null(M$Name))     stop("Column 'Name' is missing!!")
-	if(is.null(M$RI))       stop("Column 'RI' is missing!!")
+    if(is.null(M$Name))     stop("Column 'Name' is missing!!")
+    if(is.null(M$RI)) {
+        stop("Column 'RI' is missing!!")
+    } else { # force numeric
+        M$RI <- as.numeric(M$RI)
+        if(any(is.na(M$RI))) {
+            stop("Missing values in RI definition found. Please check input data.")
+        }
+    }
 
 	has.spectra <- TRUE
 	spectra     <- list()
