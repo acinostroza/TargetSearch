@@ -9,7 +9,7 @@
 
 \usage{
 NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10,
-                  pp.method = "smoothing", baseline = FALSE, baseline.opts = NULL)
+                  pp.method = "ppc", baseline = FALSE, baseline.opts = NULL)
 }
 
 \arguments{

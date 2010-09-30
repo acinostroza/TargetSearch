@@ -1,3 +1,10 @@
+		CHANGES IN VERSION 1.4.3:
+
+NEW FEATURES
+
+    o	Function NetCDFPeakFinding: 'ppc' is now the default peak picking
+	 method.
+
 		CHANGES IN VERSION 1.4.2:
 
 BUG FIXES

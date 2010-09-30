@@ -7,7 +7,7 @@
 #    - method: peak picking method. PPC / smoothing
 
 NetCDFPeakFinding <- function(cdfFile, massRange =c(85,500), Window = 5, IntThreshold = 10,
-	pp.method = "smoothing", baseline = FALSE, baseline.opts = NULL) {
+	pp.method = "ppc", baseline = FALSE, baseline.opts = NULL) {
 
 	method <- pmatch(pp.method,c("smoothing", "ppc"))
 	 
