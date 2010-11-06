@@ -12,5 +12,5 @@ Depends: R (>= 2.7.0), xcms, methods
 Imports: graphics, grDevices, methods, stats, tcltk, utils
 Suggests: TargetSearchData
 Description: This packages provides a targeted pre-processing method for GC-MS data. 
-biocViews: Technology,MassSpectrometry,Preprocessing
+biocViews: MassSpectrometry,Preprocessing
 License: GPL (>= 2)
