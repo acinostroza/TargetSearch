@@ -1,5 +1,5 @@
 RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold,
-	pp.method = "smoothing", showProgressBar = FALSE,
+	pp.method = "ppc", showProgressBar = FALSE,
 	baseline = FALSE, baseline.opts = NULL ) {
 	
 	manyFiles <- CDFfiles(samples)

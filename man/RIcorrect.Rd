@@ -8,7 +8,7 @@
 }
 \usage{
 RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold, 
-	pp.method = "smoothing", showProgressBar = FALSE, baseline = FALSE,
+	pp.method = "ppc", showProgressBar = FALSE, baseline = FALSE,
     baseline.opts = NULL )
 }
 \arguments{
@@ -25,18 +25,17 @@ RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold,
   \item{baseline.opts}{A list of options passed to \code{\link{baselineCorrection}}}.
 }
 \details{
-	There are two pick picking methods available: "smoothing" and "ppc". 
-	
+	There are two pick picking methods available: "ppc" and "smoothing".
+
+	The "ppc" method (default) implements the peak detection method described in the \code{ppc}
+	package. It looks for the local maxima within a \code{2*Window + 1} scans for
+	every mass trace.
+
 	The "smoothing" method calculates a moving average of \code{2*Window + 1} points
 	for every mass trace. Then it looks for	a change of sign (from positive to negative) of
 	the difference between two consecutive points. Those points will be returned as
 	detected peaks.
-	
-	The "ppc" method implements the peak detection method described in the \code{ppc}
-	package. It looks for the local maxima within a \code{2*Window + 1} scans for
-	every mass trace.
 }
-	
 \value{
 	A retention time matrix of the found retention time markers. Every column represents a
 	sample and rows RT markers.
