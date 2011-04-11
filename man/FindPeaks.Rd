@@ -6,17 +6,18 @@
   RI window.
 }
 \usage{
-FindPeaks(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
-          showProgressBar = FALSE)
+FindPeaks(my.files, refLib,
+    columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
+    showProgressBar = FALSE)
 }
 \arguments{
   \item{my.files}{ A character vector naming files to be searched. }
   \item{refLib}{ A numeric matrix with three columns or a list of three column
   matrices. The second column contains the masses and the first and third column
   contains the RI limits.}
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM} and
-    \code{RETENTION_TIME_INDEX} or a character vector with the header names of those
-    columns. }
+  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
+    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
+    with the header names of those columns.}
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
 }
 \details{

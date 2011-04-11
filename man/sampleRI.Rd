@@ -6,7 +6,7 @@
 }
 \usage{
 sampleRI(samples, Lib, r_thres = 0.95,
-         columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
+         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
          method = "dayNorm", minPairObs = 5, showProgressBar = FALSE,
          makeReport = FALSE, pdfFile = "medianLibRep.pdf")
 }
@@ -16,9 +16,9 @@ sampleRI(samples, Lib, r_thres = 0.95,
   \item{Lib}{  A \code{tsLib} object created by \code{\link{ImportLibrary}} function with corrected RI values.
 	See \code{medianRILib}. }
   \item{r_thres}{ A correlation threshold.}
-  \item{columns}{A numeric vector with the positions of the columns \code{SPECTRUM} and
-	\code{RETENTION_TIME_INDEX} or a character vector with the header names of those
-	columns.  }
+  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
+    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
+    with the header names of those columns.}
   \item{method}{ Normalisation method. Options are \code{"dayNorm"}, a day based median
 	normalisation, \code{"medianNorm"}, normalisation using the median of all the intensities
 	of a given mass, and \code{"none"}, no normalisation at all. }

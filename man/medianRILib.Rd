@@ -6,7 +6,8 @@ Return a \code{tsLib} object with the median RI of the selective masses across s
 }
 \usage{
 medianRILib(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRep.pdf",
-	columns = c("SPECTRUM", "RETENTION_TIME_INDEX"), showProgressBar = FALSE)
+	columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
+    showProgressBar = FALSE)
 }
 
 \arguments{
@@ -15,9 +16,9 @@ medianRILib(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRep.pdf",
   \item{makeReport}{ Logical. If \code{TRUE} will report the RI deviations for every metabolite
 	in the library. }
   \item{pdfFile}{ The file name where the report will be saved. }
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM} and
-	\code{RETENTION_TIME_INDEX} or a character vector with the header names of those
-	columns. }
+  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
+    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
+    with the header names of those columns.}
 	\item{showProgressBar}{Logical. Should the progress bar be displayed?}
 }
 \value{

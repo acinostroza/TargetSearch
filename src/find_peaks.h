@@ -18,14 +18,15 @@
 typedef struct {
 	int      n; /* spectrum length */
 	double  ri; /* retention time index */
+	double  rt; /* retention time */
 	int  *mass; /* mass */
 	int    *in; /* intensity */
 } SPECTRA;
 
 /* Function prototypes */
 
-SPECTRA *read_file(FILE *fp, int *total, int, int);
+SPECTRA *read_file(FILE *fp, int *total, int, int, int);
 
 int read_spectrum(char *spectrum, int *mass, int *in, int n);
-void find_peak (double ,int ,double ,SPECTRA *,int ,double *, int *);
+void find_peak (double ,int ,double ,SPECTRA *,int ,double *, int *, double *);
 

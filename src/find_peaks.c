@@ -14,11 +14,11 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP columns) {
 	FILE *fp;
 	int n_scans = 0, libtotal = 0, j;
 	int *mass, *int_found;
-	double *ri_min, *ri_max, *ri_found;
-	int ri_COL, sp_COL;
+	double *ri_min, *ri_max, *ri_found, *rt_found;
+	int ri_COL, sp_COL, rt_COL;
 	char *myfile;
 	SPECTRA *spectra;
-	SEXP result, RI_Found, INT_Found;
+	SEXP result, RI_Found, RT_Found, INT_Found;
 
 	/* R objects created in the C code have to be reported using the PROTECT 
 	 * macro on a pointer to the object. This tells R that the object is in 
@@ -38,6 +38,7 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP columns) {
 	mass   = INTEGER_POINTER(Mass);
 	sp_COL = INTEGER_POINTER(columns)[0]; /* Spectra column number */
 	ri_COL = INTEGER_POINTER(columns)[1]; /* R.I. column number */
+	rt_COL = INTEGER_POINTER(columns)[2]; /* R.T. column number */
 
 	libtotal = GET_LENGTH(Mass);
 
@@ -45,34 +46,38 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP columns) {
 
 	fp = fopen(myfile, "r");
 	is_open(fp, myfile, 5);
-	spectra = read_file(fp, &n_scans, sp_COL, ri_COL);
+	spectra = read_file(fp, &n_scans, sp_COL, ri_COL, rt_COL);
 	fclose(fp);
 
 	PROTECT(RI_Found  = NEW_NUMERIC(libtotal));
 	ri_found = NUMERIC_POINTER(RI_Found);
+	PROTECT(RT_Found  = NEW_NUMERIC(libtotal));
+	rt_found = NUMERIC_POINTER(RT_Found);
 	PROTECT(INT_Found = NEW_INTEGER(libtotal));
 	int_found = INTEGER_POINTER(INT_Found);
 
 	for (j = 0; j < libtotal; j++) {
 		if (ISNAN(ri_min[j]) || ISNAN(mass[j]) || ISNAN(ri_max[j])) {
 			ri_found[j]  = NA_REAL;
+			rt_found[j]  = NA_REAL;
 			int_found[j] = NA_INTEGER;
 			continue;
 		}
 		
 		find_peak(ri_min[j], mass[j], ri_max[j], spectra, n_scans,
-			ri_found+j, int_found+j);
+			ri_found+j, int_found+j, rt_found+j);
 	}
 	
 	/* free_spectra(spectra, n_scans); */
 
 	/* Creating a list with 2 vector elements: ri_found and int_found */
-	PROTECT(result = allocVector(VECSXP, 2));
+	PROTECT(result = allocVector(VECSXP, 3));
 	// Attaching elements
 	SET_VECTOR_ELT(result, 0, INT_Found);
-	SET_VECTOR_ELT(result, 1, RI_Found);      
+	SET_VECTOR_ELT(result, 1, RI_Found);
+	SET_VECTOR_ELT(result, 2, RT_Found);
 
-	UNPROTECT(8);
+	UNPROTECT(9);
 	return result;
 }
 
@@ -80,16 +85,16 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP columns) {
 
 /* Functions */
 
-SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL) {
+SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL, int RT_COL) {
 	SPECTRA *spectra;
 	int total = 0, i, j;
 	int header = 1;
 	char *line = NULL;
 	int  len = 0;
 
-	char *ri_str = NULL, *sp_str = NULL;
-	int  ri_i, sp_i, tabs, n;
-	int  ri_len = 0, sp_len = 0;
+	char *ri_str = NULL, *sp_str = NULL, *rt_str = NULL;
+	int  ri_i, sp_i, rt_i, tabs, n;
+	int  ri_len = 0, sp_len = 0, rt_len = 0;
 
 	while (getLine(&line, &len, fp) != -1) {
 		total++;
@@ -110,17 +115,22 @@ SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL) {
 		tabs = 0;
 		i    = 0;
 		ri_i = 0;
+		rt_i = 0;
 		sp_i = 0;
 		n    = 0;
 
 		/* allocates memory for RI string and spectra if 'line' 
 		 * length is updated. string lengths will be the same as 'line' */
 		str_alloc(ri_str, ri_len, len);
+		str_alloc(rt_str, rt_len, len);
 		str_alloc(sp_str, sp_len, len);
 
 		while (i < strlen(line)) {
 			if (line[i] == '\t' || line[i] == '\n' || line[i] == '\r')
 				tabs++;
+			if (tabs == RT_COL)
+				if(line[i] != '\t')
+					rt_str[rt_i++] = line[i];
 			if (tabs == SPECTRUM_COL) {
 				if(line[i] != '\t')
 					sp_str[sp_i++] = line[i];
@@ -133,6 +143,7 @@ SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL) {
 			i++;
 		}
 		ri_str[ri_i] = '\0';
+		rt_str[rt_i] = '\0';
 		sp_str[sp_i] = '\0';
 		
 		if(n == 0)
@@ -140,6 +151,7 @@ SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL) {
 
 		spectra[j].n  = n;
 		spectra[j].ri = atof(ri_str);
+		spectra[j].rt = atof(rt_str);
 
 		spectra[j].mass = (int *) R_alloc(n , sizeof(int));
 		spectra[j].in   = (int *) R_alloc(n , sizeof(int));
@@ -153,6 +165,8 @@ SPECTRA *read_file(FILE *fp, int *ptotal, int SPECTRUM_COL, int RI_COL) {
 		R_chk_free(line);
 	if(ri_str)
 		R_chk_free(ri_str);
+	if(rt_str)
+		R_chk_free(rt_str);
 	if(sp_str)
 		R_chk_free(sp_str);
 
@@ -210,7 +224,8 @@ int read_spectrum(char *spectrum, int *mass, int *in, int n) {
 }
 
 void find_peak
-(double ri_min,int mass,double ri_max,SPECTRA *sp,int n_scans,double *ri_found, int *int_found) {
+(double ri_min,int mass,double ri_max,SPECTRA *sp,int n_scans,double *ri_found, 
+	int *int_found, double *rt_found) {
 	int i, j, imax = -1;
 	int max = -1;
 
@@ -245,10 +260,12 @@ void find_peak
 	}
 	if (imax != -1) {
 		*ri_found  = sp[imax].ri;
+		*rt_found  = sp[imax].rt;
 		*int_found = max;
 	}
 	else {
 		*ri_found  = NA_REAL;
+		*rt_found  = NA_REAL;
 		*int_found = NA_INTEGER;
 	}
 }

@@ -2,7 +2,7 @@
 # 07.10.2008: the function was change to support the new Library format.
 
 sampleRI <-
-function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
+function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
  method = "dayNorm", minPairObs = 5, showProgressBar = FALSE,
  makeReport = FALSE, pdfFile = "medianLibRep.pdf"){
 

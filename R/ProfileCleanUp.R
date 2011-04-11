@@ -8,24 +8,31 @@ function(Profile, timeSplit=500, r_thres=0.95){
   searchData2 <- profileInfo(Profile)[o,]
   medInt2     <- profileInt(Profile)[o,]
   medRI2      <- profileRI(Profile)[o,]
+  medRT2      <- profileRT(Profile)[o,]
   intensity   <- Intensity(Profile)[o]
   RI          <- retIndex(Profile)[o]
+  RT          <- retTime(Profile)[o]
  
   if(sum(is.na(searchData2$RI) == FALSE) > 1) {
     medInt2 <-  medInt2[is.na(searchData2$RI) == FALSE,]
     medRI2  <-  medRI2[is.na(searchData2$RI) == FALSE,]
+    medRT2  <-  medRT2[is.na(searchData2$RI) == FALSE,]
     intensity   <- intensity[is.na(searchData2$RI) == FALSE]
     RI          <- RI[is.na(searchData2$RI) == FALSE]
+    RT          <- RT[is.na(searchData2$RI) == FALSE]
     searchData2 <- searchData2[is.na(searchData2$RI) == FALSE,]
 
   } else if(sum(is.na(searchData2$RI) == FALSE) == 1) {
     medInt2 <- t( medInt2[is.na(searchData2$RI) == FALSE,] )
     medRI2 <-  t( medRI2[is.na(searchData2$RI) == FALSE,] )
+    medRT2 <-  t( medRT2[is.na(searchData2$RI) == FALSE,] )
     intensity   <- intensity[is.na(searchData2$RI) == FALSE]
     RI          <- RI[is.na(searchData2$RI) == FALSE]
+    RT          <- RT[is.na(searchData2$RI) == FALSE]
     searchData2 <- searchData2[is.na(searchData2$RI) == FALSE,]
     searchData2$final_sample_count <- sum(is.finite(medInt2))
-    return(new("tsProfile", RI=RI, Intensity=intensity, info = searchData2, profInt = medInt2, profRI = medRI2))
+    return(new("tsProfile", RI=RI, RT=RT, Intensity=intensity, info = searchData2,
+     profInt = medInt2, profRI = medRI2, profRT = medRT2))
   } else {
     return(Profile)
   }
@@ -70,18 +77,23 @@ function(Profile, timeSplit=500, r_thres=0.95){
   corData <- corData2[o,]
   medInt2 <- medInt2[o,]
   medRI2 <- medRI2[o,]
+  medRT2 <- medRT2[o,]
   RI     <- RI[o]
+  RT     <- RT[o]
   intensity <- intensity[o]
+  
   d <- duplicated(cbind(tmGroups,corGroups))
   MET_info <- cbind(searchData2[d == F,],corData[d == F,])
   MET <- medInt2[d == F,]
   MET_RI <- medRI2[d == F,]
+  MET_RT <- medRT2[d == F,]
   MET_info$final_sample_count <- apply(MET, 1, function(x) sum(is.finite(x)))
-  rownames(MET) <- MET_info$Name
-	rownames(MET_RI) <- MET_info$Name
+  rownames(MET) <- rownames(MET_RI) <- rownames(MET_RT) <- MET_info$Name
   RI <- RI[d == FALSE]
+  RT <- RT[d == FALSE]
   intensity <- intensity[d == FALSE]
-  return(new("tsProfile", RI=RI, Intensity=intensity, info = MET_info, profInt = MET, profRI = MET_RI))
+  return(new("tsProfile", RI=RI, RT=RT, Intensity=intensity, info = MET_info,
+    profInt = MET, profRI = MET_RI, profRT = MET_RT))
 }
 
 timeGroups <- function(x, d) {

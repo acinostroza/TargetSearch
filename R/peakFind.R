@@ -1,6 +1,6 @@
 
 peakFind <-
-function(samples, Lib, cor_RI, columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
+function(samples, Lib, cor_RI, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
 	showProgressBar = FALSE) {
 
 	my.files <- RIfiles(samples)
@@ -10,9 +10,12 @@ function(samples, Lib, cor_RI, columns = c("SPECTRUM", "RETENTION_TIME_INDEX"),
 	RES    <- FindPeaks(my.files, refLib, columns, showProgressBar)
 	resInt <- Intensity(RES)
 	resRI  <- retIndex(RES)
+    resRT  <- retTime(RES)
 
-    for(i in 1:length(resInt)) colnames(resRI[[i]]) <- colnames(resInt[[i]]) <- my.names
-    names(resRI) <- names(resInt) <- rownames(cor_RI)
+    for(i in 1:length(resInt))
+        colnames(resRT[[i]]) <- colnames(resRI[[i]]) <- colnames(resInt[[i]]) <- my.names
 
-	return(new("tsMSdata", RI = resRI, Intensity = resInt))
+    names(resRI) <- names(resInt) <- names(resRT) <- rownames(cor_RI)
+
+    return(new("tsMSdata", RI = resRI, Intensity = resInt, RT = resRT))
 }

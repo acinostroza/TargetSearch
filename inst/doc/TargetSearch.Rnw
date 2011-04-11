@@ -224,6 +224,11 @@ plotFAME(samples, RImatrix, 1)
 \caption{Retention Index Marker 1.}\label{fig:01}
 \end{figure}
 
+Note that \Rpackage{TargetSearch} assumes that the RI markers
+are injected together with the biological samples. A different approach is to
+inject them separately. If this is the case, please look at the script
+\texttt{RetentionIndexCorrection.R} for a workaround.
+
 \section{Library Search}
 
 \subsection{Reference Library File}

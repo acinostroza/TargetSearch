@@ -5,6 +5,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
     resInt <- Intensity(peakData)
     resRI  <- retIndex(peakData)
+    resRT  <- retTime(peakData)
     libId  <- libId(Lib, sel = FALSE)
   
     # extract addictonal information
@@ -19,7 +20,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
     colnames(medInt) <- my.names
     rownames(medInt) <- 1:length(Lib)
-    medRI <- medInt
+    medRT <- medRI <- medInt
 
     res <- switch(method,
                 dayNorm = dayNorm(samples, resInt),
@@ -85,9 +86,11 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 		if(length(y) == 1) {
         medInt[i,] <- res[[i]][y,]
         medRI[i,] <- resRI[[i]][y,]
+        medRT[i,] <- resRT[[i]][y,]
     } else {
         medInt[i,] <- apply(res[[i]][y,],2,median, na.rm=T)
         medRI[i,] <- apply(resRI[[i]][y,],2,median, na.rm=T)
+        medRT[i,] <- apply(resRT[[i]][y,],2,median, na.rm=T)
     }
   }
 
@@ -103,7 +106,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
   options(warn=0)
   return(new("tsProfile", peakData, info = cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData),
-    profInt=medInt, profRI=medRI))
+    profInt=medInt, profRI=medRI, profRT=medRT))
 }
 
 # calculate scores. Inputs: two matrices with two columns. First and second
