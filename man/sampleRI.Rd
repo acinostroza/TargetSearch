@@ -25,7 +25,7 @@ sampleRI(samples, Lib, r_thres = 0.95,
   \item{minPairObs}{ Minimum number of pair observations. Correlations between two variables are
 	computed using all complete pairs of observations in those variables. If the number
 	of observations is too small, you may get high correlations values just by chance,
-	so this parameters is used to avoid that. }
+	so this parameters is used to avoid that. Cannot be set lower than 5. }
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
   \item{makeReport}{ Logical. If \code{TRUE} will report the RI deviations for every metabolite
 	in the library. }

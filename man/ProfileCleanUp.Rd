@@ -5,12 +5,16 @@
 	This function reduces/removes redundancy in a profile.
 }
 \usage{
-ProfileCleanUp(Profile, timeSplit = 500, r_thres = 0.95)
+ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5)
 }
 \arguments{
   \item{Profile}{ A \code{tsProfile} object. See \code{\link{Profile}}. }
   \item{timeSplit}{ A RI window. }
   \item{r_thres}{ A correlation threshold. }
+  \item{minPairObs}{Minimum number of pair observations. Correlations between two variables are
+                computed using all complete pairs of observations in those variables. If the number
+                of observations is too small, you may get high correlations values just by chance,
+                so this parameters is used to avoid that. Cannot be set lower than 5.}
 }
 \details{
 	Metabolites that are inside a \code{timeSplit} window will be correlated

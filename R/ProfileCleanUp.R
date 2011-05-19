@@ -1,8 +1,16 @@
 ProfileCleanUp <-
-function(Profile, timeSplit=500, r_thres=0.95){
+function(Profile, timeSplit=500, r_thres=0.95, minPairObs=5){
 
   if(nrow(profileInfo(Profile)) <= 1)
     return(Profile)
+
+  # you can't set this paremeter lower than 5.
+  minPairObs <- max(minPairObs, 5)
+
+  # It doesn't make sense to perform a clean up with few samples
+  if(ncol(profileInt(Profile)) < minPairObs) {
+    return(Profile)
+  }
 
   o <- order(profileInfo(Profile)$RI)
   searchData2 <- profileInfo(Profile)[o,]
@@ -59,7 +67,10 @@ function(Profile, timeSplit=500, r_thres=0.95){
 
   for(i in 1:max(tmGroups)){
     if(sum(tmGroups == i) >1){
-      tmp     <- cor( t(log2(medInt2[tmGroups == i,])), use = "pair")
+      M       <- log2(medInt2[tmGroups == i,])
+      tmp     <- cor(t(M), use = "pair")
+      tmp[is.finite(M) %*% is.finite(t(M)) < minPairObs] <- 0
+      diag(tmp) <- 1
       tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
       tmp.sel <- tmp[tmp.max,]
       y <- which(tmp.sel > r_thres)

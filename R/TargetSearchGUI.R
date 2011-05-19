@@ -448,7 +448,7 @@ TargetSearchGUI <- function() {
           .Tcl("update idletasks")
         }
         UpdateTextGUI("Running... (Please wait!)", "Reading Parameters")
-        cat("\nTargetSearch", ts.version, "is processing your data...\nYou may continue working.\n\n")
+        cat("\nTargetSearch", ts.version, "is processing your data...\nPlease wait until finished.\n\n")
         
       # A function to read a masses range to an R-vector
       # Example:  fcnMzRangeToVector("126,147:149,160") = 126, 147, 148, 149, 160.
@@ -530,7 +530,8 @@ TargetSearchGUI <- function() {
                                 minPairObs = as.numeric(tclvalue(valProfSNr)))
         finalProfile <- ProfileCleanUp(Profile = MetabProfile, 
                                        timeSplit = as.numeric(tclvalue(valProfTS)), 
-                                       r_thres = as.numeric(tclvalue(valProfthr)))
+                                       r_thres = as.numeric(tclvalue(valProfthr)),
+                                       minPairObs = as.numeric(tclvalue(valProfSNr)))
       # save your results in tabbed text format files
         Write.Results(Lib, finalProfile)
         

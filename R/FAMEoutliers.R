@@ -11,7 +11,7 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 		m <- matrix(nrow = nrow(RImatrix), ncol = length(days.unique))
 		# get the daily mean RI per R.T. Standard
 		for(d in days.unique) {
-			tmp <- RImatrix[, d == days]
+			tmp <- RImatrix[, d == days, drop=FALSE]
 			m[, which(days.unique %in% d)] <- apply(tmp, 1, mean)
 		}
 
@@ -37,12 +37,13 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	colnames(RI_out) <- colnames(RImatrix)
 	rownames(RI_out) <- rownames(RImatrix)
 	for(i in 1:max(day.groups)) {
-		RI_tmp <- RImatrix[, days %in% days.unique[day.groups == i]]
+		RI_tmp <- RImatrix[, days %in% days.unique[day.groups == i], drop=FALSE]
 		RI_tmp.mean <- rowMeans(RI_tmp, na.rm=TRUE)
 		RI_tmp.sd <- apply(RI_tmp, 1, sd, na.rm=TRUE)
 		RI_out[, days %in% days.unique[day.groups == i]] <-
 		RI_tmp < RI_tmp.mean - threshold*RI_tmp.sd | RI_tmp > RI_tmp.mean + threshold*RI_tmp.sd
 	}
+    RI_out[is.na(RI_out)] <- FALSE
 
 	# find missing markes
 	missingMarkers <- missingIndex <- NULL

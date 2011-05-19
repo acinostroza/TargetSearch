@@ -19,7 +19,7 @@ Profile(samples, Lib, peakData, r_thres = 0.95, method = "dayNorm", minPairObs =
   \item{minPairObs}{Minimum number of pair observations. Correlations between two variables are
 		computed using all complete pairs of observations in those variables. If the number
 		of observations is too small, you may get high correlations values just by chance,
-		so this parameters is used to avoid that. }
+		so this parameters is used to avoid that. Cannot be set lower than 5.}
 }
 \value{
 	A \code{tsProfile} object. The slots are:

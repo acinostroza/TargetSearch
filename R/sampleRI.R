@@ -16,10 +16,12 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 	if(makeReport == TRUE)
 	 	plotAllRIdev(Lib, RES, pdfFile)
 
+	# you can't set this paremeter lower than 5.
+	minPairObs <- max(minPairObs, 5)
 
 	resInt    <- Intensity(RES)
 	resRI     <- retIndex(RES)
-	
+
 	# normalise intensities using "method"
 	res <- switch(method,
 						dayNorm = dayNorm(samples, resInt),
@@ -53,6 +55,9 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
       # this counts the number of pair values that were used to calculate the correlation
       # coefficient of every member of "tmp" and set to 0 the pairs with less than minPairObs
       tmp[is.finite(res_log[[i]]) %*% is.finite(t(res_log[[i]])) < minPairObs] <- 0
+
+      # assume that the correlation of a metabolite with itself is always 1
+      diag(tmp) <- 1
 
       tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
       tmp.sel <- tmp[tmp.max,]

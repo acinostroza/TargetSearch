@@ -7,7 +7,10 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     resRI  <- retIndex(peakData)
     resRT  <- retTime(peakData)
     libId  <- libId(Lib, sel = FALSE)
-  
+
+    # you can't set this paremeter lower than 5.
+    minPairObs <- max(minPairObs, 5)
+
     # extract addictonal information
     addiData  <- libData(Lib)
     addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
@@ -44,13 +47,17 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     	    # this counts the number of pair values that were used to calculate the correlation
 	        # coefficient of every member of "tmp" and sets to 0 the cor.coef. with less than minPairObs
 			tmp[is.finite(M) %*% is.finite(t(M)) <= minPairObs] <- 0
-    
+
+            # assume that the correlation of a metabolite with itself is always 1
+            diag(tmp) <- 1
+
             tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
-    
+ 
 	        M <- res_log[[i]]
   	        tmp <- cor(t(M), use="pair")
  			tmp[is.finite(M) %*% is.finite(t(M)) < minPairObs] <- 0
-    
+            diag(tmp) <- 1
+ 
 	        tmp.sel <- tmp[tmp.max,]
             y <- which(tmp.sel > r_thres)
   	  
@@ -82,15 +89,15 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     searchData$RI[i]     <- median(resRI[[i]][y,], na.rm=T)
     searchData$Score_all_masses[i] <- score_all
     searchData$Score_cor_masses[i] <- score_cor
-    
+ 
 		if(length(y) == 1) {
         medInt[i,] <- res[[i]][y,]
         medRI[i,] <- resRI[[i]][y,]
         medRT[i,] <- resRT[[i]][y,]
     } else {
-        medInt[i,] <- apply(res[[i]][y,],2,median, na.rm=T)
-        medRI[i,] <- apply(resRI[[i]][y,],2,median, na.rm=T)
-        medRT[i,] <- apply(resRT[[i]][y,],2,median, na.rm=T)
+        medInt[i,] <- apply(res[[i]][y,,drop=FALSE],2,median, na.rm=T)
+        medRI[i,] <- apply(resRI[[i]][y,,drop=FALSE],2,median, na.rm=T)
+        medRT[i,] <- apply(resRT[[i]][y,,drop=FALSE],2,median, na.rm=T)
     }
   }
 
