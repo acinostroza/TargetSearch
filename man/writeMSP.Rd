@@ -6,12 +6,12 @@
   can be viewed with NIST.
 }
 \usage{
-writeMSP(lib, peaks, file, append = FALSE)
+writeMSP(metlib, metprof, file, append = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{lib}{ A \code{tsLib} object. }
-  \item{peaks}{ A \code{tsMSdata} object. }
+  \item{metlib}{ A \code{tsLib} object. A metabolite library. }
+  \item{metprof}{ A \code{tsProfile} object. Usually the ouput of \code{\link{Profile}} or
+	 \code{\link{ProfileCleanUp}} functions. }
   \item{file}{ A string naming the output file. }
   \item{append}{ Logical. If \code{TRUE} the results will be appended to \code{file}.
   Otherwise, it will overwrite the contents of \code{file}.}

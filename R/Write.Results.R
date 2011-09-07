@@ -37,41 +37,48 @@ Write.Results <- function(Lib, metabProfile, prefix = NA) {
 }
 
 # function to create a MSP file that can be viewed with NIST
+# metlib : library
+# metprof: at tsProfile object (output of Profile or ProfileCleanUp)
+# file: msp output file name
+# append: should data be appended to 'file'
 
-writeMSP <- function(lib, peaks, file, append=FALSE) {
-
-    if(is.logical(append) == FALSE) {
+writeMSP <- function (metlib, metprof, file, append = FALSE)
+{
+    if (is.logical(append) == FALSE) {
         stop("append must be logical")
     }
-    file <- file(file, ifelse(append[1], "a", "w"))
-    tmp <- t(Intensity(peaks))
-    
-    for(i in 1:length(lib)) {
+    tmp <- Intensity(metprof)
+    # check ids
+    if(!all(names(tmp) %in% rownames(libData(metlib))))
+        stop("library identifiers don't match profile identifiers.")
 
-        x <- tmp[, colnames(tmp) == i]
-        if(all(is.na(x))) {
+    file <- file(file, ifelse(append[1], "a", "w"))
+    for (id in names(tmp)) {
+        x <- tmp[[id]]
+        i <- which(id == rownames(libData(metlib)))
+        if (all(is.na(x))) {
             next
         }
-   		# remove samples with no data.
-		x <- x[apply(x, 1, function(x) all(is.na(x))) == FALSE,]
-
-   		# remove masses with no data
-		bar      <- apply(x, 2, function(x) all(is.na(x))) == FALSE
-		x        <- x[,bar]
-
-   		x.median <- apply(x, 2, median, na.rm = T)
-		x.median <- round(999 * x.median / max(x.median))
-		mz <- topMass(lib)[[i]][bar]
-
-		cat(sprintf("Name: %s", libName(lib)[i]), file = file, sep = "\n")
-		cat(sprintf("Synon: RI: %.1f", medRI(lib)[i]), file = file, sep = "\n")
-		cat(sprintf("Synon: MST SEL MASS: %s", substring(paste(selMass(lib)[[i]], collapse = ";"), 1, 230)), file = file, sep = "\n")
-		cat(sprintf("Num Peaks: %d", length(x.median)), file = file, sep = "\n")
-#		cat(paste(mz, " ", x.median, ";" , sep = ""), file = file, sep = "\n")
+        x.median <- apply(x, 1, median, na.rm = T)
+        x.median[is.na(x.median)] <- 0
+        x.median <- round(999 * x.median/max(x.median))
+        mz <- topMass(metlib)[[id]][x.median > 0]
+        x.median <- x.median[x.median > 0]
+        if(length(x.median) < 2)
+            next
+        cat(sprintf("Name: %s", libName(metlib)[i]), file = file,
+            sep = "\n")
+        cat(sprintf("Synon: RI: %.1f", medRI(metlib)[i]), file = file,
+            sep = "\n")
+        cat(sprintf("Synon: MST SEL MASS: %s", substring(paste(selMass(metlib)[[id]],
+            collapse = ";"), 1, 230)), file = file, sep = "\n")
+        cat(sprintf("Num Peaks: %d", length(x.median)), file = file,
+            sep = "\n")
         foo <- paste(mz, " ", x.median, ";", sep = "")
         foo <- split(foo, rep(1:ceiling(length(foo)/6), each = 6)[1:length(foo)])
-        cat (sapply(foo, function(x) paste(x, collapse = " ")), file = file, sep = "\n")
-		cat("", file = file, sep = "\n")
-	}
-	close(file)
+        cat(sapply(foo, function(x) paste(x, collapse = " ")),
+            file = file, sep = "\n")
+        cat("", file = file, sep = "\n")
+    }
+    close(file)
 }
