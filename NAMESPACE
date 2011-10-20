@@ -120,5 +120,6 @@ export(
 	"baseline",
 	"baselineCorrection",
 	"fixRIcorrection",
-	"TargetSearchGUI"
+	"TargetSearchGUI",
+	"writeLibText"
 )
