@@ -1,9 +1,52 @@
+		CHANGES IN VERSION 1.10.0:
+
+NEW FEATURES
+
+    o	New function "writeLibText" to save "tsLib" objects in a tab-delimited
+	text file (which can consecuently be re-imported). It might be also used to
+	convert a MSP file into a TEXT file.
+
+		CHANGES IN VERSION 1.8.2:
+
+BUG FIXES
+
+    o	bug fixed error due to changes in TargetSearch object definitions in
+	function writeMSP.
+
+		CHANGES IN VERSION 1.8.1:
+
+BUG FIXES
+
+    o	'sampleRI' and 'Profile' functions would return NA if the minPairCor
+	parameter was greater than the number of samples.
+
+    o	Change GUI message to a more suitable one.
+
+    o	'FAMEoutliers' failed if only one sample was analyzed.
+
+    o	'ProfileCleanUP' accepts a minPairObs parameter like 'Profile'
+
+    o	The parameter minPairObs is now checked so that cannot take a value
+	lower than 5 in 'sampleRI', 'Profile', and 'ProfileCleanUP' functions.
+
+		CHANGES IN VERSION 1.6.0:
+
+NEW FEATURES
+
+    o	The Retention Time information is now imported from the RI files.
+	This means that the RT slot of the "tsMSdata" object contains the R.T.
+	values (formerly it was just an empty slot).
+
+BUG FIXES
+
+    o	Several fixes, improvements, and code cleaning.
+
 		CHANGES IN VERSION 1.4.3:
 
 NEW FEATURES
 
     o	Function NetCDFPeakFinding: 'ppc' is now the default peak picking
-	 method.
+	method.
 
 		CHANGES IN VERSION 1.4.2:
 
