@@ -6,6 +6,13 @@ NEW FEATURES
 	text file (which can consecuently be re-imported). It might be also used to
 	convert a MSP file into a TEXT file.
 
+BUG FIXES
+
+    o   Added some 'drop=FALSE' in plotSpectra function.
+
+    o	Calls to 'pdf' are now followed by 'on.exit(dev.off())' to make sure that
+	the device is closed after unexpected errors or user interruption.
+
 		CHANGES IN VERSION 1.8.2:
 
 BUG FIXES

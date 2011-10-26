@@ -33,12 +33,12 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 plotAllRIdev <- function(Lib, peaks, pdfFile, width = 8, height = 8,...) {
 	n <- length(Lib)
 	pdf(pdfFile, width, height, ...)
+	on.exit(dev.off())
 	for(i in 1:ceiling(n/9)) {
 		x <- 9*i - 8
 		y <- min(9*i, n)
 		plotRIdev(Lib, peaks, x:y)
 	}
-	dev.off()
 }
 
 # function to plot a empty box with "NA" text.
@@ -93,14 +93,14 @@ plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
 		plot.NA(main = libName(Lib)[id], xlab = "mz", ylab = "Intensity")
 	} else {
 		# remove samples with no data.
-		x <- x[apply(x, 1, function(x) all(is.na(x))) == FALSE,]
+		x <- x[apply(x, 1, function(x) all(is.na(x))) == FALSE,,drop=FALSE]
 
 		# remove masses with no data
 		bar      <- apply(x, 2, function(x) all(is.na(x))) == FALSE
-		x        <- x[,bar]
+		x        <- x[,bar,drop=FALSE]
 		# x        <- apply(x, 1,median,na.rm = T), FUN = "/")
 
-		x.median <- if(is.null(dim(x))) median(x, na.rm = T) else  apply(x, 2, median, na.rm = T)
+		x.median <- apply(x, 2, median, na.rm = T)
 		x.median <- 999 * x.median / max(x.median)
 
 		mz <- topMass(Lib)[[id]][bar]
@@ -157,8 +157,8 @@ plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
 # a wrapper function to plotSpectrum to plot all spectra
 plotAllSpectra <- function(Lib, peaks, type = "ht", pdfFile, width = 8, height = 8, ...) {
 	pdf(pdfFile, width, height, ...)
+	on.exit(dev.off())
 	for(i in 1:length(Lib)) {
 		plotSpectra(Lib, peaks, i, type)
 	}
-	dev.off()
 }

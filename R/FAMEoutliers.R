@@ -78,6 +78,7 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	}	
 	# print outliers in FAME report file
 	pdf(pdffile, width = 8, height = 8)
+	on.exit(dev.off())
 	if(length(outliers) > 0) {
 		npages <- ceiling(length(outliers)/45)
 		op <- par(mar = c(3,3,3,2))
@@ -103,7 +104,6 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 		plotFAME(samples, RImatrix, i)
 		points(which(RI_out[i,]), RImatrix[i,RI_out[i,]], cex = 2, col = "blue")
 	}
-	dev.off()
 	message("FAMEs were saved in ", pdffile)
 	
 	# set missing markers to NA
