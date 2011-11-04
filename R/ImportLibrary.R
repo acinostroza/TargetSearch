@@ -51,7 +51,7 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 			stop("argument \"libdata\" should be a 'data.frame'")
 		}
 	} else {
-		M <- read.delim(libfile, as.is = T)
+		M <- read.delim(libfile, as.is = T, quote="")
 	}
 
     if(is.null(M$Name))     stop("Column 'Name' is missing!!")

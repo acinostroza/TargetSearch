@@ -168,7 +168,7 @@ TargetSearchGUI <- function() {
         tmp <- tclvalue(tkgetOpenFile(initialdir = tclvalue(valWD), filetypes = "{{RI} {.txt}} {{All files} *}"))
         if (tmp != "") {
           tclvalue(valRIData) <- tmp 
-          RI_SearchFrames <- read.delim(tclvalue(valRIData), sep="\t", header=T, check.names=F)
+          RI_SearchFrames <- read.delim(tclvalue(valRIData), sep="\t", quote="", header=T)
           TSPar <- get("TSPar", envir=envirGUI)
           TSPar$RI_SearchFrames <- RI_SearchFrames
           assign("TSPar", value = TSPar, envir = envirGUI)
@@ -241,7 +241,7 @@ TargetSearchGUI <- function() {
         tmp <- tclvalue(tkgetOpenFile(initialdir = tclvalue(valWD), filetypes = "{{Lib} {.txt}} {{All files} *}"))
         if (tmp != "") {
           tclvalue(valLibData) <- tmp 
-          Lib_Data <- read.delim(tclvalue(valLibData), sep="\t", header=T, quote="", comment="", as.is=T, check.names=F)
+          Lib_Data <- read.delim(tclvalue(valLibData), quote="", as.is=T)
           TSPar <- get("TSPar", envir=envirGUI)
           TSPar$Library_Data <- Lib_Data
           assign("TSPar", value = TSPar, envir = envirGUI)

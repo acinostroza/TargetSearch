@@ -1,3 +1,11 @@
+		CHANGES IN VERSION 1.12.0:
+
+BUG FIXES
+
+    o	Changed to check.names=TRUE in 'read.delim' call in functions
+	TargetSearchGUI() and ImportLibrary(). This prevents empty column names
+	that make errors downstream functions.
+
 		CHANGES IN VERSION 1.10.0:
 
 NEW FEATURES
