@@ -72,7 +72,7 @@ plotPeak <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE
 	par(mar = c(5,4,5,2)+0.1, mgp = c(2,0.8,0))
 	matplot(tm[idx], rawpeaks$Peaks[idx, ms ], type = 'l', xlab = xlab, ylab = "Intensity", ...)
 	if(useRI == TRUE) {
-        axis(3, at = tm[idx[1:(length(idx/10)/10)*10]], label = rawpeaks$Time[idx[1:(length(idx/10)/10)*10]])
+        axis(3, at = tm[idx[1:(length(idx/10)/10)*10]], labels = rawpeaks$Time[idx[1:(length(idx/10)/10)*10]])
 	}
 	legend("topright", legend = masses, col = 1:6, lty = 1:5)
 }

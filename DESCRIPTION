@@ -1,14 +1,14 @@
 Package: TargetSearch
 Type: Package
 Title: A package for the analysis of GC-MS metabolite profiling data.
-Version: 1.11.1
+Version: 1.11.2
 Date: 2011-11-04
 Author: Alvaro Cuadros-Inostroza <inostroza@mpimp-golm.mpg.de>,
         Jan Lisec <lisec@mpimp-golm.mpg.de>,
         Henning Redestig <henning.red@googlemail.com>,
         Matt Hannah <matthew.hannah@bayercropscience.com>
 Maintainer: Alvaro Cuadros-Inostroza <inostroza@mpimp-golm.mpg.de>
-Depends: R (>= 2.7.0), xcms, methods
+Depends: R (>= 2.7.0), mzR, methods
 Imports: graphics, grDevices, methods, stats, tcltk, utils
 Suggests: TargetSearchData
 Description: This packages provides a targeted pre-processing method for GC-MS data. 

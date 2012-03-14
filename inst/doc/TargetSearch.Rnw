@@ -50,7 +50,6 @@ GC-MS data.
 
 <<LibraryPreload, echo = FALSE, results = hide>>=
 options(width=60)
-library(xcms)
 library(TargetSearch)
 library(TargetSearchData)
 @
