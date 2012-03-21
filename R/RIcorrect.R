@@ -1,10 +1,12 @@
 RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold,
 	pp.method = "ppc", showProgressBar = FALSE,
 	baseline = FALSE, baseline.opts = NULL ) {
-	
+
 	manyFiles <- CDFfiles(samples)
 	outFile   <- RIfiles(samples)
 	Names     <- sampleNames(samples)
+	ftype     <- fileFormat(samples)
+	if(is.na(ftype)) ftype <- "binary"
 
 	if(is.null(rimLimits) == FALSE) {
 		standard  <- rimStandard(rimLimits)
@@ -17,31 +19,30 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 
 	# check Files
 	if(!all(file.exists(manyFiles))) {
-	 	stop("These files don't exist: ", paste(manyFiles[!file.exists(manyFiles)], collapse = " "))
+		stop("These files don't exist: ", paste(manyFiles[!file.exists(manyFiles)], collapse = " "))
 	}
 
 	if(showProgressBar)
 		pb <- ProgressBar(title="Extracting peaks...", label="File in processing...")
 	for(i in 1:length(manyFiles)) {
-		if(showProgressBar)
-			setProgressBar(pb, value=i/length(manyFiles),
-				title=paste("Extracting peaks (", round(100*i/length(manyFiles)), "%)"),
-				label=basename(manyFiles[i]))
-			
 		Peaks  <- NetCDFPeakFinding(manyFiles[i], massRange, Window, IntThreshold, pp.method = pp.method,
 				baseline = baseline, baseline.opts = baseline.opts)
 		if(is.null(rimLimits) == FALSE) {
 			fameTimes <- findRetentionTime(Peaks$Time, Peaks$Peaks[, mass - massRange[1] + 1], rLimits)
 			RIcheck[,i] <- fameTimes
 			riInde <- rt2ri(Peaks$Time, fameTimes, standard)
-			writeRIFile(outFile[i], Peaks, riInde, massRange)
+			writeRIFile(outFile[i], Peaks, riInde, massRange, ftype)
 		} else {
-		 	writeRIFile(outFile[i], Peaks, Peaks$Time, massRange)
+			writeRIFile(outFile[i], Peaks, Peaks$Time, massRange, ftype)
 		}
+		if(showProgressBar)
+			setProgressBar(pb, value=i/length(manyFiles),
+				title=paste("Extracting peaks (", round(100*i/length(manyFiles)), "%)"),
+				label=basename(manyFiles[i]))
 	}
-	if(showProgressBar)	
+	if(showProgressBar)
 		close(pb)
-	
+
 	if(is.null(rimLimits) == FALSE) {
 		colnames(RIcheck) <- Names
 		rownames(RIcheck) <- rownames(rLimits)

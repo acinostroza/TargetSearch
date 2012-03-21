@@ -11,7 +11,7 @@ FindPeaks(my.files, refLib,
     showProgressBar = FALSE)
 }
 \arguments{
-  \item{my.files}{ A character vector naming files to be searched. }
+  \item{my.files}{ A character vector naming RI files to be searched. }
   \item{refLib}{ A numeric matrix with three columns or a list of three column
   matrices. The second column contains the masses and the first and third column
   contains the RI limits.}
@@ -25,6 +25,9 @@ FindPeaks(my.files, refLib,
     three-column matrix or a list of such matrices. If it is a list, the length
     must match the length of \code{my.files}. In this case, every component will
     be used to iteratively search in the corresponding file.
+
+    The RI files format can be either "text" or "binary". The type is detected
+    dinamically.
 }
 \value{
     A \code{tsMSdata} object.

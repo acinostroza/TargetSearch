@@ -41,6 +41,7 @@ TargetSearchGUI <- function() {
       
       fncGrayParApex <- function(ApexVal) {
         if(ApexVal == "Apex Data") {
+            tkconfigure(cbxFileFmt, "-state", "disabled")
             tkconfigure(ebxBaseline, "-state", "disabled")
             tkconfigure(cbxBaseline, "-state", "disabled")
             tkconfigure(ebxPDthr, "-state", "disabled")
@@ -52,6 +53,7 @@ TargetSearchGUI <- function() {
             tkconfigure(butRIEdit, "-state", "disabled")
             tkconfigure(butRISave, "-state", "disabled")
         } else {
+            tkconfigure(cbxFileFmt, "-state", "normal")
             tkconfigure(cbxBaseline, "-state", "normal")
             fncCBBaseline()
             tkconfigure(ebxPDthr, "-state", "normal")
@@ -63,18 +65,18 @@ TargetSearchGUI <- function() {
             fncRIGrayEditSave()
         }
       }
-      
+
       fncGetFiles <- function() {
         tmp.filetype <- ifelse(tclvalue(rbValue)=="Apex Data",
-                               "{{Peak Apex Files} {.txt}} {{All files} *}",
-                               "{{NetCDF Files} {.cdf}} {{All files} *}") 
+                               "{{Peak Apex Files} {.dat}} {{Peak Apex Files} {.txt}} {{All files} *}",
+                               "{{NetCDF Files} {.cdf}} {{All files} *}")
         tclvalue(valFiles) <- tclvalue(
-          tkgetOpenFile(initialdir = tclvalue(valWD), 
-                        filetypes = tmp.filetype, 
+          tkgetOpenFile(initialdir = tclvalue(valWD),
+                        filetypes = tmp.filetype,
                         multiple = TRUE))
         tclvalue(valFileNum) <- length(fncSplitTclStrg(tclvalue(valFiles)))
         tkconfigure(labData, "-text", paste("File Import (", tclvalue(valFileNum), " Files)", sep=""))
-        
+
         fncGrayParApex(as.character(tclvalue(rbValue)))
         invisible()
       }
@@ -131,6 +133,7 @@ TargetSearchGUI <- function() {
     # set number of parameter lines and main label
       #for (i in 1:11) { eval(substitute(x <- tkframe(f3, borderwidth=2), list(x=paste("f3z", i, sep="")))) }
 
+      f3zFF <- tkframe(f3, borderwidth=2)  # File Format
       f3zBL <- tkframe(f3, borderwidth=2)  # Baseline
       f3zRI <- tkframe(f3, borderwidth=2)  # RI correction
       f3zPD1 <- tkframe(f3, borderwidth=2) # Peak Detection
@@ -144,6 +147,13 @@ TargetSearchGUI <- function() {
       f3z10 <- tkframe(f3, borderwidth=2)
       f3z11 <- tkframe(f3, borderwidth=2)
       labPar <- tklabel(parent=f3, text="Processing Parameters")
+
+    # File Format
+      labFileFmt <- tklabel(parent=f3, text="    Peak Apex File Format")
+      valFileFmt <- tclVar(1)
+      cbxFileFmt <- tkcheckbutton(parent=f3zFF, variable=valFileFmt)
+      labFileFmtOnOff <- tklabel(parent=f3zFF, text="Use binary format")
+
     # Baseline
       labBaseline <- tklabel(parent=f3, text="    Baseline Correction")
       fncCBBaseline <- function() {
@@ -161,6 +171,7 @@ TargetSearchGUI <- function() {
       ebxBaseline <- tkentry(parent=f3zBL, width=4, textvariable=valBaseline)
       tkconfigure(ebxBaseline, "-state", "disabled")
       labBaselineEBX <- tklabel(parent=f3zBL, text="threshold (0..1)")
+
     # Retention Index
       labRI <- tklabel(parent=f3, text="    Retention Index Corr.")
       valRIData <- tclVar("")
@@ -330,6 +341,7 @@ TargetSearchGUI <- function() {
       ebxProfSNr <- tkentry(parent=f3z11, width=4, textvariable=valProfSNr)
       labProfSNr <- tklabel(parent=f3z11, text="min number of correl. samples")
       # Pack Widgets
+      tkpack(cbxFileFmt, labFileFmtOnOff, side="left", padx=1, anchor="w")
       tkpack(cbxBaseline, side="left", padx=0, anchor="w") 
       tkpack(labBaselineOnOff, ebxBaseline, labBaselineEBX, side="left", padx=1, anchor="w")
       tkpack(butRILoad, butRICreate, butRIEdit, butRISave, side="left", padx=1, anchor="w")
@@ -344,6 +356,7 @@ TargetSearchGUI <- function() {
       tkpack(ebxProfTS, labProfTS, ebxProfthr, labProfthr, side="left", padx=1, anchor="w") 
       tkpack(ebxProfSNr, labProfSNr, side="left", padx=1, anchor="w")
       tkgrid(labPar, sticky="w")
+      tkgrid(labFileFmt, f3zFF, sticky="w")
       tkgrid(labBaseline, f3zBL, sticky="w")
       tkgrid(labPD, f3zPD1, sticky="w")
       tkgrid(labPD2, f3zPD2, sticky="w")
@@ -368,6 +381,7 @@ TargetSearchGUI <- function() {
         # write Parameters from TSPar (R List) into TargetSearch GUI
         tclvalue(valWD) <- TSPar$"WorkingDirectory"
         tclvalue(valFileNum) <- TSPar$"Files"$"FileNum"
+        tclvalue(valFileFmt) <- TSPar$"Files"$"FileFmt"
         tclvalue(rbValue) <- TSPar$"Files"$"FileType"
         fncGrayParApex(TSPar$"Files"$"FileType")
         tclvalue(valFiles) <- TSPar$"Files"$"FilePath"
@@ -397,6 +411,7 @@ TargetSearchGUI <- function() {
           "WorkingDirectory" = tclvalue(valWD),
           "Files" = list(
             "FileNum" = as.numeric(tclvalue(valFileNum)),
+            "FileFmt" = as.numeric(tclvalue(valFileFmt)),
             "FileType" = tclvalue(rbValue),
             "FilePath" = fncSplitTclStrg(tclvalue(valFiles))
           ),
@@ -467,20 +482,22 @@ TargetSearchGUI <- function() {
         # Start 'RUN'
         CDFdir <- tclvalue(valWD)
         RIdir  <- tclvalue(valWD)
+        ftype  <- c("text","binary")[as.numeric(tclvalue(valFileFmt))+1]
         setwd(CDFdir)
         if (as.character(tclvalue(rbValue)) == "Apex Data") {
           RI_FILE <- basename( fncSplitTclStrg(tclvalue(valFiles)) )
           RIdir   <- dirname( fncSplitTclStrg(tclvalue(valFiles)) )[1]
-          CDF_FILE <- gsub("RI_", "", gsub("txt", "cdf", RI_FILE))
+          CDF_FILE <- gsub("^RI_", "", gsub("\\.(dat|txt)$", ".cdf", RI_FILE, ignore.case=TRUE))
         }
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {
           CDF_FILE <- basename( fncSplitTclStrg(tclvalue(valFiles)) )
           CDFdir   <- dirname( fncSplitTclStrg(tclvalue(valFiles)) )[1]
-          RI_FILE <- gsub("cdf", "txt", paste("RI_", CDF_FILE, sep=""))
+          RI_FILE  <- character(0)
         }
         MEASUREMENT_DAY <- sub('^([0-9]+).*$','\\1', CDF_FILE)
         UpdateTextGUI(NA, "Import Samples")
-        samples   <- new("tsSample", CDFfiles = CDF_FILE, RIfiles = RI_FILE, days = MEASUREMENT_DAY, CDFpath = CDFdir, RIpath = RIdir)
+        samples   <- new("tsSample", CDFfiles=CDF_FILE, RIfiles=RI_FILE,
+                         days=MEASUREMENT_DAY, CDFpath=CDFdir, RIpath=RIdir, ftype=ftype)
         if (all(get("TSPar", envir=envirGUI)$Library_Data == "")) {
           Lib <- ImportLibrary(libfile = tclvalue(valLibData),
                                RI_dev = as.numeric(c(tclvalue(valPDW1), tclvalue(valPDW2), tclvalue(valPDW3))))

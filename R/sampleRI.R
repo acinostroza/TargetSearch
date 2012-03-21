@@ -33,15 +33,10 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 	met_cor <- list()
 	options(warn = -1)
 	
-	if(showProgressBar) 
+	if(showProgressBar)
 		pb <- ProgressBar(title="Correlating Masses...", label="File in processing...")
-  
-	for(i in 1:length(Lib)) {
 
-  	if(showProgressBar)  
-		  setProgressBar(pb, value=i/length(Lib),
-						title=sprintf("Correlating Masses (%d %%)",round(100*i/length(Lib))),
-						label=sprintf("Metabolite %d",i))
+	for(i in 1:length(Lib)) {
 
 		  x <- which(libId == i)
 
@@ -62,30 +57,35 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
       tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
       tmp.sel <- tmp[tmp.max,]
       met_cor[[i]] <- which(tmp.sel > r_thres)
+
+		if(showProgressBar)
+			setProgressBar(pb, value=i/length(Lib),
+				title=sprintf("Correlating Masses (%d %%)",round(100*i/length(Lib))),
+				label=sprintf("Metabolite %d",i))
   }
-  if(showProgressBar)  
-		close(pb)  
+  if(showProgressBar)
+		close(pb)
 	options(warn = 0)
 	cor_RI <- matrix(ncol=length(my.files),nrow=length(Lib))
   colnames(cor_RI) <- Names
   rownames(cor_RI) <- rownames(libData(Lib))
-  
+
 	apply2 <- function(X, MARGIN, FUN, ...) {
 		if(is.null(dim(X)))
 			return(X)
 		apply(X, MARGIN, FUN, ...)
 	}
 	
-	if(showProgressBar)  
+	if(showProgressBar)
 		pb <- ProgressBar(title="Getting RIs...", label="File in processing...")
   for(i in 1:length(Lib)){
-  	if(showProgressBar)  
-	   setProgressBar(pb, value=i/length(Lib),
+		cor_RI[i,] <- apply2(resRI[[i]][met_cor[[i]],], 2, median, na.rm=T)
+		if(showProgressBar)
+			setProgressBar(pb, value=i/length(Lib),
 				title=sprintf("Getting RIs (%d %%)",round(100*i/length(Lib))),
-						label=sprintf("Metabolite %d",i))
-       cor_RI[i,] <- apply2(resRI[[i]][met_cor[[i]],], 2, median, na.rm=T)
+				label=sprintf("Metabolite %d",i))
   }
-  if(showProgressBar)  
+  if(showProgressBar)
 		close(pb)
   return(cor_RI)
 }

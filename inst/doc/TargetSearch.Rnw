@@ -50,6 +50,7 @@ GC-MS data.
 
 <<LibraryPreload, echo = FALSE, results = hide>>=
 options(width=60)
+library(mzR)
 library(TargetSearch)
 library(TargetSearchData)
 @
@@ -182,7 +183,7 @@ These files contain the extracted peak list of the respective NetCDF file.
 
 <<RIcorrection>>=
 RImatrix <- RIcorrect(samples, rimLimits, massRange = c(85,500),
-            IntThreshold = 10, pp.method = "smoothing", Window = 7)
+            IntThreshold = 10, pp.method = "smoothing", Window = 15)
 @
 
 
@@ -459,16 +460,13 @@ the raw chromatogram and \Rfunction{plotPeak} to plot the peak (figure~\ref{fig:
 \begin{figure}[htp]
 \centering
 <<plotPeak, fig=true, width=8, height=6>>=
-# select "Valine" top masses
-top.masses <- topMass(lib)[[3]]
 # we select the first sample
 sample.id <- 1
 cdf.file  <- file.path(cdf.path, cdffiles[sample.id])
 rawpeaks  <- peakCDFextraction(cdf.file, massRange = c(85,500))
-plotPeak(rawpeaks, time.range = libRI(lib)[3] + c(-2000,2000),
-    masses = top.masses, useRI = TRUE, rimTime = RImatrix[,sample.id],
-    standard = rimStandard(rimLimits), massRange = c(85, 500),
-    main = "Valine")
+# which.met=3 (id of Valine)
+plotPeak(samples, lib, MetabProfile, rawpeaks, which.smp=sample.id,
+    which.met=3, massRange=c(85,500), corMass=FALSE)
 @
 \caption{Chromatographic peak of Valine.}\label{fig:04}
 \end{figure}

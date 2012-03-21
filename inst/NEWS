@@ -1,10 +1,21 @@
 		CHANGES IN VERSION 1.12.0:
 
+NEW FEATURES
+
+    o	New binary file format for the peak-list files, a.k.a. RI files.
+	This speeds up metabolite searches by 5-10 fold. The old TEXT format
+	is kept for compatibility. Also, functions are provided to convert
+	from and to the new format.
+
+    o	New plot peak function 'plotPeak'. The old function was renamed as
+	plotPeakSimple. The function show also the regions in which the
+	searches were performed to provide better quality controls.
+
 BUG FIXES
 
     o	Changed to check.names=TRUE in 'read.delim' call in functions
 	TargetSearchGUI() and ImportLibrary(). This prevents empty column names
-	that make errors downstream functions.
+	that might produce errors in downstream functions.
 
 		CHANGES IN VERSION 1.10.0:
 

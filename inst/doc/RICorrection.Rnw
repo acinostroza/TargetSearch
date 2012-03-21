@@ -1,0 +1,210 @@
+%\VignetteIndexEntry{RI correction}
+%\VignetteDepends{TargetSearchData}
+%\VignetteKeywords{preprocess, GC-MS, analysis}
+%\VignettePackage{TargetSearch}
+
+\documentclass[11pt]{article}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[authoryear,round]{natbib}
+
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in 
+
+\SweaveOpts{keep.source=TRUE}
+
+\title{RI correction when standards are not co-injected with biological samples}
+\author{\'Alvaro Cuadros-Inostroza\\
+\small{Max Planck Institute for Molecular Plant Physiology}\\
+\small{Potsdam, Germany}\\
+\small{\url{http://www.mpimp-golm.mpg.de/}}
+}
+
+\begin{document}
+% Sweave options
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=1em,fontsize=\small}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+\maketitle
+\parskip=.3cm
+
+\section{Motivation}
+
+The \Rpackage{TargetSearch} package assumes that the retention index
+markers (RIM), such as n-alkanes or FAMEs (fatty acid methyl esters),
+are injected together with the biological samples. A different approach
+often used is to inject the RIMs separately, alternating between
+RIMs and biological samples. For example, a GC-MS run may look like
+the list shown in Table~\ref{tab:01}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{cc}
+\hline
+Measurement Order & Sample Type \\
+\hline
+1  & Alkanes \\
+2  & Biological \\
+3  & Biological \\
+4  & Biological \\
+5  & Biological \\
+6  & Alkanes \\
+7  & Biological \\
+8  & Biological \\
+9  & Biological \\
+10 & Biological \\
+11 & Alkanes \\
+12 & Biological \\
+13 & Biological \\
+14 & Biological \\
+15 & Biological \\
+\hline
+\end{tabular}
+\caption{An example of a GC-MS run. ``Alkanes'' samples are retention
+index markers (RIMs).}
+\label{tab:01}
+\end{table}
+
+In the example (Table~\ref{tab:01}), samples 1, 6, 11 are RIMs and the rest
+are biological samples. The assumption is that the retention time shifts
+between consecutive runs are not significant, so sample \#1 is used to correct
+samples \#2-5, sample \#6 corrects samples \#7-10, and so on. This document
+shows how to perform RI correction in such case with \Rpackage{TargetSearch}, using
+the available chromatograms of the \Rpackage{TargetSearchData} package.
+
+\section{Retention Index correction}
+
+<<options, echo = FALSE, results = hide>>=
+options(width=80)
+@
+
+First, we load the required packages
+<<LibraryPreload>>=
+library(TargetSearch)
+library(TargetSearchData)
+@
+
+Specify the directory where the CDF files are. In this example we will
+use the CDF files of \Rpackage{TargetSearchData} package.
+
+<<cdffiles>>=
+cdfPath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+dir(cdfPath, pattern="cdf$")
+@
+
+Create a \Robject{tsSample} object using all chromatograms from the
+previous directory. Also set the RI path to the current directory.
+Use the R commands \Rfunction{setwd()} and \Rfunction{getwd()}
+to set/get the working directory.
+
+<<samples>>=
+samples.all <- ImportSamplesFromDir(cdfPath)
+RIpath(samples.all) <- "."
+@
+
+Import retention index marker times limits. We will use the
+ones defined in \Rpackage{TargetSearchData}.
+
+<<rim>>=
+rimLimits <- ImportFameSettings(file.path(cdfPath,"rimLimits.txt"))
+rimLimits
+@
+
+Run the retention index correction methods. Here we use
+a mass scan range of 85-320 $m/z$, intensity threshold of 50,
+the peak detection method is "ppc", and the time window width
+is $2*15+1=31$ scan points (equal to 1.5 seconds in this example).
+
+<<ricorrect>>=
+RImatrix <- RIcorrect(samples.all, rimLimits, massRange=c(85,320),
+            Window=15, pp.method="ppc", IntThreshold=50)
+RImatrix
+@
+
+Now you should make sure that the retention times (RT) of the RIMs
+(not the biological samples!!) are correct by using a chromatogram
+visualization tool such as LECO Pegasus, AMDIS, etc. Because there
+are no RIMs inyected in the biological samples, the RTs of the
+RIMs found in \Robject{RImatrix} will make no sense, so you don't need
+to check them.
+
+Up to now we have run the usual \Rpackage{TargetSearch} workflow
+which you can find in the main vignette. To correct the RI of
+the biological samples, the following procedure can be used.
+
+First, we need a logical vector indicating which samples are
+RIMs and which biological. For example, you could create a
+vector like this.
+
+<<isRIMarker>>=
+isRIMarker <- c(T, F, F, F, F, T, F, F, F, F, T, F, F, F, F)
+@
+
+where \Robject{isRIMarker} is \Robject{TRUE} if the respective
+sample is a RIM and \Robject{FALSE} otherwise. Note that here
+we have set components 1, 6, 11 to \Robject{TRUE} just like
+the example in Table~\ref{tab:01}.
+
+Then we have to copy the RIM columns of \Robject{RImatrix} to
+their respective biological sample columns. In other words,
+copy column 1 to columns 2, 3, 4, 5; column 6 to columns 7,
+8, 9, 10; and so on. There are many ways to achieve that,
+here I show two examples.
+
+<<updateRImatrix2>>=
+RImatrix2 <- RImatrix
+RImatrix2[, 2:5]   <- RImatrix[,1]
+RImatrix2[, 7:10]  <- RImatrix[,6]
+RImatrix2[, 12:15] <- RImatrix[,11]
+@
+
+This code snippet is a straight forward method, but has the
+disadvantage that the column indexes must be filled manually.
+A more general approach could be.
+
+<<updateRImatrix>>=
+RImatrix2 <- RImatrix
+z <- cumsum(as.numeric(isRIMarker))
+for(i in unique(z))
+    RImatrix2[, z==i] <- RImatrix[, z==i][,1]
+RImatrix2
+@
+
+After the \Robject{RImatrix2} object is corrected, the RI files
+of the biological samples must be fixed as well.
+
+<<fixRI>>=
+fixRIcorrection(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
+@
+
+Finally, we remove the standards, since we don't need them anymore.
+
+<<finally>>=
+samples <- samples.all[!isRIMarker]
+RImatrix <- RImatrix2[, !isRIMarker]
+@
+
+After that, we can continue we the normal \Rpackage{TargetSearch}
+workflow. If you prefer to use the GUI, run \Rfunction{TargetSearchGUI()}
+from this point and import the RI files by selecting the option ``Apex Data''
+(don't import the standard files).
+
+You could find a copy of all the commands used in this document
+in the \texttt{doc} directory of the \Rpackage{TargetSearch} package.
+
+\end{document}

@@ -1,17 +1,19 @@
 `writeRIFile` <-
-function(outFile, Peaks, riInde, massRange) {
-	Header <- c("RETENTION_TIME","SPECTRUM","RETENTION_TIME_INDEX")
-	# Get rid of scans width no peaks
-	time_idx <- which(apply(Peaks$Peaks, 1, max) > 0)
+function(outFile, Peaks, riInde, massRange, ftype=c("binary", "text")) {
+	ftype <- pmatch(ftype[1], c("binary", "text"))
 
-	format_spectra <- function (x, minmass = massRange[1]) {
-		tmp <- which( x > 0 )
-		minmass <- minmass - 1
-		return(paste(paste(tmp+minmass, x[tmp], sep = ":"), collapse = " "))
+	if(ftype == 2) {
+		Header <- "RETENTION_TIME\tSPECTRUM\tRETENTION_TIME_INDEX"
+		res <- .C("writePeaksTXT", as.character(outFile), as.double(Peaks$Time),
+			as.double(riInde), as.integer(Peaks$Peaks), as.integer(massRange),
+			as.integer(length(Peaks$Time)), as.character(Header), PACKAGE="TargetSearch")
+	} else if(ftype == 1) {
+		swap <- pmatch(.Platform$endian, c("little", "big")) - 1
+		res <- .C("writePeaksDAT", as.character(outFile), as.double(Peaks$Time),
+			as.double(riInde), as.integer(Peaks$Peaks), as.integer(massRange),
+			as.integer(length(Peaks$Time)), as.integer(swap), PACKAGE="TargetSearch")
+	} else {
+		stop("Error: invalid parameter ftype")
 	}
-	
-	spectra <- apply(Peaks$Peaks[time_idx,], 1, format_spectra)
-	write.table(data.frame(Peaks$Time[time_idx],spectra, riInde[time_idx]),
-	 file = outFile, col.names = Header,row.names = F, sep="\t", quote=FALSE)
+	invisible(1)
 }
-

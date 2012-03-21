@@ -13,22 +13,22 @@ setGeneric("CDFfiles<-", function(obj, value) standardGeneric("CDFfiles<-"))
 setReplaceMethod("CDFfiles", "tsSample", function(obj, value) {
 	obj@CDFfiles <- basename(value)
 	validObject(obj)
-	obj			
+	obj
 })
 
 setGeneric("RIfiles", function(obj) standardGeneric("RIfiles"))
 setMethod("RIfiles", "tsSample", function(obj) {
 	if(obj@RIpath != ".")
-	 file.path(obj@RIpath,obj@RIfiles)
- 	else
-    obj@RIfiles
-  })
+		file.path(obj@RIpath,obj@RIfiles)
+	else
+	obj@RIfiles
+})
 
 setGeneric("RIfiles<-", function(obj, value) standardGeneric("RIfiles<-"))
 setReplaceMethod("RIfiles", "tsSample", function(obj, value) {
 	obj@RIfiles <- basename(value)
 	validObject(obj)
-	obj			
+	obj
 })
 
 setGeneric("sampleNames", function(obj) standardGeneric("sampleNames"))
@@ -94,9 +94,9 @@ setValidity("tsSample", function(object) {
 	else if(length(object@Names) != n)
 		paste("Unequal number of CDF files and Names: ", n,", ", length(object@Names), sep = "")
 	else if(length(object@days) != n)
-		paste("Unequal number of CDF files and Days: ", n,", ", length(object@days), sep = "")		
+		paste("Unequal number of CDF files and Days: ", n,", ", length(object@days), sep = "")
 	else if(nrow(object@data) != n)
-		paste("Unequal number of CDF files and Sample Data: ", n,", ", nrow(object@data), sep = "")		
+		paste("Unequal number of CDF files and Sample Data: ", n,", ", nrow(object@data), sep = "")
 	else TRUE
 })
 
@@ -117,14 +117,19 @@ setMethod("initialize",
           "tsSample",
           function(.Object, Names    = character(0), CDFfiles = character(0),
                             RIfiles  = character(0), CDFpath  = ".", RIpath   = ".",
-                            days     = character(0), data     = data.frame()) {
+                            days     = character(0), data     = data.frame(),
+                            ftype    = "binary") {
             if (length(CDFfiles) > 0) {
                 if(length(Names) == 0)
                     Names <- gsub(".cdf", "", CDFfiles, ignore.case = T)
-                if(length(RIfiles) == 0)
-                    RIfiles <- sub("cdf$", "txt", paste("RI_", CDFfiles, sep = ""), ignore.case = T)
+                if(length(RIfiles) == 0) {
+                    ftype <- pmatch(ftype, c("binary","text"))[1]
+                    stopifnot(!is.na(ftype))
+                    ext <- c("dat","txt")[ftype]
+                    RIfiles <- sub("cdf$", ext, paste("RI_", CDFfiles, sep = ""), ignore.case = T)
+                }
                 if(length(days) == 0)
-                    days <- TargetSearch:::getDays(CDFfiles)
+                    days <- getDays(CDFfiles)
                 if(all(dim(data) == 0))
                     data <- data.frame(Names = Names, CDF_FILE = CDFfiles, MEASUREMENT_DAY = days , RI_FILE = RIfiles)
             }
@@ -138,3 +143,28 @@ setMethod("initialize",
             .Object@data     <- data
             .Object
           })
+
+# new methods for 'binary' or 'text' RI-file format.
+# the file type is determined by the file extension.
+#   *.dat => binary, *.txt => text
+# returns either 'binary' or 'text'
+setGeneric("fileFormat", function(obj) standardGeneric("fileFormat"))
+setMethod("fileFormat", "tsSample", function(obj) {
+	tmp <- unique(substring(tolower(obj@RIfiles), nchar(obj@RIfiles)-2))
+	if(length(tmp)!=1)
+		warning("Incorrect RIfile extensions. Expected '*.dat' or '*.txt'")
+	c("binary","text")[pmatch(tmp[1], c("dat", "txt"))]
+})
+
+setGeneric("fileFormat<-", function(obj, value) standardGeneric("fileFormat<-"))
+setReplaceMethod("fileFormat", "tsSample", function(obj, value) {
+	value <- pmatch(value[1], c("binary","text"))
+	if(is.na(value))
+		stop("Incorrect file format: It should be either 'binary' or 'text'")
+	obj@RIfiles <- sub("\\.\\w{3}$", c(".dat",".txt")[value], obj@RIfiles, perl=TRUE)
+	if(!is.null(obj@data$RI_FILE))
+		obj@data$RI_FILE <- obj@RIfiles
+	validObject(obj)
+	obj
+})
+

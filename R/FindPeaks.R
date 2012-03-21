@@ -3,17 +3,6 @@
 FindPeaks <-
 function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"), showProgressBar = FALSE) {
 
-    get.columns <- function(my.file, columns) {
-        if(is.character(columns)) {
-            header <- scan(my.file, what = "character", nlines = 1, quiet = TRUE)
-            tmp <- sapply(columns, function(x) which( header == x ))
-            if(length(unlist(tmp)) != length(columns))
-                stop("Column name not found. Check your RI file.")
-            columns <- unlist(tmp) - 1
-        }
-            return(columns)
-    }
-
     my.names <- basename(my.files)
     if(is.list(refLib)) {
         # check that all matrices have the same size
@@ -46,22 +35,30 @@ function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETE
 
     if(showProgressBar)
         pb <- ProgressBar(title="Finding Peaks...", label="File in processing...")
+
     for (i in 1:length(my.files)) {
+
+        # Guess the file format. See file "file.R"
+        opts <- get.file.format.opt(my.files[i], columns)
+
+        out  <- if(is.list(refLib)) {
+                    .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[[i]][,1]),
+                        as.integer(refLib[[i]][,2]), as.integer(refLib[[i]][,3]),
+                        as.integer(opts), PACKAGE="TargetSearch")
+                } else { .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[,1]),
+                        as.integer(refLib[,2]), as.integer(refLib[,3]),
+                        as.integer(opts), PACKAGE="TargetSearch") }
+
+        resInt[, i] <- out[[1]]
+        resRI[, i]  <- out[[2]]
+        resRT[, i]  <- out[[3]]
+
         if(showProgressBar)
             setProgressBar(pb, value=i/length(my.files),
                 title=paste("Findind Peaks (", round(100*i/length(my.files)), "%)"),
                 label=sprintf("Reading File %s", basename(my.files[i])))
-
-        cols <- get.columns(my.files[i], columns)
-        out  <- if(is.list(refLib)) {
-                    .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[[i]][,1]),
-                        as.integer(refLib[[i]][,2]),	as.integer(refLib[[i]][,3]), as.integer(cols), PACKAGE="TargetSearch")
-                } else { .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[,1]),
-                        as.integer(refLib[,2]),	as.integer(refLib[,3]), as.integer(cols), PACKAGE="TargetSearch") }
-        resInt[, i] <- out[[1]]
-        resRI[, i]  <- out[[2]]
-        resRT[, i]  <- out[[3]]
     }
+
     if(showProgressBar)
         close(pb)
 

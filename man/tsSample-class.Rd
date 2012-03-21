@@ -32,6 +32,10 @@
 \alias{sampleNames}
 \alias{sampleNames<-,tsSample-method}
 \alias{sampleNames<-}
+\alias{fileFormat,tsSample-method}
+\alias{fileFormat}
+\alias{fileFormat<-,tsSample-method}
+\alias{fileFormat<-}
 \alias{show,tsSample-method}
 
 \title{Class for representing samples}
@@ -43,9 +47,9 @@ the object generator function.
 \code{
 new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
      RIfiles = [list of RI file names], CDFpath = [CDF files path],
-		 RIpath = [RI files path], days = [measurement days],
-		 data = [additional sample information])}
-}
+     RIpath  = [RI files path], days = [measurement days],
+     data    = [additional sample information], ftype = [RI file format])
+}}
 
 \section{Slots}{
   \describe{
@@ -71,7 +75,15 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{sampleDays}}{\code{signature(obj = "tsSample")}: measurement days. }
     \item{\code{sampleNames}}{\code{signature(obj = "tsSample")}: sample names.}
     \item{\code{show}}{\code{signature(object = "tsSample")}: the show funtion. }
-	 }
+    \item{\code{fileFormat}}{\code{signature}{obj = "tsSample"}: Sets or gets the RI file format.
+        Options are either "binary" or "text". See note below.}
+ }
+}
+\section{Notes}{
+    The method \code{fileFormat} only changes the internal information
+    of the file type and not the files themselves. To actually
+    change the files, use the functions \code{\link{bin2text}}
+    and \code{\link{text2bin}}.
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{

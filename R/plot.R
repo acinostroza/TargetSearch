@@ -50,7 +50,7 @@ plot.NA <- function(...) {
 
 # function to plot a chromatographic peak.
 
-plotPeak <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE, rimTime = NULL,
+plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE, rimTime = NULL,
 	standard = NULL, massRange = c(85, 500), ...) {
 
 	if(is.null(cdfFile) == FALSE)
@@ -76,6 +76,100 @@ plotPeak <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE
 	}
 	legend("topright", legend = masses, col = 1:6, lty = 1:5)
 }
+
+# a new version
+plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, massRange=c(85,500), corMass=FALSE) {
+
+	grep2 <- function(pattern, x) {
+		out <- grep(tolower(pattern), tolower(x), fixed=TRUE)
+		if(length(out) == 0) # trying regular expression
+			out <- grep(tolower(pattern), tolower(x), ignore.case=TRUE)
+		out
+	}
+
+	if(is.character(which.smp)) {
+		which.smp <- grep2(which.smp[1], sampleNames(samples))
+		if(length(which.smp) > 1) {
+			message("Multiple samples found. Using the first match.")
+			message(sprintf("[%d] %s\n", which.smp, sampleNames(samples)[which.smp]))
+		} else if(length(which.smp) == 0) {
+			stop("No samples matching pattern found")
+		}
+	}
+	which.smp <- which.smp[1]
+
+	if(is.character(which.met)) {
+		which.met <- grep2(which.met[1], libName(Lib))
+		if(length(which.met) > 1) {
+			message("Multiple metabolites found. Using the first match.")
+			message(sprintf("[%d] %s\n", which.met, libName(Lib)[which.met]))
+		} else if(length(which.met) == 0) {
+			stop("No metabolites found.")
+		}
+	}
+	which.met <- which.met[1]
+
+	cdfFile   <- CDFfiles(samples)[which.smp]
+	riFile    <- RIfiles(samples)[which.smp]
+
+	if(missing(rawpeaks))
+		rawpeaks <- peakCDFextraction(cdfFile, massRange)
+	if(is.null(rawpeaks))
+		rawpeaks <- peakCDFextraction(cdfFile, massRange)
+
+	# code to transform from RI to RT
+	cols      <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
+	opt       <- TargetSearch:::get.file.format.opt(riFile, cols)
+	if(opt[1] == 0) {
+		tmp  <- read.delim(riFile, as.is = TRUE)
+		ri   <- rt2ri(rawpeaks$Time, tmp$RETENTION_TIME, tmp$RETENTION_TIME_INDEX)
+	} else if(opt[1] == 1) {
+		tmp <- TargetSearch:::readRIBin(riFile)
+		ri  <- rt2ri(rawpeaks$Time, tmp$retTime, tmp$retIndex)
+	}
+
+	id <- as.character(which.met)
+	topMz <- topMass(Lib)[[which.met]]
+	topMz <- topMz[topMz >= massRange[1] & topMz <= massRange[2]]
+	corMz <- profileInfo(metProf)[id, "Masses"]
+	corMz <- as.numeric(unlist(strsplit(corMz,";")))
+
+	if(corMass) topMz <- corMz
+
+	font <- lwd <- rep(1, length(topMz))
+	lwd[topMz %in% corMz] <- 3
+	font[topMz %in% corMz] <- 2
+
+	libOriRI <- libRI(Lib)[which.met]
+	libMedRI <- medRI(Lib)[which.met]
+	smpMedRI <- median(retIndex(metProf)[[which.met]][, which.smp], na.rm=T)
+	rdev <- RIdev(Lib)[which.met,]
+
+	riRange <- range(c(c(libOriRI,libMedRI,smpMedRI)-rdev,
+		c(libOriRI,libMedRI,smpMedRI)+rdev), na.rm=T)
+
+	idx <- which( ri >= riRange[1] & ri <= riRange[2])
+	mz  <- topMz - massRange[1] + 1
+
+	intRange <- range(rawpeaks$Peaks[idx, mz ])
+
+	main <- sprintf("Sample: %s | Metab: %s",  sampleNames(samples)[which.smp], libName(Lib)[which.met])
+
+	plot(NA, type="n", xlab = 'Retention Index (RI)', ylab = "Intensity", xlim=range(ri[idx]), ylim=intRange)
+	mtext(main, 3, font=2, line=2)
+	axis(3, at = ri[idx[1:(length(idx/10)/10)*10]], labels = rawpeaks$Time[idx[1:(length(idx/10)/10)*10]])
+
+	rect(libMedRI-rdev[2], -intRange[2]*2, libMedRI+rdev[2], intRange[2]*2, col=gray(0.95), lty=0)
+	rect(smpMedRI-rdev[3], -intRange[2]*2, smpMedRI+rdev[3], intRange[2]*2, col=gray(0.9), lty=0)
+
+	matlines(ri[idx], rawpeaks$Peaks[idx, mz ], lwd=lwd)
+	legend("topright", legend = topMz, col = 1:6, lty = 1:5, lwd=lwd, text.col=font)
+	box()
+
+	invisible(rawpeaks)
+}
+
+
 
 # function to plot the median intensities across all the samples with the reference spectrum
 # for a given metabolite.

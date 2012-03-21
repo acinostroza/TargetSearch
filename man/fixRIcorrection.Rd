@@ -3,7 +3,7 @@
 \title{Manual Retention Time Index Correction}
 \description{
     This function can be used to manually correct the detected retention time index (RI)
-    or to force their location to specific time.
+    or to force their location to specific retention times.
 }
 \usage{
 fixRIcorrection(samples, rimLimits, RImatrix, sampleNames)
