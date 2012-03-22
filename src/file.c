@@ -322,6 +322,11 @@ SPECTRA pktosp(double *rt, double *ri, int *in, int *mass, int nscans)
 	int nmz=mass[1]-mass[0]+1;
 
 	sp.n_scans = -1;
+	sp.pk = NULL;
+	sp.n  = NULL;
+	sp.rt = NULL;
+	sp.ri = NULL;
+	sp.p_count = 0;
 
 	if(nmz < 0)
 		return sp;
@@ -446,7 +451,6 @@ void txt2dat(char **infile, char **outfile, int *swap, int *cols)
 /* Function to convert from DAT to TXT format*/
 void dat2txt(char **infile, char **outfile, int *swap, char **header)
 {
-	int splen=0;
 	FILE *fpin, *fpout;
 	SPECTRA sp;
 
