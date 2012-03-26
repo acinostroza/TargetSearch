@@ -1,11 +1,11 @@
 		CHANGES IN VERSION 1.12.0:
 
-NEW FEATURES
+SIGNIFICANT USER-VISIBLE CHANGES
 
     o	New binary file format for the peak-list files, a.k.a. RI files.
 	This speeds up metabolite searches by 5-10 fold. The old TEXT format
-	is kept for compatibility. Also, functions are provided to convert
-	from and to the new format.
+	is kept for compatibility. See method 'fileFormat'. Also see
+	'bin2text' and 'text2bin' funtions.
 
     o	New plot peak function 'plotPeak'. The old function was renamed as
 	plotPeakSimple. The function show also the regions in which the

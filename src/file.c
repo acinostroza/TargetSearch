@@ -37,8 +37,9 @@ void swapb(void *ptr, int size)
 /* apply byte swapping to an array */
 void swapp(void *ptr, int size, int len) {
 	int i;
+	char *p=ptr;
 	for(i = 0; i < len; i++)
-		swapb(ptr + i*size, size);
+		swapb(p + i*size, size);
 }
 
 /* function to read a DAT file:
