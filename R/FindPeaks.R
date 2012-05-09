@@ -42,11 +42,11 @@ function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETE
         opts <- get.file.format.opt(my.files[i], columns)
 
         out  <- if(is.list(refLib)) {
-                    .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[[i]][,1]),
-                        as.integer(refLib[[i]][,2]), as.integer(refLib[[i]][,3]),
+                    .Call("FindPeaks", as.character(my.files[i]), as.double(refLib[[i]][,1]),
+                        as.integer(refLib[[i]][,2]), as.double(refLib[[i]][,3]),
                         as.integer(opts), PACKAGE="TargetSearch")
-                } else { .Call("FindPeaks", as.character(my.files[i]), as.integer(refLib[,1]),
-                        as.integer(refLib[,2]), as.integer(refLib[,3]),
+                } else { .Call("FindPeaks", as.character(my.files[i]), as.double(refLib[,1]),
+                        as.integer(refLib[,2]), as.double(refLib[,3]),
                         as.integer(opts), PACKAGE="TargetSearch") }
 
         resInt[, i] <- out[[1]]
