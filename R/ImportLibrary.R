@@ -135,9 +135,9 @@ Spectra <- function(x) {
 	x <- sub("^ ","", x)
 	x <- sub(" $","", x)
 
-  y <- strsplit(as.character(x), " +")
-	z <- sapply(y, function(x) unlist(strsplit(x, ":")))
-	z <- sapply(z, function(x) matrix(as.numeric(x), ncol = 2, byrow = T))
+	y <- strsplit(as.character(x), " +")
+	z <- sapply(y, function(x) unlist(strsplit(x, ":")), simplify=FALSE)
+	z <- sapply(z, function(x) matrix(as.numeric(x), ncol=2, byrow=TRUE), simplify=FALSE)
 	return(z)
 }
 
