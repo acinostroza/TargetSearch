@@ -65,15 +65,15 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 			y <- 1 	  
  	  }
 
-		# calculates scores 	  
- 	  if(length(spectra(Lib)) > 0 & length(x) >= 3) {
- 	  	M <- apply(resInt[[i]], 1, median, na.rm = T)
- 	  	M[is.na(M)] <- 0
- 	  	score_all   <- Score(cbind(topMass(Lib)[[i]], M), spectra(Lib)[[i]])
- 	  	if(length(y) >= 3) {
- 	  		score_cor <- Score(cbind(topMass(Lib)[[i]][y], M[y]), spectra(Lib)[[i]])
- 	  	}
- 	  }
+		# calculates scores if there are at least 3 top masses
+		if(length(spectra(Lib)) > 0 & length(topMass(Lib)[[i]]) >= 3) {
+			M <- apply(resInt[[i]], 1, median, na.rm = T)
+			M[is.na(M)] <- 0
+			score_all   <- Score(cbind(topMass(Lib)[[i]], M), spectra(Lib)[[i]])
+			if(length(y) >= 3) {
+				score_cor <- Score(cbind(topMass(Lib)[[i]][y], M[y]), spectra(Lib)[[i]])
+			}
+		}
 
     searchData$Mass_count[i]                 <- length(y)
     searchData$Non_consecutive_Mass_count[i] <- length(y) - sum(diff(sort(topMass(Lib)[[i]][y])) == 1)
@@ -121,17 +121,21 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 # is obtain using the common masses. Otherwise, all the masses are used.
 
 Score <- function(x, y, match = T) {
-  x <- x[order(x[,1]),]
-  y <- y[order(y[,1]),]
+	if(all(x[,2] == 0) | all(y[,2] == 0))
+		return(0)
+
+	x <- x[order(x[,1]),]
+	y <- y[order(y[,1]),]
 	if(match) {
-	  x1 <- x[x[,1] %in% y[,1],2]
-	  y1 <- y[y[,1] %in% x[,1],2]
+		x1 <- x[x[,1] %in% y[,1],2]
+		y1 <- y[y[,1] %in% x[,1],2]
 	} else {
-	  r <- range(x[,1], y[,1])
-	  x1 <- sapply(r[1]:r[2], function(z) if(any(x[,1] == z)) x[x[,1] == z,2] else 0)
-	  y1 <- sapply(r[1]:r[2], function(z) if(any(y[,1] == z)) y[y[,1] == z,2] else 0)
+		r <- range(x[,1], y[,1])
+		x1 <- sapply(r[1]:r[2], function(z) if(any(x[,1] == z)) x[x[,1] == z,2] else 0)
+		y1 <- sapply(r[1]:r[2], function(z) if(any(y[,1] == z)) y[y[,1] == z,2] else 0)
 	}
-  x1 <- 999 * x1 / max(x1)
-  y1 <- 999 * y1 / max(y1)
+	x1 <- 999 * x1 / max(x1)
+	y1 <- 999 * y1 / max(y1)
 	round((1 - sum(abs(x1-y1)) / sum(abs(x1+y1)))*1000)
 }
+
