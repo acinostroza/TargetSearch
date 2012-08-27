@@ -51,13 +51,20 @@ plot.NA <- function(...) {
 # function to plot a chromatographic peak.
 
 plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE, rimTime = NULL,
-	standard = NULL, massRange = c(85, 500), ...) {
+	standard = NULL, massRange = NULL, ...) {
 
 	if(is.null(cdfFile) == FALSE)
 		rawpeaks <- peakCDFextraction(cdfFile, massRange)
 
 	if(length(time.range) != 2)
 		stop("time.range length must be equal to 2.")
+
+	if(is.null(massRange)) {
+		if(!is.null(rawpeaks$massRange))
+			massRange <- rawpeaks$massRange
+		else
+			stop("mass range definition is missing.")
+	}
 
 	if(useRI == TRUE) {
 	    tm <- rt2ri(rawpeaks$Time,rimTime, standard)
@@ -78,7 +85,7 @@ plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI =
 }
 
 # a new version
-plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, massRange=c(85,500), corMass=FALSE) {
+plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, massRange=NULL, corMass=FALSE) {
 
 	grep2 <- function(pattern, x) {
 		out <- grep(tolower(pattern), tolower(x), fixed=TRUE)
@@ -116,6 +123,12 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 		rawpeaks <- peakCDFextraction(cdfFile, massRange)
 	if(is.null(rawpeaks))
 		rawpeaks <- peakCDFextraction(cdfFile, massRange)
+	if(is.null(massRange)) {
+		if(!is.null(rawpeaks$massRange))
+			massRange <- rawpeaks$massRange
+		else
+			stop("mass range definition is missing.")
+	}
 
 	# code to transform from RI to RT
 	cols      <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
@@ -168,8 +181,6 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 
 	invisible(rawpeaks)
 }
-
-
 
 # function to plot the median intensities across all the samples with the reference spectrum
 # for a given metabolite.

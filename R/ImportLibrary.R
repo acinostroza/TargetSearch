@@ -1,18 +1,21 @@
 # function to import a library. a general function for
 # MSP or tab-delimited format.
 # Arguments:
-#  - libfile: The library file
+#  - x: a library file or a data.frame
 #  - type: the file type: options are "auto" (autodetection), "tab" and "msp"
 
-ImportLibrary <- function(libfile, type = "auto", ...) {
+ImportLibrary <- function(x, type = "auto", ...) {
 
     # detects file type: either tab-delimited or NIST MSP format
+    if(is.data.frame(x)) {
+        return(ImportLibrary.tab(libdata=x, ...))
+    }
     type <- pmatch(type[1], c("auto", "tab", "msp"))
     if(is.na(type))
         stop("Invalided 'type' option.")
-        
+
     if(type == 1) {
-        line <- readLines(libfile, n = 1)
+        line <- readLines(x, n = 1)
         if(grepl("\t", line)) {
             type <- 2
         } else if(grepl("^Name:", line)) {
@@ -23,9 +26,20 @@ ImportLibrary <- function(libfile, type = "auto", ...) {
     }
 
     if(type == 2)
-        ImportLibrary.tab(libfile, ...)
+        ImportLibrary.tab(x, ...)
     else
-        ImportLibrary.msp(libfile, ...)
+        ImportLibrary.msp(x, ...)
+}
+
+.optfun <- function(file, opt)
+{
+	stopifnot(is.list(opt) | is.null(opt))
+	# default options passed to read.table
+	def <- list(file=file, header=TRUE, sep="\t", quote="", dec=".",
+			fill=TRUE, comment.char="")
+	for(n in names(opt))
+		def[[n]] <- opt[[n]]
+	def
 }
 
 # function to import a library (from a tab delimited file):
@@ -38,46 +52,52 @@ ImportLibrary <- function(libfile, type = "auto", ...) {
 #  - TopMasses: How many masses from the spectra should be uses as top Masses.
 #  - ExcludeMasses: Don't take this masses as TopMasses automatically.
 #  - libdata: A data frame containing the data from a library file (optional)
+#  - file.opt: A list. Further options passed to read.delim
 
 ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
-	SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata) {
+	SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata, file.opt=NULL) {
 
 	op <- options(stringsAsFactors=FALSE)
 
 	if(missing(libfile)) {
 		if(missing(libdata)) {
 			stop("argument \"libfile\" and \"libdata\" are missing, with no default")
-		} else if(class(libdata) == 'data.frame'){
+		} else if(is.data.frame(libdata)) {
 			M <- libdata
 		} else {
 			stop("argument \"libdata\" should be a 'data.frame'")
 		}
 	} else {
-		M <- read.delim(libfile, as.is = T, quote="")
+		file.opt <- .optfun(libfile, file.opt)
+		M <- do.call("read.table", file.opt)
 	}
 	M <- .check.data.frame(M)
 
-    if(is.null(M$Name))     stop("Column 'Name' is missing!!")
-    if(is.null(M$RI)) {
-        stop("Column 'RI' is missing!!")
-    } else { # force numeric
-        M$RI <- as.numeric(M$RI)
-        if(any(is.na(M$RI))) {
-            stop("Missing values in RI definition found. Please check input data.")
-        }
-    }
+	if(is.null(M$Name))
+		stop("Column 'Name' is missing!!")
+	if(is.null(M$RI)) {
+		stop("Column 'RI' is missing!!")
+	} else { # force numeric
+		M$RI <- as.numeric(M$RI)
+		if(any(is.na(M$RI))) {
+			stop("Missing values in RI definition found. Please check input data.")
+		}
+	}
+
+	options(op)
 
 	has.spectra <- TRUE
 	spectra     <- list()
-	
+
 	if(is.null(M$SPECTRUM)) has.spectra <- FALSE
 	if(is.null(M$SEL_MASS)) M$SEL_MASS <- NA
-	if(is.null(M$TOP_MASS)) M$TOP_MASS <- NA 
+	if(is.null(M$TOP_MASS)) M$TOP_MASS <- NA
 
 	sel.mass  <- strsplit(as.character(M$SEL_MASS), "[;\\|:, ]+")
 	top.mass  <- strsplit(as.character(M$TOP_MASS), "[;\\|:, ]+")
 
-	if(has.spectra)	spectra <- Spectra(as.character(M$SPECTRUM))
+	if(has.spectra)
+		spectra <- Spectra(as.character(M$SPECTRUM))
 
 	selMass <- list()
 	topMass <- list()
@@ -90,7 +110,9 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 			if(has.spectra) {
 				tm <- Top.Masses(spectra[[i]], TopMasses, ExcludeMasses)
 			} else {
-				if(all(is.na(sm))) stop ("Error importing library: line ", i+1, ".\nNo mass was found. Please check Library file\n.")
+				if(all(is.na(sm)))
+					stop ("Error importing library: line ", i+1,
+						".\nNo mass was found. Please check Library file\n.")
 				tm <- sm
 			}
 		}
@@ -112,11 +134,9 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 	if(is.null(M$Win_3)) w3 <- rep(RI_dev[3], length(M$RI)) else w3 <- M$Win_3
 	qM <- if(is.null(M$QUANT_MASS)) numeric(nrow(M)) else as.numeric(M$QUANT_MASS)
 
-	options(op)
-
-	new("tsLib", Name = M$Name, RI = M$RI, medRI = M$RI, RIdev = cbind(w1,w2,w3),
+	new("tsLib", Name = as.character(M$Name), RI = M$RI, medRI = M$RI, RIdev = cbind(w1,w2,w3),
 		selMass = selMass, topMass = topMass, quantMass=qM, spectra = spectra, libData = M)
-	
+
 }
 
 Top.Masses <- function(sp, TopMasses, ExcludeMasses = NULL) {
@@ -196,7 +216,7 @@ read.msp <- function(msp.file) {
 }
 
 # import a library from a MSP file. It has the same arguments as ImportLibrary.tab
-# except fields. 
+# except fields.
 
 ImportLibrary.msp <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL) {
@@ -222,9 +242,9 @@ ImportLibrary.msp <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
                     as.numeric( sub(re, "\\1", x$Synon[id[1]] ) )
                 } else 0
             })
- 
+
         } else stop("'fields' must have at list one member")
-  
+
         if(n >= 2) {
             selMass <- lapply(msp, function(x) {
                 re <- paste("^Synon: ?", fields[[2]][1], " *(.+)$", sep = "")
@@ -235,7 +255,7 @@ ImportLibrary.msp <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
             })
         } else
             selMass <- as.list(rep("NA", length(msp)))
-  
+
         selMass <- mapply(function(x,y) if(any(x == "NA")) y[1:SelMasses] else x, selMass, topMass, SIMPLIFY = FALSE)
         selMass <- lapply(selMass, as.numeric)
     }

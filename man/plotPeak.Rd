@@ -6,17 +6,18 @@
 }
 \usage{
 plotPeak(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1,
-	massRange=c(85,500), corMass=FALSE)
+	massRange=NULL, corMass=FALSE)
 }
 \arguments{
   \item{samples}{A \code{tsSample} object created by \code{ImportSamples} function.}
   \item{Lib}{A \code{tsLib} object created by \code{\link{ImportLibrary}} function.}
   \item{metProf}{A metabolite profile object. See \code{\link{Profile}}}
-  \item{rawpeaks}{ A two component list containing the retention time and the intensity matrices.
-	See \code{\link{peakCDFextraction}}. }
+  \item{rawpeaks}{ A thre component list containing the retention time, the intensity matrix,
+	and the mass range. See \code{\link{peakCDFextraction}}. }
   \item{which.smp}{ A numeric value indicating the sample. }
   \item{which.met}{ A numeric value indicating the metabolite. }
-  \item{massRange}{ A two component numeric vector with the scan mass range to extract. }
+  \item{massRange}{ A two component numeric vector with the scan mass range to extract. or
+	\code{NULL} for automatic detection.}
   \item{corMass}{ Logical. If TRUE, show only correlating masses for the selected
 	metabolite. Show all masses otherwise.}
 }

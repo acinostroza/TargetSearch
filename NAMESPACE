@@ -127,5 +127,7 @@ export(
 	"TargetSearchGUI",
 	"writeLibText",
 	"bin2text",
-	"text2bin"
+	"text2bin",
+	"riMatrix",
+	"fixRI"
 )

@@ -1,4 +1,4 @@
-RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold,
+RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThreshold,
 	pp.method = "ppc", showProgressBar = FALSE,
 	baseline = FALSE, baseline.opts = NULL ) {
 
@@ -27,6 +27,10 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 	for(i in 1:length(manyFiles)) {
 		Peaks  <- NetCDFPeakFinding(manyFiles[i], massRange, Window, IntThreshold, pp.method = pp.method,
 				baseline = baseline, baseline.opts = baseline.opts)
+
+		if(is.null(massRange))
+			massRange <- Peaks$massRange
+
 		if(is.null(rimLimits) == FALSE) {
 			fameTimes <- findRetentionTime(Peaks$Time, Peaks$Peaks[, mass - massRange[1] + 1], rLimits)
 			RIcheck[,i] <- fameTimes
@@ -51,3 +55,5 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange, Window, IntThreshold
 		return(NULL)
 	}
 }
+
+# vim: set ts=4 sw=4:

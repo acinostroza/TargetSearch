@@ -72,7 +72,7 @@ RImatrix2[, 7:10]   <- RImatrix[,6]
 RImatrix2[, 12:15]  <- RImatrix[,11]
 
 # update the RIs of the biological samples.
-fixRIcorrection(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
+fixRI(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
 
 # remove the standards, since we don't need them anymore.
 samples <- samples.all[!isRIMarker]

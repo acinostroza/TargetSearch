@@ -1,3 +1,43 @@
+		CHANGES IN VERSION 1.14.0:
+
+NEW FEATURES
+
+    o	New function 'fixRI'. This function can be used to correct RI markers
+	or to manually force their location to specific retention times if,
+	for example, the RI markers were not co-injected with the biological
+	samples. Replaces the now deprecated 'fixRIcorrection'.
+
+    o	New function 'riMatrix'. This function searches RI markers in RI
+	files instead of CDF files.
+
+    o	Improvements in CDF import functions:
+	 - Automatic detection of m/z range.
+	 - Detection and correction of CDF files with non-integer m/z values.
+	   These values are converted to nominal mass.
+
+    o	ImportLibrary:
+	 - New parameter 'file.opt'. A list containing arguments to
+	   be passed to 'read.delim'.
+	 - It can take a data frame instead of a file to create a library
+	   object.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o	Function 'fixRIcorrection' is deprecated. Use 'fixRI'.
+
+BUG FIXES
+
+    o	The .Call function in FindPeaks.R would incorrectly coerce RI limits
+	to integers instead of double.
+
+    o	ImportLibrary:
+	 - Fixed bug when reading one-metabolite libraries.
+	 - Check for unexpected quotation mark characters in input file or
+	   input data.frame. They will be removed.
+
+    o	Profile: check for at least three top masses to calculate spectra
+	similarity scores.
+
 		CHANGES IN VERSION 1.12.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES

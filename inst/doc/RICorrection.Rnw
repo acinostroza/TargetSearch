@@ -189,7 +189,7 @@ After the \Robject{RImatrix2} object is corrected, the RI files
 of the biological samples must be fixed as well.
 
 <<fixRI>>=
-fixRIcorrection(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
+fixRI(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
 @
 
 Finally, we remove the standards, since we don't need them anymore.

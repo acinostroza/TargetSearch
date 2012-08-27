@@ -7,7 +7,7 @@
 	text files (a.k.a. RI files).
 }
 \usage{
-RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold, 
+RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
 	pp.method = "ppc", showProgressBar = FALSE, baseline = FALSE,
 	baseline.opts = NULL )
 }
@@ -15,7 +15,8 @@ RIcorrect(samples, rimLimits = NULL, massRange, Window, IntThreshold,
   \item{samples}{ A \code{tsSample} object created by \code{ImportSamples} function. }
   \item{rimLimits}{ A \code{tsRim} object. If set to \code{NULL}, no retention
 	time will be performed. See \code{ImportFameSettings}.}
-  \item{massRange}{ A two component vector of m/z range used by the GC-MS machine. }
+  \item{massRange}{ A two component vector of m/z range used by the GC-MS machine
+	or \code{NULL}, in which case the range will be detected automatically. }
   \item{Window}{ The window used for smoothing. The number of points actually used
 	is \code{2*Window + 1}. }
   \item{IntThreshold}{ Apex intensities lower than this value will be removed from the RI files. }

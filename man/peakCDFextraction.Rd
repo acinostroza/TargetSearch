@@ -6,7 +6,7 @@
 	the retention time and the intensity matrices.
 }
 \usage{
-peakCDFextraction(cdfFile, massRange = c(85, 500))
+peakCDFextraction(cdfFile, massRange = NULL)
 }
 \arguments{
   \item{cdfFile}{ A character string naming a netcdf file. }
@@ -19,13 +19,15 @@ peakCDFextraction(cdfFile, massRange = c(85, 500))
 	
 	The \code{massRange} parameter is a numeric vector with two components: lower
 	and higher masses. All masses in that range will be extracted. Note that it is
-	not possible to extract a discontinuous mass range.
+	not possible to extract a discontinuous mass range. It also can be \code{NULL},
+	in which case the mass range will be determined by scanning the cdf file.
 }
 \value{
 	A two component list.
   \item{Time}{The retention time vector.}
   \item{Peaks}{The intensity matrix. Rows are the retention times and columns are masses. The first
 	column is the lower mass value and the last one is the higher mass. }
+  \item{massRange}{The mass range.}
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \note{

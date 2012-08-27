@@ -9,17 +9,23 @@
     more common NIST MSP format.
 }
 \usage{
-ImportLibrary(libfile, type = "auto", ...)
+ImportLibrary(x, type = "auto", ...)
 
 ImportLibrary.tab(libfile, fields = NULL, RI_dev = c(2000,1000,200),
-    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata)
+    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL,
+    libdata, file.opt=NULL)
 
 ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL)
 
 }
 \arguments{
-  \item{libfile}{ A character string naming a library file. See details. }
+  \item{x}{A character string or a \code{data.frame}. If \code{data.frame},
+    it will be passed to \code{ImportLibrary.tab} as parameter \code{libdata}.
+    If \code{character}, it will be passed as \code{libfile} to either
+    \code{ImportLibrary.tab} or \code{ImportLibrary.msp} according to the file
+    type (option \code{type}).}
+  \item{libfile}{A character string naming a library file. See details.}
   \item{type}{The library file format. Posible options are \code{"tab"} for a
   tab-delimited file, \code{"msp"} for NIST MSP format, or \code{"auto"} for
   autodetection. Default to \code{"auto"}.}
@@ -32,15 +38,36 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     if no \code{TOP_MASSES} is provided.}
   \item{ExcludeMasses}{ Optional. A vector containing a list of masses that will be excluded.}
   \item{libdata}{Optional. A data frame with library data. The format is the same
-    as the library file. It is equivalent to loading the library file first with \code{\link[utils]{read.delim}} and
-    calling \code{ImportLibrary.tab} after.}
+    as the library file. It is equivalent to importing the library file first
+    with \code{\link[utils]{read.table}} and calling \code{ImportLibrary.tab} after.
+    This might be preferable for "fine tuning", for example, if the library file
+    is in CSV format instead of tab-delimited.}
+  \item{file.opt}{Optional. A list containing arguments to be passed to
+    \code{\link[utils]{read.table}}.}
   \item{\dots}{Further arguments passed to \code{ImportLibrary.tab} or \code{ImportLibrary.msp}}
 }
 \details{
 
-    The tab-delimited format is a tab delimited text file with the following column names.
-    \itemize{
+    \code{ImportLibrary} is a wrapper for functions \code{ImportLibrary.tab} and
+    \code{ImportLibrary.msp} which detects automatically which function should be
+    called.
 
+    \code{ImportLibrary.tab} reads a tab delimited text file by calling the function
+    \code{\link[utils]{read.table}} which will be parsed and converted to a
+    \code{\linkS4class{tsLib}} object. The following arguments are used by default
+    (which are not exactly the defaults for \code{read.table}):
+
+    \code{header=TRUE, sep="\t", quote="", dec=".", fill=TRUE, comment.char="#"}
+
+    The argument \code{file.opt} can be used to change these options. Other
+    alternative is to import first the file with \code{read.table} and
+    friends, and call \code{ImportLibrary} with the resulting \code{data.frame}.
+    This allows more flexibility with libraries with unusual characters, for
+    example.
+
+    These columns are needed:
+
+    \itemize{
     \item \code{Name} - The metabolite name.
     \item \code{RI} - The expected RI.
     \item \code{SEL_MASSES} - A list of selective masses separated with semicolon.
@@ -64,7 +91,7 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 
     The MSP format is a text file that can be imported/exported from NIST. A typical
     MSP file looks like this:
-    
+
 \preformatted{
 Name: Pyruvic Acid
 Synon: Propanoic acid, 2-(methoxyimino)-, trimethylsilyl ester
@@ -85,7 +112,7 @@ Num Peaks: 41
 
 Name: another metabolite
 ...
-} 
+}
 
     Different entries must be separated by empty lines. In order to parse the retention
     time index (RI) and selective masses (SEL MASS), a two component list
@@ -95,7 +122,7 @@ Name: another metabolite
     Alternatively, you could provide the RI and SEL_MASS using the \code{\linkS4class{tsLib}}
     methods.
 
-}    
+}
 
 \value{
   A \code{tsLib} object.
@@ -106,7 +133,7 @@ cdfpath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
 lib.file  <- file.path(cdfpath, "library.txt")
 
 # Import the reference library
-refLibrary <- ImportLibrary(lib.file) 
+refLibrary <- ImportLibrary(lib.file)
 
 # set new names for the first 3 metabolites
 libName(refLibrary)[1:3] <- c("Metab01", "Metab02", "Metab03")

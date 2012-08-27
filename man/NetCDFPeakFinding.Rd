@@ -8,13 +8,14 @@
 }
 
 \usage{
-NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10,
+NetCDFPeakFinding(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
                   pp.method = "ppc", baseline = FALSE, baseline.opts = NULL)
 }
 
 \arguments{
   \item{cdfFile}{A character string naming a netcdf file.}
-  \item{massRange}{A two component numeric vector with the scan mass range to extract.}
+  \item{massRange}{A two component numeric vector with the scan mass range to extract
+	or \code{NULL}, in which case the range will be inferred from the cdf file.}
   \item{Window}{The window used by peak picking method. The number of points actually used
 		is \code{2*Window + 1}.  }
   \item{IntThreshold}{Apex intensities lower than this value will be removed from the RI files. }
@@ -30,7 +31,8 @@ NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10
 	
 	The \code{massRange} parameter is a numeric vector with two components: lower
 	and higher masses. All masses in that range will be extracted. Note that it is
-	not possible to extract a discontinuous mass range.
+	not possible to extract a discontinuous mass range. It also can be \code{NULL},
+	in which case the mass range will be determined by scanning the cdf file.
 	
 	There are two peak picking algorithms that can be used. The \code{"smoothing"} method
 	smooths the m/z curves and then looks for a change of sign of the intensity difference
@@ -40,10 +42,11 @@ NetCDFPeakFinding(cdfFile, massRange = c(85, 500), Window = 5, IntThreshold = 10
 }
 
 \value{
-	A two component list.
+	A three component list.
   \item{Time}{The retention time vector.}
   \item{Peaks}{The intensity matrix. Rows are the retention times and columns are masses. The first
 	column is the lower mass value and the last one is the higher mass. }
+  \item{massRange}{The mass range.}
 }
 
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }

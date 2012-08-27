@@ -9,7 +9,6 @@ baseline <- function(ncData, baseline.opts = NULL) {
    		int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
     	ncData$intensity <- as.vector(int)
 	} else {
-		warning("Baseline Correction: It seems that the data is already baseline corrected.")
 		int <- t(.Call("peakExtraction", ncData$mz, ncData$intensity,
             ncData$point_count, ncData$scanindex, range(ncData$mz),
             PACKAGE = "TargetSearch"))

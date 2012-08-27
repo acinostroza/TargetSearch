@@ -6,11 +6,11 @@
 }
 \usage{
 plotPeakSimple(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE,
-	 rimTime = NULL, standard = NULL, massRange = c(85, 500), ...)
+	 rimTime = NULL, standard = NULL, massRange = NULL, ...)
 }
 \arguments{
-  \item{rawpeaks}{ A two component list containing the retention time and the intensity matrices.
-	See \code{\link{peakCDFextraction}}. }
+  \item{rawpeaks}{ A three component list containing the retention time, the intensity matrix,
+	and the mass range. See \code{\link{peakCDFextraction}}. }
   \item{time.range}{ The time range to plot in retention time or retention time index units to plot. }
   \item{masses}{ A vector containing the ions or masses to plot. }
   \item{cdfFile}{ The name of a CDF file. If a file name is specified, the ions will be extracted
@@ -20,10 +20,11 @@ plotPeakSimple(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE,
 	when \code{useRI} is \code{TRUE}.}
   \item{standard}{A numeric vector with RI values of retention time markers. It is only used
 	when \code{useRI} is \code{TRUE}.}
-  \item{massRange}{ A two component numeric vector with the scan mass range to extract. }
+  \item{massRange}{ A two component numeric vector with the scan mass range to extract or
+	\code{NULL} for automatic detection.}
   \item{\dots}{ Further options passed to \code{\link{matplot}}. }
 }
-\note{This function used to named 'plotPeak'. This function was completely rewritten
+\note{This function used to be named 'plotPeak'. This function was completely rewritten
 so we kept the old version and renamed it 'plotPeakSimple'.}
 \examples{
 require(TargetSearchData)
