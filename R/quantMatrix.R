@@ -2,11 +2,14 @@ quantMatrix <- function(Lib, metabProfile, value = "maxint") {
     value <- pmatch(value, c("maxint", "maxobs"))
     Int   <- Intensity(metabProfile)
     qM    <- quantMass(Lib)
-    if(length(qM) == 0) qM <- numeric(length(Lib))
+    if(length(qM) == 0)
+        qM <- numeric(length(Lib))
     M <- matrix(nrow=length(Int),ncol=ncol(Int[[1]]),
         dimnames = list(profileInfo(metabProfile)$Name,colnames(profileInt(metabProfile))))
 
-    id <- as.numeric(rownames(profileInfo(metabProfile)))
+    id <- rownames(profileInfo(metabProfile))
+    stopifnot(all(id %in% names(selMass(Lib))))
+
     sM <- profileInfo(metabProfile)$Masses
     attr(M, "quantMass") <- character(length(id))
     attr(M, "isSelMass") <- logical(length(id))

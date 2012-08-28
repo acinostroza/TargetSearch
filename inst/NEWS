@@ -38,6 +38,8 @@ BUG FIXES
     o	Profile: check for at least three top masses to calculate spectra
 	similarity scores.
 
+    o	quantMatrix: use character indeces instead of numeric indeces.
+
 		CHANGES IN VERSION 1.12.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
