@@ -1,6 +1,5 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
-#include <R_ext/RConverters.h>
 #include <R_ext/Rdynload.h>
 
 SEXP FindPeaks(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
