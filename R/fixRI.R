@@ -1,26 +1,8 @@
 # A function to manually correct the RIs
 # Deprecated! see fixRI
-fixRIcorrection <- function(samples, rimLimits, RImatrix, sampleNames) {
+fixRIcorrection <- function(...) {
 
-   .Deprecated("fixRI")
-   if( all( colnames(RImatrix) == sampleNames(samples) ) == FALSE) {
-        stop("Sample names and columns of the RI matrix do not match")
-   }
-
-   if(is.character(sampleNames)) {
-        idx <- which(sampleNames(samples) %in% sampleNames)
-        if(length(idx) <= 0) {
-            stop("sampleNames not found")
-        }
-   } else if(is.numeric(sampleNames)) {
-        idx <- sampleNames
-   } else {
-        stop("Invalid sampleNames argument")
-   }
-
-   ri.files <- RIfiles(samples)
-   standard  <- rimStandard(rimLimits)
-   .fixRIfile(ri.files, RImatrix, standard, idx)
+   .Defunct("fixRI")
 }
 
 # function to fix the RI of the files indexed by 'idx'
