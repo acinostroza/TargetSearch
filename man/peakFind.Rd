@@ -28,7 +28,7 @@ require(TargetSearchData)
 data(TargetSearchData)
 
 # get RI file path
-RI.path <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
 
 # update RI file path

@@ -15,7 +15,7 @@ writeLibText(lib, file)
 }
 \examples{
 # get the reference library file
-cdfpath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 lib.file  <- file.path(cdfpath, "library.txt")
 
 # Import the reference library

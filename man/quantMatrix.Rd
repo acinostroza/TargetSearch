@@ -28,7 +28,7 @@ require(TargetSearchData)
 data(TargetSearchData)
 
 # process chormatograms and get a profile
-RI.path    <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+RI.path    <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 RIpath(sampleDescription) <- RI.path
 refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
 refLibrary    <- medianRILib(sampleDescription, refLibrary)

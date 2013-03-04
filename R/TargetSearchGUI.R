@@ -4,7 +4,7 @@ TargetSearchGUI <- function() {
   tkwm.deiconify(TS_GUI)
   tkfocus(TS_GUI)
 # Gets the GUI icon path and TargetSearch Version
-  ts.ico     <- file.path(.find.package("TargetSearch"), "ico/Icon_TSGUI.ico")
+  ts.ico     <- file.path(find.package("TargetSearch"), "ico/Icon_TSGUI.ico")
   ts.version <- installed.packages()["TargetSearch", "Version"]
 # Set the GUI's icon (Windows only)
   if (.Platform$OS.type == "windows")

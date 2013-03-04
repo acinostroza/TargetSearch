@@ -51,7 +51,7 @@ require(TargetSearchData)
 # import refLibrary, rimLimits and sampleDescription.
 data(TargetSearchData)
 # get the CDF files
-cdfpath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 cdfpath
 list.files(cdfpath)
 # update the CDF path

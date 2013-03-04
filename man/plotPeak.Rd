@@ -32,8 +32,8 @@ require(TargetSearchData)
 data(TargetSearchData)
 
 # update CDF and RI paths
-CDFpath(sampleDescription) <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
-RIpath(sampleDescription) <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+CDFpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+RIpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 
 # Plot the peak "Valine" for sample number 1
 grep("Valine", libName(refLibrary)) # answer: 3

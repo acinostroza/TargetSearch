@@ -52,7 +52,7 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE,
 }
 \examples{
 # get the sample definition definition file
-cdfpath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 sample.file  <- file.path(cdfpath, "samples.txt")
 
 # set a path where the RI files will be created

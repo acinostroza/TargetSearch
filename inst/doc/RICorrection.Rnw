@@ -103,7 +103,7 @@ Specify the directory where the CDF files are. In this example we will
 use the CDF files of \Rpackage{TargetSearchData} package.
 
 <<cdffiles>>=
-cdfPath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfPath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 dir(cdfPath, pattern="cdf$")
 @
 

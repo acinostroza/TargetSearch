@@ -30,7 +30,7 @@ ImportFameSettings(tmp.file = NA, mass = NA, ...)
 }
 \examples{
 # get the RI marker definition file
-cdfpath  <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfpath  <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 rim.file <- file.path(cdfpath, "rimLimits.txt")
 
 # set the mass marker to 87

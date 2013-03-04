@@ -38,7 +38,7 @@ library(TargetSearch)
 library(TargetSearchData)
 
 # get the directory where TargetSearchData's CDF files are located
-cdfPath <- file.path(.find.package("TargetSearchData"), "gc-ms-data")
+cdfPath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 # show the cdf files
 dir(cdfPath, pattern="cdf$")
 
