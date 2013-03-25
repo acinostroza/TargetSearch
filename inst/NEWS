@@ -9,6 +9,9 @@ BUG FIXES
 
     o	Removed references to deprecated R functions.
 
+    o	Fixed bug in 'ImportLibrary.msp' that occurs if there is only one
+	metabolite.
+
 		CHANGES IN VERSION 1.14.0:
 
 NEW FEATURES
