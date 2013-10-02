@@ -17,7 +17,7 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP Options,
         int *mass, *int_found;
         double *ri_min, *ri_max, *ri_found, *rt_found;
         char *myfile;
-        SPECTRA spectra;
+        SPECTRA *spectra;
         SEXP result, RI_Found, RT_Found, INT_Found;
 
 	int ftype; /* file type: 0 = TXT; 1 = DAT */
@@ -58,10 +58,14 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP Options,
 		fp = fopen(myfile, "r");
 		is_open(fp, myfile, 5);
 		spectra = read_txt(fp, sp_COL, ri_COL, rt_COL);
+		if(!spectra)
+			error("Error reading file %s\n", myfile);
 	} else {
 		fp = fopen(myfile, "rb");
 		is_open(fp, myfile, 5);
 		spectra = read_dat(fp, swap);
+		if(!spectra)
+			error("Error reading file %s\n", myfile);
 	}
         fclose(fp);
 
@@ -80,7 +84,7 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP Options,
                         continue;
                 }
 
-                find_peak(ri_min[j], mass[j], ri_max[j], &spectra, 
+                find_peak(ri_min[j], mass[j], ri_max[j], spectra,
                         ri_found+j, int_found+j, rt_found+j, use_rt);
         }
 

@@ -22,6 +22,8 @@ importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
 importFrom("utils", "edit", "head", "installed.packages", "read.delim",
            "setTxtProgressBar", "txtProgressBar", "write.table")
 
+import("mzR")
+
 exportClasses(
 	"tsLib",
 	"tsRim",

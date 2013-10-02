@@ -48,58 +48,68 @@ void swapp(void *ptr, int size, int len) {
  *   - p_splen: spectra legth
  *   - swap: 1 (big endian; swap) 0 (little endian; no swap)
  * returns: SPECTRA struct */
-SPECTRA read_dat(FILE *fp, int swap)
+SPECTRA * read_dat(FILE *fp, int swap)
 {
-        SPECTRA spectra;
-        int i, splen=0, sptotal=0;
+	SPECTRA * spectra;
+	int i, splen=0, sptotal=0;
 	unsigned char s[SIGLEN];
 
-	fread(s, SIGLEN, 1, fp);
+	spectra = (SPECTRA *) R_alloc(1, sizeof(SPECTRA));
+
+	if(!fread(s, SIGLEN, 1, fp))
+		return NULL;
 	if(checksig(s) == 0)
 		error("incorrect file format\n");
 
-        fread(&splen, sizeof(splen), 1, fp);
-        fread(&sptotal, sizeof(sptotal), 1, fp);
-	
+	if(!fread(&splen, sizeof(splen), 1, fp))
+		return NULL;
+	if(!fread(&sptotal, sizeof(sptotal), 1, fp))
+		return NULL;
+
 	if(swap == 1) {
 		swapb(&splen, sizeof(splen));
 		swapb(&sptotal, sizeof(sptotal));
 	}
 
-	spectra.n_scans = splen;
-	spectra.p_count = sptotal;
+	spectra->n_scans = splen;
+	spectra->p_count = sptotal;
 
-	spectra.ri = (double *) R_alloc(splen, sizeof(double));
-	spectra.rt = (double *) R_alloc(splen, sizeof(double));
-	spectra.n  = (int *) R_alloc(splen, sizeof(int));
-	spectra.pk = (struct peaks *) R_alloc(splen, sizeof(struct peaks));
+	spectra->ri = (double *) R_alloc(splen, sizeof(double));
+	spectra->rt = (double *) R_alloc(splen, sizeof(double));
+	spectra->n  = (int *) R_alloc(splen, sizeof(int));
+	spectra->pk = (struct peaks *) R_alloc(splen, sizeof(struct peaks));
 
-	fread(spectra.ri, splen * sizeof(double), 1, fp);
-	fread(spectra.rt, splen * sizeof(double), 1, fp);
-	fread(spectra.n, splen *  sizeof(int), 1, fp);
+	if(!fread(spectra->ri, splen * sizeof(double), 1, fp))
+		return NULL;
+	if(!fread(spectra->rt, splen * sizeof(double), 1, fp))
+		return NULL;
+	if(!fread(spectra->n, splen *  sizeof(int), 1, fp))
+		return NULL;
 
 	if(swap == 1) {
-		swapp(spectra.n, sizeof(int), splen);
-		swapp(spectra.ri, sizeof(double), splen);
-		swapp(spectra.rt, sizeof(double), splen);
+		swapp(spectra->n, sizeof(int), splen);
+		swapp(spectra->ri, sizeof(double), splen);
+		swapp(spectra->rt, sizeof(double), splen);
 	}
 
-        spectra.pk[0].mass = (int *) R_alloc(sptotal, sizeof(int));
-        spectra.pk[0].in   = (int *) R_alloc(sptotal, sizeof(int));
+	spectra->pk[0].mass = (int *) R_alloc(sptotal, sizeof(int));
+	spectra->pk[0].in   = (int *) R_alloc(sptotal, sizeof(int));
 
-        for(i = 0; i < splen; i++) {
-                if(i > 0) {
-                        spectra.pk[i].mass = spectra.pk[i-1].mass + spectra.n[i-1];
-                        spectra.pk[i].in   = spectra.pk[i-1].in   + spectra.n[i-1];
-                }
-                fread(spectra.pk[i].mass, spectra.n[i] * sizeof(int), 1, fp);
-                fread(spectra.pk[i].in, spectra.n[i] * sizeof(int), 1, fp);
-		if(swap == 1) {
-			swapp(spectra.pk[i].mass, sizeof(int), spectra.n[i]);
-			swapp(spectra.pk[i].in,   sizeof(int), spectra.n[i]);
+	for(i = 0; i < splen; i++) {
+		if(i > 0) {
+			spectra->pk[i].mass = spectra->pk[i-1].mass + spectra->n[i-1];
+			spectra->pk[i].in   = spectra->pk[i-1].in   + spectra->n[i-1];
 		}
-        }
-        return spectra;
+		if(!fread(spectra->pk[i].mass, spectra->n[i] * sizeof(int), 1, fp))
+			return NULL;
+		if(!fread(spectra->pk[i].in, spectra->n[i] * sizeof(int), 1, fp))
+			return NULL;
+		if(swap == 1) {
+			swapp(spectra->pk[i].mass, sizeof(int), spectra->n[i]);
+			swapp(spectra->pk[i].in,   sizeof(int), spectra->n[i]);
+		}
+	}
+	return spectra;
 }
 
 /* function to write a dat file */
@@ -164,9 +174,9 @@ void write_dat(FILE *fp, SPECTRA *sp, int swap)
 }
 
 /* function to read a spectra file in TAB-DELIMITED format */
-SPECTRA read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
+SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 {
-	SPECTRA spectra;
+	SPECTRA *spectra;
 	int total = 0, i, j;
 	int header = 1;
 	char *line = NULL;
@@ -176,18 +186,20 @@ SPECTRA read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 	int  ri_i, sp_i, rt_i, tabs, n;
 	int  ri_len = 0, sp_len = 0, rt_len = 0;
 
+	spectra = (SPECTRA *) R_alloc(1, sizeof(SPECTRA));
+
 	while (getLine(&line, &len, fp) != -1) {
 		total++;
 	}
 
 	total--; /* header isn't counted */
-	spectra.n_scans = total;
-	spectra.p_count = 0;
+	spectra->n_scans = total;
+	spectra->p_count = 0;
 
-	spectra.ri = (double *) R_alloc(total, sizeof(double));
-	spectra.rt = (double *) R_alloc(total, sizeof(double));
-	spectra.n  = (int *) R_alloc(total, sizeof(int));
-	spectra.pk = (struct peaks *) R_alloc(total, sizeof(struct peaks));
+	spectra->ri = (double *) R_alloc(total, sizeof(double));
+	spectra->rt = (double *) R_alloc(total, sizeof(double));
+	spectra->n  = (int *) R_alloc(total, sizeof(int));
+	spectra->pk = (struct peaks *) R_alloc(total, sizeof(struct peaks));
 
 	fseek(fp, 0, SEEK_SET);
 	j = 0;
@@ -234,16 +246,16 @@ SPECTRA read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		if(n == 0)
 			error("Error reading spectra. Invalid spectrum format\n");
 
-		spectra.p_count += n;
+		spectra->p_count += n;
 
-		spectra.n[j]  = n;
-		spectra.ri[j] = atof(ri_str);
-		spectra.rt[j] = atof(rt_str);
+		spectra->n[j]  = n;
+		spectra->ri[j] = atof(ri_str);
+		spectra->rt[j] = atof(rt_str);
 
-		spectra.pk[j].mass = (int *) R_alloc(n , sizeof(int));
-		spectra.pk[j].in   = (int *) R_alloc(n , sizeof(int));
+		spectra->pk[j].mass = (int *) R_alloc(n , sizeof(int));
+		spectra->pk[j].in   = (int *) R_alloc(n , sizeof(int));
 
-		if(read_spectrum(sp_str, spectra.pk[j].mass, spectra.pk[j].in) == 0)
+		if(read_spectrum(sp_str, spectra->pk[j].mass, spectra->pk[j].in) == 0)
 			error("Error reading spectra. Invalid spectrum format\n");
 		j++;
 	}
@@ -435,7 +447,7 @@ void write_txt(FILE *fp, SPECTRA *sp, char *header)
 void txt2dat(char **infile, char **outfile, int *swap, int *cols)
 {
 	FILE *fpin, *fpout;
-	SPECTRA sp;
+	SPECTRA *sp;
 
 	fpin = fopen(infile[0], "r");
 	if(fpin == NULL)
@@ -444,7 +456,9 @@ void txt2dat(char **infile, char **outfile, int *swap, int *cols)
 	if(fpout == NULL)
 		error("Error opening file %s\n", outfile[0]);
 	sp = read_txt(fpin, cols[0], cols[1], cols[2]);
-	write_dat(fpout, &sp, *swap);
+	if(!sp)
+		error("Error reading file %s\n", infile[0]);
+	write_dat(fpout, sp, *swap);
 	fclose(fpin);
 	fclose(fpout);
 }
@@ -453,7 +467,7 @@ void txt2dat(char **infile, char **outfile, int *swap, int *cols)
 void dat2txt(char **infile, char **outfile, int *swap, char **header)
 {
 	FILE *fpin, *fpout;
-	SPECTRA sp;
+	SPECTRA *sp;
 
 	fpin = fopen(infile[0], "rb");
 	if(fpin == NULL)
@@ -462,7 +476,9 @@ void dat2txt(char **infile, char **outfile, int *swap, char **header)
 	if(fpout == NULL)
 		error("Error opening file %s\n", outfile[0]);
 	sp = read_dat(fpin, *swap);
-	write_txt(fpout, &sp, header[0]);
+	if(!sp)
+		error("Error reading file %s\n", infile[0]);
+	write_txt(fpout, sp, header[0]);
 	fclose(fpin);
 	fclose(fpout);
 }

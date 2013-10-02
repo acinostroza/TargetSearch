@@ -5,7 +5,9 @@
 	This function reduces/removes redundancy in a profile.
 }
 \usage{
-ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5)
+ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
+    prioritization=c('mass','score'), corMass=1, score=0,
+    show=c('unidentified','knowns','full'))
 }
 \arguments{
   \item{Profile}{ A \code{tsProfile} object. See \code{\link{Profile}}. }
@@ -15,12 +17,29 @@ ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5)
                 computed using all complete pairs of observations in those variables. If the number
                 of observations is too small, you may get high correlations values just by chance,
                 so this parameters is used to avoid that. Cannot be set lower than 5.}
+  \item{prioritization}{Selects whether the metabolite suggestion should be based on
+                the number of correlation masses (\code{mass}) or the score (\code{score}).}
+  \item{corMass}{Metabolites with a number of correlation masses lower than \code{score}
+                will be marked as 'Unidentified RI'}
+  \item{score}{Metabolites with a score lower than \code{score} will be marked as
+                unidentified.}
+  \item{show}{A character vector. If \code{unidentified}, all non-redundant metabolites will
+                be returned; if \code{knowns}, only returns those metabolites with
+                correlation masses and score greater than the given values; and if
+                \code{full}, it shows all redundant metabolites, which may be useful
+                to retrieve the data from misidentified metabolites. }
 }
 \details{
 	Metabolites that are inside a \code{timeSplit} window will be correlated
-	to see whether the metabolites are the same or not, by using \code{r_thres}
-	as a cutoff. If so, the intensities and RI will be averaged and the metabolite
-	with more correlating masses will be suggested.
+	to see whether the metabolites are potentially the same or not, by using
+	\code{r_thres} as a cutoff. If so, the best candidate will be chosen
+	according to the value of \code{prioritization}: If 'mass', then
+	metabolites will be suggested based on number of correlating masses, and
+	if 'score', then the score will be used. Metabolites that don't have
+	al least \code{corMass} correlating masses and \code{score} score will
+	be marked as 'unidentified'. Note that by chosing \code{prioritization='mass'},
+	\code{score=0}, and \code{corMass=1} you will get the former behaviour
+	(\code{TargetSearch <= 1.6}).
 }
 \value{
 	A \code{tsProfile} object with a non-redundant profile of the masses that

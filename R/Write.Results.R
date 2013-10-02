@@ -1,5 +1,7 @@
 # this function saves all results in a text format
-Write.Results <- function(Lib, metabProfile, prefix = NA) {
+`Write.Results` <-
+function(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'), prefix = NA) {
+    opt <- options(stringsAsFactors=FALSE)
     if(missing(prefix))
         prefix <- paste("TargetSearch-", Sys.Date(), sep = "")
 
@@ -8,10 +10,19 @@ Write.Results <- function(Lib, metabProfile, prefix = NA) {
     file.pro.info <- paste(prefix, ".profile.info.txt", sep ="")
     file.pro.int  <- paste(prefix, ".profile.intensities.txt", sep ="")
     file.pro.ri   <- paste(prefix, ".profile.ri.txt", sep ="")
+    file.quantmat <- paste(prefix, ".profile.quantmatrix.txt", sep="")
+
+    qm <- match.arg(quantMatrix)
+    if(qm != 'none') {
+        M <- quantMatrix(Lib, metabProfile, value=qm)
+        M <- data.frame(Name=rownames(M), quantMass=attr(M, "quantMass"),
+            isSelectiveMass=attr(M, "isSelMass"), M, row.names=1:nrow(M))
+        write.table(M, file=file.quantmat, sep="\t", quote=F, row.names=FALSE)
+    }
 
     write.table(profileInfo(metabProfile), file = file.pro.info, sep = "\t", quote = F)
     write.table(profileInt(metabProfile), file = file.pro.int, sep = "\t", quote = F)
-    write.table(profileRI(metabProfile), file = file.pro.ri,	sep = "\t", quote = F)
+    write.table(profileRI(metabProfile), file = file.pro.ri, sep = "\t", quote = F)
 
     metInfo   <- profileInfo(metabProfile)
     metPrf    <- as.list(metabProfile)
@@ -28,12 +39,13 @@ Write.Results <- function(Lib, metabProfile, prefix = NA) {
     
     Out <- data.frame(libId=libIndex, Name= Name, Lib_RI=libRI, Mass = mass,
          med_RI, IS_SEL = is_sel, IS_COR=is_cor)
-		
-		write.table( data.frame(Out, metPrf$Intensity, row.names = NULL,
-            check.names = FALSE), file = file.peak.int,	sep = "\t", quote = F, row.names = F)
-		write.table( data.frame(Out, metPrf$RI, row.names = NULL,
+
+    write.table( data.frame(Out, metPrf$Intensity, row.names = NULL,
+            check.names = FALSE), file = file.peak.int, sep = "\t", quote = F, row.names = F)
+    write.table( data.frame(Out, metPrf$RI, row.names = NULL,
             check.names = FALSE), file = file.peak.ri, sep = "\t", quote = F, row.names = F)
-		
+    options(opt)
+    invisible()
 }
 
 # function to create a MSP file that can be viewed with NIST
@@ -82,3 +94,5 @@ writeMSP <- function (metlib, metprof, file, append = FALSE)
     }
     close(file)
 }
+
+# vim: set ts=4 sw=4 expandtab:

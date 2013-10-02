@@ -37,11 +37,11 @@ int checksig(unsigned char *);
 void swapb(void *, int);
 void swapp(void *, int, int);
 
-SPECTRA read_dat(FILE *, int);
+SPECTRA * read_dat(FILE *, int);
 void write_dat(FILE *, SPECTRA *, int);
 void writePeaksDAT(char **, double *, double *, int *, int *, int *, int *);
 
-SPECTRA read_txt(FILE *, int, int, int);
+SPECTRA * read_txt(FILE *, int, int, int);
 int read_spectrum(char *, int *, int *);
 void write_txt(FILE *, SPECTRA *, char *);
 void writePeaksTXT(char **, double *, double *, int *, int *, int *, char **);

@@ -1,5 +1,7 @@
 Profile <- 
 function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
+
+    opt <- options(stringsAsFactors=FALSE)
     my.files <- RIfiles(samples)
     my.names <- sampleNames(samples)
 
@@ -100,6 +102,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
         medRT[i,] <- apply(resRT[[i]][y,,drop=FALSE],2,median, na.rm=T)
     }
   }
+  options(warn=0)
 
     if(length(addiNames) > 0) {
         if(length(addiNames) == 1) {
@@ -111,8 +114,9 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
         searchData <- cbind(searchData, addiTemp)
     }
 
-  options(warn=0)
-  return(new("tsProfile", peakData, info = cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData),
+  info <- cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData)
+  options(opt)
+  return(new("tsProfile", peakData, info=info,
     profInt=medInt, profRI=medRI, profRT=medRT))
 }
 
@@ -139,3 +143,4 @@ Score <- function(x, y, match = T) {
 	round((1 - sum(abs(x1-y1)) / sum(abs(x1+y1)))*1000)
 }
 
+# vim: set ts=4 sw=4 expandtab:

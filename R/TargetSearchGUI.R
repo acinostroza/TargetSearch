@@ -143,9 +143,14 @@ TargetSearchGUI <- function() {
       f3zLib2 <- tkframe(f3, borderwidth=2)
       f3zLib3 <- tkframe(f3, borderwidth=2)
       f3zLib4 <- tkframe(f3, borderwidth=2)
-      f3z9 <- tkframe(f3, borderwidth=2)
-      f3z10 <- tkframe(f3, borderwidth=2)
+      f3z9 <- tkframe(f3, borderwidth=2)   # Normalization
+      f3z10 <- tkframe(f3, borderwidth=2)  # Final Profile
       f3z11 <- tkframe(f3, borderwidth=2)
+      f3z12 <- tkframe(f3, borderwidth=2)
+      f3z13 <- tkframe(f3, borderwidth=2)
+
+      f3zQ  <- tkframe(f3, borderwidth=2)  # quantification
+
       labPar <- tklabel(parent=f3, text="Processing Parameters")
 
     # File Format
@@ -340,6 +345,33 @@ TargetSearchGUI <- function() {
       labProfz11 <- tklabel(parent=f3, text="")
       ebxProfSNr <- tkentry(parent=f3z11, width=4, textvariable=valProfSNr)
       labProfSNr <- tklabel(parent=f3z11, text="min number of correl. samples")
+
+      # prioritization parameters
+      labProfz12 <- tklabel(parent=f3, text="")
+      prioVar    <- tclVar("mass")
+      prioLab0   <- tklabel(f3z12, text="Prioritization: ")
+      prioLab1   <- tklabel(f3z12, text="corr. mass")
+      prioLab2   <- tklabel(f3z12, text="score")
+      prioRbt1   <- tkradiobutton(f3z12, variable=prioVar, value="mass")
+      prioRbt2   <- tkradiobutton(f3z12, variable=prioVar, value="score")
+      # prioritization thresholds
+      labProfz13     <- tklabel(parent=f3, text="")
+      prioCorMassVar <- tclVar("3")
+      prioScoreVar   <- tclVar("600")
+      prioThrCM      <- tkentry(parent=f3z13, width=4, textvariable=prioCorMassVar)
+      prioThrScr     <- tkentry(parent=f3z13, width=4, textvariable=prioScoreVar)
+      prioThrLab     <- tklabel(parent=f3z13, text="Thresholds: ")
+      prioThrCMLab   <- tklabel(parent=f3z13, text="corr. mass")
+      prioThrScrLab  <- tklabel(parent=f3z13, text="score")
+
+      # quantification
+      labQz          <- tklabel(parent=f3, text="    Quantification Mass")
+      quantVar       <- tclVar("maxint")
+      quantLab1      <- tklabel(parent=f3zQ, text="max intensity")
+      quantLab2      <- tklabel(parent=f3zQ, text="max observations")
+      quantRbt1      <- tkradiobutton(f3zQ, variable=quantVar, value="maxint")
+      quantRbt2      <- tkradiobutton(f3zQ, variable=quantVar, value="maxobs")
+
       # Pack Widgets
       tkpack(cbxFileFmt, labFileFmtOnOff, side="left", padx=1, anchor="w")
       tkpack(cbxBaseline, side="left", padx=0, anchor="w") 
@@ -355,6 +387,14 @@ TargetSearchGUI <- function() {
       tkpack(labNorm1, rbtNorm1, labNorm2, rbtNorm2, labNorm3, rbtNorm3, side="left", padx=1, anchor="w")
       tkpack(ebxProfTS, labProfTS, ebxProfthr, labProfthr, side="left", padx=1, anchor="w") 
       tkpack(ebxProfSNr, labProfSNr, side="left", padx=1, anchor="w")
+
+      tkpack(prioLab0, prioLab1, prioRbt1, prioLab2, prioRbt2, side="left",
+             padx=1, anchor="w")
+      tkpack(prioThrLab, prioThrCM, prioThrCMLab, prioThrScr, prioThrScrLab,
+             side="left", padx=1, anchor="w")
+      tkpack(quantLab1, quantRbt1, quantLab2, quantRbt2, side="left", padx=1,
+             anchor="w")
+
       tkgrid(labPar, sticky="w")
       tkgrid(labFileFmt, f3zFF, sticky="w")
       tkgrid(labBaseline, f3zBL, sticky="w")
@@ -370,6 +410,11 @@ TargetSearchGUI <- function() {
       tkgrid(labNorm, f3z9, sticky="w")
       tkgrid(labProf, f3z10, sticky="w")
       tkgrid(labProfz11, f3z11, sticky="w")
+      tkgrid(labProfz12, f3z12, sticky="w")
+      tkgrid(labProfz13, f3z13, sticky="w")
+
+      tkgrid(labQz, f3zQ, sticky="w")
+
 # Section for Working Directory
   f4 <- tkframe(TS_GUI, borderwidth=2, relief="groove")
     f4z1 <- tkframe(f4, borderwidth=2)
@@ -404,6 +449,10 @@ TargetSearchGUI <- function() {
         tclvalue(valProfTS) <- TSPar$"Profiles"$"TimeSplit"
         tclvalue(valProfthr) <- TSPar$"Profiles"$"Threshold"
         tclvalue(valProfSNr) <- TSPar$"Profiles"$"MinSamNr"
+        tclvalue(prioVar) <- TSPar$"Profiles"$"prioritization"
+        tclvalue(prioCorMassVar) <- TSPar$"Profiles"$"corMass"
+        tclvalue(prioScoreVar) <- TSPar$"Profiles"$"score"
+        tclvalue(quantVar) <- TSPar$"Quantification"$"quantValue"
       }
       fncInitialParameters <- function() {
         # write all Parameters into a R list
@@ -435,7 +484,13 @@ TargetSearchGUI <- function() {
           "Profiles" = list(
             "TimeSplit" = as.numeric(tclvalue(valProfTS)),
             "Threshold" = as.numeric(tclvalue(valProfthr)),
-            "MinSamNr" = as.numeric(tclvalue(valProfSNr))
+            "MinSamNr"  = as.numeric(tclvalue(valProfSNr)),
+            "prioritization" = tclvalue(prioVar),
+            "corMass"   = as.numeric(tclvalue(prioCorMassVar)),
+            "score"     = as.numeric(tclvalue(prioScoreVar))
+          ),
+          "Quantification" = list(
+            "quantValue"   = tclvalue(quantVar)
           )
         )
         return(TSPar)
@@ -548,9 +603,13 @@ TargetSearchGUI <- function() {
         finalProfile <- ProfileCleanUp(Profile = MetabProfile, 
                                        timeSplit = as.numeric(tclvalue(valProfTS)), 
                                        r_thres = as.numeric(tclvalue(valProfthr)),
-                                       minPairObs = as.numeric(tclvalue(valProfSNr)))
+                                       minPairObs = as.numeric(tclvalue(valProfSNr)),
+                                       prioritization = tclvalue(prioVar),
+                                       corMass = as.numeric(tclvalue(prioCorMassVar)),
+                                       score = as.numeric(tclvalue(prioScoreVar)))
+
       # save your results in tabbed text format files
-        Write.Results(Lib, finalProfile)
+        Write.Results(Lib, finalProfile, quantMatrix=tclvalue(quantVar))
         
       # save workspace
         if (as.character(tclvalue(rbValue)) == "NetCDF Data") {
