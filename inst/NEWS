@@ -1,3 +1,18 @@
+		CHANGES IN VERSION 1.18.0:
+
+NEW FEATURES
+
+    o	New options for function 'ProfileCleanUp' that allow fine tuning of the
+	suggested metabolite in case of redundancy. This problem occurs when the
+	reference library contains two or more metabolites in the same
+	retention time window.
+
+    o	The function 'Write.Results' can create a quantification matrix based
+	in one quantification mass. This mass can be selected automatically or
+	specified by the user.
+
+    o	The above options have been incorporated in the GUI as well.
+
 		CHANGES IN VERSION 1.16.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES

@@ -37,9 +37,29 @@ ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
 	metabolites will be suggested based on number of correlating masses, and
 	if 'score', then the score will be used. Metabolites that don't have
 	al least \code{corMass} correlating masses and \code{score} score will
-	be marked as 'unidentified'. Note that by chosing \code{prioritization='mass'},
-	\code{score=0}, and \code{corMass=1} you will get the former behaviour
-	(\code{TargetSearch <= 1.6}).
+	be marked as 'unidentified' and not will be suggested, unless all the
+	metabolites in group are unidentified.
+
+	For example, suppose that three metabolites A (CM=3, S=900),
+	B (CM=6, S=700), C (CM=5, S=800) correlate within the same time group,
+	where CM is the number of correlating masses and S is the score.
+
+	\itemize{
+	\item If prioritization='mass', corMass=3, score=650, then the
+	suggested order is B, C, A.
+	\item If prioritization='mass', corMass=3, score=750, then the
+        suggested order is C, A, B.
+	\item If prioritization='mass', corMass=3, score=850, then the
+        suggested order is A, B, C.
+	\item If prioritization='score', corMass=3, score=650, then the
+        suggested order is A, C, B.
+	\item If prioritization='score', corMass=4, score=650, then the
+        suggested order is C, B, A.
+	\item If prioritization='score', corMass=4, score=850, then the
+        suggested order is C, A, B.
+	}
+	Note that by chosing \code{prioritization='mass'}, \code{score=0}, and
+	\code{corMass=1} you will get the former behavior (\code{TargetSearch <= 1.6}).
 }
 \value{
 	A \code{tsProfile} object with a non-redundant profile of the masses that

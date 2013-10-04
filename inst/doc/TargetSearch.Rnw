@@ -540,7 +540,20 @@ of a given mass, and \Rfunarg{none}, no normalization at all.
 RI window that will be used to look for metabolites that could have been redundanly
 identified. \emph{correl. thr.} is the correlation threshold and \emph{min. number
 of correlation samples} is a threshold used to make sure that correlations are
-computed with at least said number of observations.
+computed with at least said number of observations. \emph{prioritization}
+is used to resolv ambiguities by taking the metabolite with the most correlating
+masses (\emph{corr. mass}) or the highest similarity \emph{score}.
+Metabolites with corr. mass and score higher than the thresholds will be
+suggested above the one that do not pass the thresholds, which are marked
+as ``unidentified.''
+
+\item[Quantification Mass]: This section is used to generate an intensity
+matrix based on one quantification mass. The quantification mass can
+be specified in the library file (column "QUANT\_MASS") or selected
+automatically by choosing \emph{max intensity} or \emph{max observations}.
+\emph{max intensity} selects the mass with the highest intensity across the
+samples, while \emph{max observation} takes the mass with less missing
+values.
 
 \item[Parameters]: You may \emph{Save} the current parameters as an \texttt{*.RData}
 file or \emph{Load} previously saved parameters to compare the outcome of different settings or
