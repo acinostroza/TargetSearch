@@ -122,6 +122,9 @@ Name: another metabolite
     Alternatively, you could provide the RI and SEL_MASS using the \code{\linkS4class{tsLib}}
     methods.
 
+    Libraries for TargetSearch and for different retention index systems, such
+    as VAR5 or MDN35, can be downloaded from
+    \url{http://gmd.mpimp-golm.mpg.de/}.
 }
 
 \value{

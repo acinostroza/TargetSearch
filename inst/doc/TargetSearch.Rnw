@@ -236,8 +236,8 @@ inject them separately. If this is the case, please look at the script
 The ``reference library'' file contains the information of the
 metabolites or mass spectral tags (MSTs) that will be searched for in
 the chromatograms. A public spectra database could be found here
-\url{http://csbdb.mpimp-golm.mpg.de/csbdb/gmd/gmd.html} at
-\emph{The Golm Metabolome Database} \citep{Kopka2005}.
+\url{http://gmd.mpimp-golm.mpg.de/} at
+\emph{The Golm Metabolome Database} \citep{Kopka2005,Hummel2007,Hummel2013}.
 
 Required information is the metabolite name
 (``Name''), expected retention time index (``RI''), 
