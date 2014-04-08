@@ -124,7 +124,8 @@ function(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
   k <- which(searchData2$Mass_count < corMass | searchData2$Score_all_masses < score)
   if(!is.character(searchData2$Name))
     searchData2$Name <- as.character(searchData2$Name)
-  searchData2$Name[k] <- sprintf("Unidentified RI [%s]", searchData2$Name[k])
+  searchData2$Name[k] <- sprintf("Unidentified %s [%s]",
+                            format(searchData2$RI[k], digits=6), searchData2$Name[k])
 
   d <- duplicated(cbind(tmGroups,corGroups))
   if(show == 'knowns') {
