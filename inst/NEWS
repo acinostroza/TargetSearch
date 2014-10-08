@@ -1,3 +1,11 @@
+		CHANGES IN VERSION 1.22.0:
+
+BUG FIXES
+
+   o	Fix bug in quantMatrix. make sure that selection mass IDs match
+	the library IDs. Add an attribute to indicate that the quantification
+	mass is also a correlation mass.
+
 		CHANGES IN VERSION 1.20.0:
 
 BUG FIXES

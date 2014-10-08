@@ -9,19 +9,23 @@ quantMatrix <- function(Lib, metabProfile, value = "maxint") {
 
     id <- rownames(profileInfo(metabProfile))
     stopifnot(all(id %in% names(selMass(Lib))))
+    id <- match(id, names(selMass(Lib)))
 
     sM <- profileInfo(metabProfile)$Masses
     attr(M, "quantMass") <- character(length(id))
     attr(M, "isSelMass") <- logical(length(id))
+    attr(M, "isCorMass") <- logical(length(id))
 
     for(i in 1:length(id)) {
         if(is.na(qM[id[i]]) | qM[id[i]] == 0) {
             if(is.na(sM[i]) | sM[i] == "") {
                 attr(M, "isSelMass")[i] <- FALSE
                 attr(M, "quantMass")[i] <- NA
+                attr(M, "isCorMass")[i] <- FALSE
                 next
             }
             mz <- unlist(strsplit(sM[i], ";"))
+            attr(M, "isCorMass")[i] <- TRUE
             int <- Int[[i]][mz,]
             mz.sel <- mz %in% selMass(Lib)[[id[i]]]
             if(any(mz.sel)) {
@@ -55,6 +59,8 @@ quantMatrix <- function(Lib, metabProfile, value = "maxint") {
                 attr(M, "isSelMass")[i] <- FALSE
                 message('Warning: mz=', qM[id[i]], ' not found in metabolite \"', libName(Lib)[id[i]], '"')
             }
+            mz <- unlist(strsplit(sM[i], ";"))
+            attr(M, "isCorMass")[i] <- any(qM[id[i]] %in% mz)
         }
     }
     M
