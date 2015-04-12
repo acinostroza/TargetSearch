@@ -18,7 +18,7 @@ RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
   \item{massRange}{ A two component vector of m/z range used by the GC-MS machine
 	or \code{NULL}, in which case the range will be detected automatically. }
   \item{Window}{ The window used for smoothing. The number of points actually used
-	is \code{2*Window + 1}. }
+	is \code{2*Window + 1}. It must be an integer. See details.}
   \item{IntThreshold}{ Apex intensities lower than this value will be removed from the RI files. }
   \item{pp.method}{ Peak picking method. Options are either "smoothing" or "ppc". See details. }
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
@@ -36,6 +36,12 @@ RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
 	for every mass trace. Then it looks for a change of sign (from positive to negative) of
 	the difference between two consecutive points. Those points will be returned as
 	detected peaks.
+
+	To work out a suitable \code{Window} value, the following might be useful:
+	\code{Window = (SR * PW - 1) / 2}, where SR is the scan rate of the MS instrument and
+	PW is the peak width. Because \code{Window} is an integer, the resulting value must be
+	rounded. For example, for SR = 20 scans per second, a PW = 1.5 seconds, then
+	\code{Window} = 14.5, which can be rounded to 15.
 
 	The RI file type is determined by the output of \code{\link{fileFormat}}
 	method applied to the \code{\linkS4class{tsSample}} input object. To
