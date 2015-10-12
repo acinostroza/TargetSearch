@@ -58,8 +58,10 @@ SPECTRA * read_dat(FILE *fp, int swap)
 
 	if(!fread(s, SIGLEN, 1, fp))
 		return NULL;
-	if(checksig(s) == 0)
-		error("incorrect file format\n");
+	if(checksig(s) == 0) {
+		REprintf("Incorrect file signature\n");
+		return NULL;
+	}
 
 	if(!fread(&splen, sizeof(splen), 1, fp))
 		return NULL;
@@ -181,6 +183,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 	int header = 1;
 	char *line = NULL;
 	int  len = 0;
+	int  err = 0;
 
 	char *ri_str = NULL, *sp_str = NULL, *rt_str = NULL;
 	int  ri_i, sp_i, rt_i, tabs, n;
@@ -216,7 +219,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		sp_i = 0;
 		n    = 0;
 
-		/* allocates memory for RI string and spectra if 'line' 
+		/* allocates memory for RI string and spectra if 'line'
 		 * length is updated. string lengths will be the same as 'line' */
 		str_alloc(ri_str, ri_len, len);
 		str_alloc(rt_str, rt_len, len);
@@ -243,9 +246,12 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		rt_str[rt_i] = '\0';
 		sp_str[sp_i] = '\0';
 		
-		if(n == 0)
-			error("Error reading spectra. Invalid spectrum format\n");
-
+		if(n == 0 || ri_i == 0 || rt_i == 0 || sp_i == 0) {
+			REprintf("Error reading spectra. Invalid spectrum format:\n");
+			REprintf("--> Line %d: '%s'\n", j+1, line);
+			err = 1;
+			goto end;
+		}
 		spectra->p_count += n;
 
 		spectra->n[j]  = n;
@@ -255,11 +261,16 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		spectra->pk[j].mass = (int *) R_alloc(n , sizeof(int));
 		spectra->pk[j].in   = (int *) R_alloc(n , sizeof(int));
 
-		if(read_spectrum(sp_str, spectra->pk[j].mass, spectra->pk[j].in) == 0)
-			error("Error reading spectra. Invalid spectrum format\n");
+		if(read_spectrum(sp_str, spectra->pk[j].mass, spectra->pk[j].in) == 0) {
+			REprintf("Error reading spectra. Invalid spectrum format:\n");
+			REprintf("--> Line %d: '%s'\n", j+1, line);
+			err = 1;
+			goto end;
+		}
 		j++;
 	}
 
+end:
 	if(line)
 		R_chk_free(line);
 	if(ri_str)
@@ -268,7 +279,8 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		R_chk_free(rt_str);
 	if(sp_str)
 		R_chk_free(sp_str);
-
+	if(err)
+		return NULL;
 	return spectra;
 }
 
