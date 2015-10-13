@@ -1,10 +1,19 @@
 `peakCDFextraction` <-
 function(cdfFile, massRange = NULL)
 {
-	nc     <- mzR:::netCDFOpen(cdfFile)
-	ncData <- mzR:::netCDFRawData(nc)
-	mzR:::netCDFClose(nc)
-	ncData$point_count <- diff(c(ncData$scanindex, length(ncData$mz)))
+	ncData <- .open.ncdf(cdfFile)
+
+	if(any(ncData$scanindex < 0)) {
+		message('Warning:')
+		message('  The following file seems to be corrupted. TargetSearch will attempt to process it anyway...')
+		message(paste('  ->', cdfFile))
+		# removing negative values
+		tmp <- ncData$scanindex >= 0
+		ncData$scanindex   <- ncData$scanindex[tmp]
+		ncData$rt          <- ncData$rt[tmp]
+		ncData$point_count <- ncData$point_count[tmp]
+	}
+
 	ncData <- .check.mz.precision(ncData)
 	if(is.null(ncData)) {
 		stop(paste("Error processing file '", cdfFile, "'. It seems to contains",

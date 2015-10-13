@@ -50,7 +50,7 @@ GC-MS data.
 
 <<LibraryPreload, echo = FALSE, results = hide>>=
 options(width=60)
-library(mzR)
+library(ncdf)
 library(TargetSearch)
 library(TargetSearchData)
 @

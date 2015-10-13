@@ -14,9 +14,7 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 	if(is.na(method))
 		stop("Invalid peak picking method.")
 
-	nc     <- mzR:::netCDFOpen(cdfFile)
-	ncData <- mzR:::netCDFRawData(nc)
-	mzR:::netCDFClose(nc)
+	ncData <- .open.ncdf(cdfFile)
 
     if(any(ncData$scanindex < 0)) {
         message('Warning:')
@@ -25,9 +23,9 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
         # removing negative values
         tmp <- ncData$scanindex >= 0
         ncData$scanindex <- ncData$scanindex[tmp]
+        ncData$point_count <- ncData$point_count[tmp]
         ncData$rt        <- ncData$rt[tmp]
     }
-	ncData$point_count <- diff(c(ncData$scanindex, length(ncData$mz)))
 
 	ncData <- .check.mz.precision(ncData)
 	if(is.null(ncData)) {
@@ -50,6 +48,21 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 			ncData$scanindex, Window, massRange, IntThreshold, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
 	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange) )
+}
+
+# imported functions
+# open.ncdf,  get.var.ncdf, close.ncdf
+
+.open.ncdf <- function(cdfFile) {
+	nc <- open.ncdf(cdfFile)
+	ncData <- list()
+	ncData$point_count <- get.var.ncdf(nc, "point_count")
+	ncData$scanindex   <- get.var.ncdf(nc, "scan_index")
+	ncData$intensity   <- get.var.ncdf(nc, "intensity_values")
+	ncData$mz          <- get.var.ncdf(nc, "mass_values")
+	ncData$rt          <- get.var.ncdf(nc, "scan_acquisition_time")
+	close.ncdf(nc)
+	return(ncData)
 }
 
 # vim: set ts=4 sw=4:

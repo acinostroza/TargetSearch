@@ -49,7 +49,7 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
 
         baseline <- apply(int, 1, function(x) {
                 # apply high pass filter
-                xf <- TargetSearch:::hpf(x, alpha)
+                xf <- hpf(x, alpha)
                 # divide xf in segments
                 np <- ceiling( n / segments )
                 segment.idx  <- rep(1:segments, each = np)[1:n]
@@ -64,7 +64,7 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
                 # and the center of a signal window of width signalwindow
                 tmp  <- which(abs( xf ) > 2*stdn)
                 # windowing step: apply signalwindow to the signal points obtained before
-                sm   <- TargetSearch:::windowingStep(tmp, n, signalWindow)
+                sm   <- windowingStep(tmp, n, signalWindow)
                 sm[1] <- sm[n] <- FALSE
                 if(met == 2) {
                 # Fit a cubic smoothing spline of the baseline using the points 

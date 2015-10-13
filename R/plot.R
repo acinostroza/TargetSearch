@@ -132,12 +132,12 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 
 	# code to transform from RI to RT
 	cols      <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
-	opt       <- TargetSearch:::get.file.format.opt(riFile, cols)
+	opt       <- get.file.format.opt(riFile, cols)
 	if(opt[1] == 0) {
 		tmp  <- read.delim(riFile, as.is = TRUE)
 		ri   <- rt2ri(rawpeaks$Time, tmp$RETENTION_TIME, tmp$RETENTION_TIME_INDEX)
 	} else if(opt[1] == 1) {
-		tmp <- TargetSearch:::readRIBin(riFile)
+		tmp <- readRIBin(riFile)
 		ri  <- rt2ri(rawpeaks$Time, tmp$retTime, tmp$retIndex)
 	}
 

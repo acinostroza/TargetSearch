@@ -33,7 +33,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
                 none = resInt)
     res_log <- lapply(res,log2)
 
-    options(warn=(-1))
+    opt_warn <- options(warn=-1) # suppress correlation warnings
     for(i in 1:length(Lib)){
 
         x <- as.character(selMass(Lib)[[i]])
@@ -52,6 +52,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
             # assume that the correlation of a metabolite with itself is always 1
             diag(tmp) <- 1
+            tmp[ is.na(tmp) | is.nan(tmp) ] <- 0
 
             tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
  
@@ -102,7 +103,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
         medRT[i,] <- apply(resRT[[i]][y,,drop=FALSE],2,median, na.rm=T)
     }
   }
-  options(warn=0)
+  options(opt_warn)
 
     if(length(addiNames) > 0) {
         if(length(addiNames) == 1) {

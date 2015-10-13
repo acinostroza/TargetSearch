@@ -1,3 +1,17 @@
+		CHANGES IN VERSION 1.26.0:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	TargetSearch now depends on "ncdf" rather than mzR.
+
+BUG FIXES
+
+   o	Fix potential potencial pearson correlation errors that occur when the
+	standard is deviation zero. If that is the case, replace the resulting
+	NA/NaN by zero.
+
+   o	Fix R check warnings.
+
 		CHANGES IN VERSION 1.24.0:
 
 BUG FIXES

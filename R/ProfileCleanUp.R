@@ -77,17 +77,20 @@ function(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
   corData$RI_dev <- format(searchData2$Lib_RI - searchData2$RI, digits = 3)
   corData$Cor_RI <- format(corData$Cor_RI, digits = 5)
 
+  opt_warn <- options(warn=-1) # suppress correlation warnings
   for(i in 1:max(tmGroups)) {
     if(sum(tmGroups == i) > 1) {
       M       <- log2(medInt2[tmGroups == i,])
       tmp     <- cor(t(M), use = "pair")
       tmp[is.finite(M) %*% is.finite(t(M)) < minPairObs] <- 0
+      tmp[is.na(tmp) | is.nan(tmp) ] <- 0
       diag(tmp) <- 1
       hc <- hclust(as.dist(1-tmp), 'single')
       ct <- cutree(hc, h=1-r_thres)
       corGroups[tmGroups == i] <- ct
     }
   }
+  options(opt_warn)
 
   Groups <- cbind(Time_group=tmGroups, Cor_group=corGroups,
                searchData2[,c("Mass_count","Score_all_masses")])
