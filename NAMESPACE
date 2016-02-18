@@ -22,7 +22,7 @@ importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
 importFrom("utils", "edit", "head", "installed.packages", "read.delim",
            "setTxtProgressBar", "txtProgressBar", "write.table")
 
-importFrom("ncdf", "open.ncdf", "get.var.ncdf", "close.ncdf")
+importFrom("ncdf4", "nc_open", "ncvar_get", "nc_close")
 
 exportClasses(
 	"tsLib",

@@ -51,17 +51,16 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 }
 
 # imported functions
-# open.ncdf,  get.var.ncdf, close.ncdf
 
 .open.ncdf <- function(cdfFile) {
-	nc <- open.ncdf(cdfFile)
+	nc <- nc_open(cdfFile)
 	ncData <- list()
-	ncData$point_count <- get.var.ncdf(nc, "point_count")
-	ncData$scanindex   <- get.var.ncdf(nc, "scan_index")
-	ncData$intensity   <- get.var.ncdf(nc, "intensity_values")
-	ncData$mz          <- get.var.ncdf(nc, "mass_values")
-	ncData$rt          <- get.var.ncdf(nc, "scan_acquisition_time")
-	close.ncdf(nc)
+	ncData$point_count <- ncvar_get(nc, "point_count")
+	ncData$scanindex   <- ncvar_get(nc, "scan_index")
+	ncData$intensity   <- ncvar_get(nc, "intensity_values")
+	ncData$mz          <- ncvar_get(nc, "mass_values")
+	ncData$rt          <- ncvar_get(nc, "scan_acquisition_time")
+	nc_close(nc)
 	return(ncData)
 }
 
