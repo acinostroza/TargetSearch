@@ -77,7 +77,7 @@ SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP Options,
         int_found = INTEGER_POINTER(INT_Found);
 
         for (j = 0; j < libtotal; j++) {
-                if (ISNAN(ri_min[j]) || ISNAN(mass[j]) || ISNAN(ri_max[j])) {
+                if (ISNAN(ri_min[j]) || (mass[j] == NA_INTEGER) || ISNAN(ri_max[j])) {
                         ri_found[j]  = NA_REAL;
                         rt_found[j]  = NA_REAL;
                         int_found[j] = NA_INTEGER;
