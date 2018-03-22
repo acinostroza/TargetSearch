@@ -4,12 +4,12 @@ import("methods")
 
 importFrom("graphics", "abline", "axis", "box", "boxplot", "legend",
            "matplot", "par", "plot", "plot.new", "points", "text",
-           "title")
+           "title", "matlines", "mtext", "rect")
 
-importFrom("grDevices", "dev.off", "pdf")
+importFrom("grDevices", "dev.off", "pdf", "gray")
 
 importFrom("stats", "approx", "cor", "cutree", "dist", "hclust", "lm",
-           "median", "predict", "sd", "smooth.spline")
+           "median", "predict", "sd", "smooth.spline", "as.dist")
 
 importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
            "tclVar", "tkbutton", "tkcheckbutton", "tkchooseDirectory",
