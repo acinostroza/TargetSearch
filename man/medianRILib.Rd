@@ -27,7 +27,7 @@ medianRILib(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRep.pdf",
 }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 # get RI file path
 RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")

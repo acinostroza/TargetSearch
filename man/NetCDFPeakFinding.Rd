@@ -52,7 +52,6 @@ NetCDFPeakFinding(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
 CDFpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 CDFfiles <- dir(CDFpath, pattern = ".cdf$", full.names = TRUE)
 CDFfiles

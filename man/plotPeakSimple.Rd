@@ -28,7 +28,7 @@ plotPeakSimple(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE,
 so we kept the old version and renamed it 'plotPeakSimple'.}
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 # update CDF path
 CDFpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")

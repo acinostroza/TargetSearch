@@ -55,7 +55,7 @@ RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
 \examples{
 require(TargetSearchData)
 # import refLibrary, rimLimits and sampleDescription.
-data(TargetSearchData)
+data(TSExample)
 # get the CDF files
 cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 cdfpath

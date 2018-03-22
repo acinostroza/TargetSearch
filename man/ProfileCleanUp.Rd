@@ -74,7 +74,7 @@ ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
 \examples{
 # load example data
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))

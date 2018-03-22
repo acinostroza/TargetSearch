@@ -29,7 +29,7 @@ plotPeak(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1,
 }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 # update CDF and RI paths
 CDFpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")

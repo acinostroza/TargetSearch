@@ -33,8 +33,10 @@ FindPeaks(my.files, refLib,
     A \code{tsMSdata} object.
 }
 \examples{
+# load example CDF files
 require(TargetSearchData)
-data(TargetSearchData)
+# load pre-calculated example data and objects
+data(TSExample)
 
 # get RI file path
 RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")

@@ -36,8 +36,8 @@ FAMEoutliers(samples, RImatrix, pdffile = NA, startDay = NA, endDay = NA,
     that the retention time marker in that particular sample is an outlier.
 }
 \examples{
-require(TargetSearchData)
-data(TargetSearchData)
+# load pre-calculated example data and objects
+data(TSExample)
 
 # find the retention marker outliers of the example data and save it in "outlier.pdf"
 outliers <- FAMEoutliers(sampleDescription, RImatrix, pdffile = "outlier.pdf")
@@ -47,4 +47,4 @@ apply(outliers, 1, which)
 
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
-\seealso{ \code{\link{RIcorrect}}, \code{\link{ImportSamples}} }
+\seealso{ \code{\link{RIcorrect}}, \code{\link{ImportSamples}}, \code{\link{TSExample}} }

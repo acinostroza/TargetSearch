@@ -25,7 +25,7 @@ quantMatrix(Lib, metabProfile, value = "maxint")
 }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 # process chormatograms and get a profile
 RI.path    <- file.path(find.package("TargetSearchData"), "gc-ms-data")

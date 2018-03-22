@@ -37,7 +37,7 @@ sampleRI(samples, Lib, r_thres = 0.95,
 }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 
 # get RI file path
 RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")

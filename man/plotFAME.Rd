@@ -15,7 +15,7 @@ plotFAME(samples, RImatrix, whichFAME)
 }
 \examples{
 require(TargetSearchData)
-data(TargetSearchData)
+data(TSExample)
 # plot Retention index standards 1 to 3
 plotFAME(sampleDescription, RImatrix, 1)
 plotFAME(sampleDescription, RImatrix, 2)
