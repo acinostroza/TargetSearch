@@ -2,18 +2,19 @@
 #include <Rdefines.h>
 #include <R_ext/Rdynload.h>
 
-SEXP FindPeaks(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP peak_finding(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP peakExtraction(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP ppc(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP cdffix(SEXP, SEXP, SEXP, SEXP);
+/* FindPeaks */
+#include "find_peaks.h"
+/* peak_finding */
+#include "netcdf_peak_finding.h"
+/* ppc */
+#include "ppc.h"
+/* cdffix */
+#include "ncdf.h"
 
-void hpf(double *, double *, int *, double *);
-void windowing(int *, int *, int *, int *, int *);
-void writePeaksDAT(char **, double *, double *, int *, int *, int *, int *);
-void writePeaksTXT(char **, double *, double *, int *, int *, int *, char **);
-void txt2dat(char **, char **, int *, int *);
-void dat2txt(char **, char **, int *, char **);
+/* hpf, windowing */
+#include "hpf.h"
+/* writePeaksDAT, writePeaksTXT, txt2dat, dat2txt */
+#include "file.h"
 
 /* Automate using sed or something. */
 #if _MSC_VER >= 1000
@@ -23,9 +24,9 @@ __declspec(dllexport)
 static const R_CallMethodDef R_CallDef[] = {
         {"FindPeaks", (DL_FUNC)&FindPeaks, 8},
         {"peak_finding", (DL_FUNC)&peak_finding, 7},
-        {"peakExtraction", (DL_FUNC)&peakExtraction, 5},
-        {"ppc", (DL_FUNC)&ppc, 7},
-        {"cdffix", (DL_FUNC)&cdffix, 4},
+        {"ncdfToMatrix", (DL_FUNC)&ncdfToMatrix, 2},
+        {"ppc", (DL_FUNC)&ppc, 4},
+        {"cdffix", (DL_FUNC)&cdffix, 2},
         {NULL, NULL, 0},
 };
 

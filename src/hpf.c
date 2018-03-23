@@ -3,6 +3,8 @@
 #include <R.h>
 #include <Rinternals.h>
 
+#include "hpf.h"
+
 /* a first order high pass filter */
 void hpf(double *x, double *y, int *n, double *a) {
 	int i = 0;

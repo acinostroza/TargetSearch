@@ -9,6 +9,8 @@
 #include <R.h>
 #include <Rdefines.h>
 
+#include "netcdf_peak_finding.h"
+
 /* local maximun window size (plus minus) */
 #define LM_WIN 4
 
