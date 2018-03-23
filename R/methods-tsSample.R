@@ -97,6 +97,8 @@ setValidity("tsSample", function(object) {
 		paste("Unequal number of CDF files and Days: ", n,", ", length(object@days), sep = "")
 	else if(nrow(object@data) != n)
 		paste("Unequal number of CDF files and Sample Data: ", n,", ", nrow(object@data), sep = "")
+	else if(any(duplicated(object@Names)))
+		paste("sample names must be unique. duplicated names found")
 	else TRUE
 })
 
@@ -141,6 +143,7 @@ setMethod("initialize",
             .Object@RIpath   <- RIpath
             .Object@days     <- days
             .Object@data     <- data
+            validObject(.Object)
             .Object
           })
 

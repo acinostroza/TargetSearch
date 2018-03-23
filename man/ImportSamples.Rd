@@ -61,7 +61,7 @@ RIpath <- "."
 # import samples
 sampleDescription <- ImportSamples(sample.file, CDFpath = cdfpath, RIpath = RIpath)
 
-# change the sample names
+# change the sample names. It is required that the names must be unique.
 sampleNames(sampleDescription) <- paste("Sample", 1:length(sampleDescription), sep = "_")
 
 # change the file paths (relative to the working path)
