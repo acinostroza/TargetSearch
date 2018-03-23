@@ -35,7 +35,7 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
   \item{RI_dev}{ A three component vector with RI windows. }
   \item{SelMasses}{ The number of selective masses that will be used. }
   \item{TopMasses}{ The number of most intensive masses that will be taken from the spectrum,
-    if no \code{TOP_MASSES} is provided.}
+    if no \code{TOP_MASS} is provided.}
   \item{ExcludeMasses}{ Optional. A vector containing a list of masses that will be excluded.}
   \item{libdata}{Optional. A data frame with library data. The format is the same
     as the library file. It is equivalent to importing the library file first
@@ -68,10 +68,11 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     These columns are needed:
 
     \itemize{
+    \item \code{libID} - A unique identifier for the metabolite.
     \item \code{Name} - The metabolite name.
     \item \code{RI} - The expected RI.
-    \item \code{SEL_MASSES} - A list of selective masses separated with semicolon.
-    \item \code{TOP_MASSES} - A list of the most abundant masses to be searched, separated
+    \item \code{SEL_MASS} - A list of selective masses separated with semicolon.
+    \item \code{TOP_MASS} - A list of the most abundant masses to be searched, separated
         with semicolons.
     \item \code{Win_k} - The RI windows, k = 1,2,3. Mass search is perfomed in three
         steps. A RI window required for each one of them.
@@ -81,13 +82,17 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     One value per metabolite and it must be one of the selective masses. (optional)
     }
 
-    The columns \code{Name} and \code{RI} are mandatory. At least one of columns \code{SEL_MASSES},
-    \code{TOP_MASSES} and \code{SPECTRUM} must be given as well. By using the
+    The columns \code{Name} and \code{RI} are mandatory. At least one of columns \code{SEL_MASS},
+    \code{TOP_MASS} and \code{SPECTRUM} must be given as well. By using the
     parameters \code{SelMasses} or \code{TopMasses} it is possible to set the selective
     masses or the top masses from the spectra. The parameter \code{ExcludeMasses} is
     used only when masses are obtained from the spectra.
     The parameter \code{RI_dev} can be used to set the RI windows.
     Note that in this case, all metabolites would have the same RI windows.
+
+    A unique identifier may be provided as well (\code{libID}). This could be a
+    external database identifier. If it is not provided, a random identifier will be created
+    of the form \code{GC.k}, k = 1,...,N.
 
     The MSP format is a text file that can be imported/exported from NIST. A typical
     MSP file looks like this:

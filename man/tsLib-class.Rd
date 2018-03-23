@@ -47,7 +47,7 @@
 \alias{topMass<-}
 
 \title{Class for representing a reference library }
-\description{ This is a class representation of a reference library.	}
+\description{ This is a class representation of a reference library.}
 \section{Objects from the Class}{
 Objects can be created by the function \code{\link{ImportLibrary}}.
 }
@@ -83,11 +83,31 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{show}}{\code{signature(object = "tsLib")}: show method. }
     \item{\code{spectra}}{\code{signature(obj = "tsLib")}: gets the spectra. }
     \item{\code{topMass}}{\code{signature(obj = "tsLib")}: gets the top masses. }
-	 }
+  }
 }
+
+\note{
+Some care is needed when using the methods \code{quantMass<-}, \code{selMass<-}, \code{topMass<-}.
+In order to be consistent, the first m/z value of the slot \code{topMass} and \code{selMass} are
+equal to \code{quantMass}, and the values of \code{selMass} are equal to the first couple of values
+of \code{topMass}. In other words, the following constrain is applied.
+
+\preformatted{
+    quantMass : x[0]
+    selMass   : x[0], x[1], ..., x[k]
+    topMass   : x[0], x[1], ..., x[k], x[k+1], ..., x[n]
+}
+
+where \code{1 <= k <= n} and \code{x[i]} is a m/z value. Thus, using one these methods will
+change the values of the other slots. In the future, these methods will be deprecated, so it
+is better to not rely on them.
+
+See the last example on how this can lead to unexpected results.
+}
+
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{
-	\code{\link{ImportLibrary}}
+    \code{\link{ImportLibrary}}
 }
 \examples{
 showClass("tsLib")
@@ -100,14 +120,14 @@ RI         <- c(100,200,300)
 selMasses  <- list(c(95,204,361), c(87,116,190), c(158,201,219))
 # define the retention time windows to look for the given selective masses.
 RIdev      <- matrix(rep(c(10,5,2), length(libNames)), ncol = 3, byrow = TRUE)
-# Set the mass spectra. A list object of two-column matrices, or set to 
-# an empty list if the spectra is not available
-spectra    <- list()
+# Set the mass spectra. A list object of two-column matrices, or set to
+# NULL if the spectra is not available
+spectra    <- NULL
 # some extra information about the library
 libData    <- data.frame(Name = libNames, Lib_RI = RI)
 # create a reference library object
 refLibrary <- new("tsLib", Name = libNames, RI = RI, medRI = RI, RIdev = RIdev,
-			selMass = selMasses, topMass = selMasses, spectra = spectra, libData = libData) 
+                  selMass = selMasses, topMass = selMasses, spectra = spectra, libData = libData)
 
 # get the metabolite names
 libName(refLibrary)
@@ -123,6 +143,27 @@ selMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 topMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 # change the retention time deviations
 RIdev(refLibrary)[3,] <- c(8,4,1)
+
+#####################################################################
+#####################################################################
+# These examples show how changing a quantitaive or selective mass
+# could lead to unexpected results.
+
+# show quantMasses
+quantMass(refLibrary)
+
+# suposse that we want to change the quant mass of metabolite 1 to 96 due
+# to a typo in the library. We could do just
+quantMass(refLibrary)[1] <- 96
+
+# however, we still see the mass 95 in the selective and top masses.
+selMass(refLibrary)[[1]]
+topMass(refLibrary)[[1]]
+
+# to remove the mass 95, set the topMass and selMass explicitely, noting that
+# the first masses coincides with 96 (the quantMass)
+selMass(refLibrary)[[1]] <- c(96, 204, 361)
+topMass(refLibrary)[[1]] <- c(96, 204, 361)
 
 }
 \keyword{classes}

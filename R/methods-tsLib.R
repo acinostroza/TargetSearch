@@ -1,10 +1,10 @@
 
-# tsLib	
+# tsLib
 setGeneric("refLib", function(obj, ...) standardGeneric("refLib"))
 setMethod("refLib", "tsLib", function(obj, ri, w = 1, sel = TRUE) {
 	if(missing(ri))
 		ri <- obj@medRI
-	
+
 	if(sel)	{
 		rp <- sapply(obj@selMass,length)
 		m  <- unlist(obj@selMass)
@@ -32,6 +32,7 @@ setGeneric("medRI", function(obj) standardGeneric("medRI"))
 setMethod("medRI", "tsLib", function(obj) obj@medRI)
 setGeneric("medRI<-", function(obj, value) standardGeneric("medRI<-"))
 setReplaceMethod("medRI", "tsLib", function(obj, value) { obj@medRI <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -41,6 +42,7 @@ setGeneric("selMass", function(obj) standardGeneric("selMass"))
 setMethod("selMass", "tsLib", function(obj) obj@selMass)
 setGeneric("selMass<-", function(obj, value) standardGeneric("selMass<-"))
 setReplaceMethod("selMass", "tsLib", function(obj, value) { obj@selMass <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -49,6 +51,7 @@ setGeneric("topMass", function(obj) standardGeneric("topMass"))
 setMethod("topMass", "tsLib", function(obj) obj@topMass)
 setGeneric("topMass<-", function(obj, value) standardGeneric("topMass<-"))
 setReplaceMethod("topMass", "tsLib", function(obj, value) { obj@topMass <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -56,6 +59,7 @@ setGeneric("quantMass", function(obj) standardGeneric("quantMass"))
 setMethod("quantMass", "tsLib", function(obj) obj@quantMass)
 setGeneric("quantMass<-", function(obj, value) standardGeneric("quantMass<-"))
 setReplaceMethod("quantMass", "tsLib", function(obj, value) { obj@quantMass <- as.numeric(value)
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -64,6 +68,7 @@ setGeneric("spectra", function(obj) standardGeneric("spectra"))
 setMethod("spectra", "tsLib", function(obj) obj@spectra)
 setGeneric("spectra<-", function(obj, value) standardGeneric("spectra<-"))
 setReplaceMethod("spectra", "tsLib", function(obj, value) { obj@spectra <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -71,6 +76,7 @@ setGeneric("libName", function(obj) standardGeneric("libName"))
 setMethod("libName", "tsLib", function(obj) obj@Name)
 setGeneric("libName<-", function(obj, value) standardGeneric("libName<-"))
 setReplaceMethod("libName", "tsLib", function(obj, value) { obj@Name <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -78,6 +84,7 @@ setGeneric("libRI", function(obj) standardGeneric("libRI"))
 setMethod("libRI", "tsLib", function(obj) obj@RI)
 setGeneric("libRI<-", function(obj, value) standardGeneric("libRI<-"))
 setReplaceMethod("libRI", "tsLib", function(obj, value) { obj@RI <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj })
 
@@ -86,6 +93,7 @@ setMethod("libData", "tsLib", function(obj) obj@libData)
 setGeneric("libData<-", function(obj, value) standardGeneric("libData<-"))
 setReplaceMethod("libData", "tsLib", function(obj, value) {
 	obj@libData <- value
+	obj <- .setLibrary(obj)
 	validObject(obj)
 	obj
 })
@@ -96,6 +104,7 @@ setMethod("RIdev", "tsLib", function(obj) obj@RIdev)
 setGeneric("RIdev<-", function(obj, value) standardGeneric("RIdev<-"))
 setReplaceMethod("RIdev", "tsLib", function(obj, value) {
  obj@RIdev <- value
+ obj <- .setLibrary(obj)
  validObject(obj)
  obj
 })
@@ -112,13 +121,13 @@ setMethod("[", "tsLib", function(x, i, j, ..., drop) {
     x@Name <- x@Name[i];
     x@RI <- x@RI[i];
     x@medRI <- x@medRI[i];
-    x@RIdev <- matrix(x@RIdev[i,], ncol = 3)
+    x@RIdev <- x@RIdev[i,,drop=FALSE]
     x@selMass <- x@selMass[i]
     x@topMass <- x@topMass[i]
-    x@libData <- x@libData[i,]
+    x@libData <- x@libData[i, j, drop=FALSE]
     x@spectra <- x@spectra[i]
     x@quantMass <- x@quantMass[i]
-    x
+    .setLibrary(x)
 })
 
 setValidity("tsLib", function(object) {
@@ -137,7 +146,7 @@ setValidity("tsLib", function(object) {
 		paste("Unequal number of Names and topMass: ", n,", ", length(object@topMass), sep = "")
 	else if(length(object@quantMass) != n)
 		paste("Unequal number of Names and quantMass: ", n,", ", length(object@quantMass), sep = "")
-	else if(length(object@spectra) != n & length(object@spectra) != 0)
+	else if(length(object@spectra) != n)
 		paste("Unequal number of Names and spectra: ", n,", ", length(object@spectra), sep = "")
 	else if(nrow(object@libData) != n)
 		paste("Unequal number of Names and libData: ", n,", ", nrow(object@libData), sep = "")
@@ -150,24 +159,45 @@ setMethod("$", "tsLib", function(x, name) {
 
 setMethod("initialize",
           "tsLib",
-          function(.Object, Name    = character(0), RI      = numeric(0),
-                            medRI   = numeric(0),   RIdev   = matrix(0,0,3),
-                            selMass = list(),       topMass = list(),
-                            quantMass = numeric(0),
-                            spectra = list(),       libData = data.frame()) {
-            if (length(Name) > 0) {
-                if(length(medRI) == 0)
-                    medRI   <- RI
-                if(length(topMass) == 0)
-                    topMass <- selMass
-                if(length(quantMass) == 0)
-                    quantMass <- numeric(length(Name))
-                if(all(dim(libData) == 0))
-                    libData <- data.frame(Name = Name, RI = RI)
-                if(is.matrix(RIdev) == FALSE & length(RIdev) == 3)
-                    RIdev   <- matrix(rep(RIdev, length(Name)), length(Name), 3, byrow = T)
+          function(.Object, Name, RI, selMass, medRI=RI, RIdev=NULL,
+                            topMass=NULL, quantMass=NULL, spectra=vector("list", length(Name)),
+                            libData=NULL)
+          {
+            # require at least 1 Name, 1 RI and 1 selMass
+            if (length(Name) != length(RI) | length(Name) != length(selMass))
+                stop("'Name', 'RI', and 'selMass' must have the same length")
+
+            if(is.null(RIdev)) {
+                RIdev <- matrix(rep(RI, 3), ncol=3)
+                RIdev <- sweep(matrix(rep(RI, 3), ncol=3), 2, c(5,2,1)/1000, FUN="*")
+            } else if(!is.numeric(RIdev)) {
+                stop("'RIdev' must be a numeric 3-column matrix")
+            } else if(!is.matrix(RIdev)) {
+                if(length(RIdev) == 3) {
+                    RIdev <- matrix(RIdev, nrow=length(Name), ncol=3, byrow=TRUE)
+                } else if(length(RIdev) == 3 * length(Name)) {
+                    RIdev <- matrix(RIdev, nrow=length(Name), ncol=3)
+                }
             }
-            ids <- as.character(1:length(Name))
+
+            if(is.numeric(selMass)) {
+                selMass <- as.list(selMass)
+            }
+
+            if(!is.numeric(sapply(selMass, getElement, 1))) {
+                stop("'selMass' must be a list of numeric vectors")
+            }
+
+            if(is.null(topMass))
+                topMass <- selMass
+            if(is.null(quantMass))
+                quantMass <- sapply(selMass, getElement, 1)
+            if(is.null(libData))
+                libData <- data.frame(Name = Name, RI = RI)
+
+            if(is.null(spectra))
+                spectra <- vector("list", length(Name))
+
             .Object@Name     <- Name
             .Object@RI       <- RI
             .Object@medRI    <- medRI
@@ -177,13 +207,61 @@ setMethod("initialize",
             .Object@quantMass <- quantMass
             .Object@spectra  <- spectra
             .Object@libData  <- libData
-            names(.Object@Name)     <- ids
-            names(.Object@RI)       <- ids
-            names(.Object@medRI)    <- ids
-            rownames(.Object@RIdev) <- ids
-            names(.Object@selMass)  <- ids
-            names(.Object@topMass)  <- ids
-            if(length(.Object@spectra) > 0) names(.Object@spectra)  <- ids
-            if(length(.Object@quantMass) > 0) names(.Object@quantMass)  <- ids
+            .Object <- .setLibrary(.Object)
             .Object
           })
+
+.setLibrary <- function(lib)
+{
+    ma <- function(...) mapply(..., SIMPLIFY=FALSE)
+    uf <- function(...) unique(c(...))
+
+    id <- lib@libData$libID
+
+    if(is.null(id)) {
+        lib@libData <- .addLibID(lib@libData)
+        id <- lib@libData$libID
+    }
+
+    # remove names in data.frame libData
+    dat <- lapply(as.list( lib@libData ), function(x) { unname(x) })
+    dat <- data.frame(dat, stringsAsFactors=FALSE)
+
+    lib@selMass <- ma(uf, lib@quantMass, lib@selMass)
+    lib@topMass <- ma(uf, lib@quantMass, lib@selMass, lib@topMass)
+
+    rownames(lib@RIdev) <- rownames(dat) <- id
+    colnames(lib@RIdev) <- sprintf("Win_%d", 1:3)
+    names(lib@Name) <- names(lib@RI) <- names(lib@medRI) <- names(lib@selMass) <- id
+    names(lib@topMass) <- names(lib@quantMass) <- names(lib@spectra) <- id
+
+    # remove extra columns from dat
+    k <- setdiff(colnames(dat), c("Win_1", "Win_2", "Win_3", "SEL_MASS", "TOP_MASS", "SPECTRUM", "QUANT_MASS"))
+    dat <- dat[, k,drop=FALSE]
+
+    lib@libData <- dat
+    stopifnot( validObject(lib) )
+    lib
+}
+
+.addLibID <- function(lib) {
+    k <- which(tolower(colnames(lib)) == "libid")
+    if(length(k) == 0) {
+        lib <- data.frame(libID=paste("GC", 1:nrow(lib), sep="."), lib, stringsAsFactors=FALSE)
+    } else if(length(k) == 1) {
+        if(colnames(lib)[k] != 'libID') {
+            warning(sprintf("Changing '%s' to 'libID'", colnames(lib)[k]))
+            colnames(lib)[k] <- 'libID'
+        }
+    }
+    else {
+        stop(sprintf("\nMultiple colnames match 'libID'. Expecting exactly one match. Please rename/remove the extra columns"))
+    }
+    id <- make.names(lib$libID, TRUE)
+    if(any(id != lib$libID))
+        warning("Some identifiers where renamed in order to make them unique")
+    lib$libID <- id
+    return(lib)
+}
+
+# vim: set ts=4 sw=4 et:
