@@ -124,3 +124,18 @@ function(x, f) {
 	invisible()
 }
 
+# Read retention times from a binary file
+# f = RI binary file
+`readRetTimes` <-
+function(f)
+{
+	z <- file(f, "rb")
+	sig <- readBin(z, what="int", n=2, endian="little")
+	if(!all(sig == c(169603882, 84919)))
+		stop(sprintf("Incorrect binary format of file %s", f))
+	n   <- readBin(z, what="int", n=2, endian="little")
+	RI  <- readBin(z, what="numeric", n=n[1], endian="little")
+	RT  <- readBin(z, what="numeric", n=n[1], endian="little")
+	close(z)
+	cbind(retIndex=RI,retTime=RT)
+}
