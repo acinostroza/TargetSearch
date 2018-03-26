@@ -63,13 +63,22 @@ riMatrix <- function(samples, rim)
 		mass <- rep(mass, dim(rLimits)[1])
 
 	cols <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
+	searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
 
 	useRT <- TRUE
 	for (i in 1:length(ri.files)) {
 		opts <- get.file.format.opt(ri.files[i], cols)
-		out  <- .Call("FindPeaks", as.character(ri.files[i]),rLimits[,1],
-			mass, rLimits[,2], opts, useRT, PACKAGE="TargetSearch")
-		RImat[,i] <- out[[3]]
+		out  <- .Call("FindPeaks",
+						as.character(ri.files[i]), # MyFile
+						as.integer(mass),          # Mass
+						NULL,                      # RI_exp
+						as.numeric(rLimits[,1]),   # RI_min
+						as.numeric(rLimits[,2]),   # RI_max
+						as.integer(opts),          # Options
+						useRT,                     # useRT
+						searchType,                # max intensity
+						PACKAGE="TargetSearch")
+		RImat[out[[4]]+1,i] <- out[[3]]
 	}
 	RImat
 }

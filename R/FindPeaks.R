@@ -1,8 +1,7 @@
 
-
-FindPeaks <-
-function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"), showProgressBar = FALSE) {
-
+`FindPeaks` <-
+function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"), showProgressBar = FALSE)
+{
     my.names <- basename(my.files)
     if(is.list(refLib)) {
         # check that all matrices have the same size
@@ -40,16 +39,35 @@ function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETE
 
         # Guess the file format. See file "file.R"
         opts <- get.file.format.opt(my.files[i], columns)
+        # set option too select for max intensity (default behaviour)
+        searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
 
         out  <- if(is.list(refLib)) {
-                    .Call("FindPeaks", as.character(my.files[i]), refLib[[i]][,1],
-                        refLib[[i]][,2], refLib[[i]][,3], opts, 0, PACKAGE="TargetSearch")
-                } else { .Call("FindPeaks", as.character(my.files[i]), refLib[,1],
-                        refLib[,2], refLib[,3], opts, 0, PACKAGE="TargetSearch") }
-
-        resInt[, i] <- out[[1]]
-        resRI[, i]  <- out[[2]]
-        resRT[, i]  <- out[[3]]
+                    .Call("FindPeaks",
+                            as.character(my.files[i]),   # MyFile
+                            as.integer(mz),              # Mass
+                            NULL,                        # RI_exp
+                            as.numeric(refLib[[i]][,1]), # RI_min
+                            as.numeric(refLib[[i]][,3]), # RI_max
+                            as.integer(opts),            # Options
+                            FALSE,                       # useRT
+                            searchType,                  # max intensity
+                            PACKAGE="TargetSearch")
+                } else {
+                    .Call("FindPeaks",
+                            as.character(my.files[i]), # MyFile
+                            as.integer(mz),            # Mass
+                            NULL,                      # RI_exp
+                            as.numeric(refLib[,1]),    # RI_min
+                            as.numeric(refLib[,3]),    # RI_max
+                            as.integer(opts),          # Options
+                            FALSE,                     # useRT
+                            searchType,                # max intensity
+                            PACKAGE="TargetSearch")
+                }
+        resInt[ out[[4]] + 1, i] <- out[[1]]
+        resRI [ out[[4]] + 1, i] <- out[[2]]
+        resRT [ out[[4]] + 1, i] <- out[[3]]
 
         if(showProgressBar)
             setProgressBar(pb, value=i/length(my.files),

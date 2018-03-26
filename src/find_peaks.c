@@ -3,154 +3,268 @@
 #include <Rdefines.h>
 #include <ctype.h>
 
-#include "file.h"
 #include "find_peaks.h"
 #include "getLine.h"
 
-/* Main program */
+#define BUFFER 4096
 
-SEXP FindPeaks(SEXP MyFile, SEXP RI_Min, SEXP Mass, SEXP RI_Max, SEXP Options,
-	SEXP useRT)
+/* search type: */
+typedef enum {
+	ALL=1,   /* return all peaks */
+	MINRI,   /* return peaks with min RI error */
+	MAXINT   /* return most abundant peaks */
+} SearchType;
+
+struct point_list_s *
+init_point_list(int size)
 {
-        FILE *fp;
-        int  libtotal = 0, j;
-        int *mass, *int_found;
-        double *ri_min, *ri_max, *ri_found, *rt_found;
-        char *myfile;
-        SPECTRA *spectra;
-        SEXP result, RI_Found, RT_Found, INT_Found;
-
-	int ftype; /* file type: 0 = TXT; 1 = DAT */
-	int ri_COL, sp_COL, rt_COL;
-	int swap;
-	int use_rt; /* use RT instead of RI */
-
-        /* R objects created in the C code have to be reported using the PROTECT
-         * macro on a pointer to the object. This tells R that the object is in
-         * use so it is not destroyed. */
-        PROTECT(MyFile  = AS_CHARACTER(MyFile));
-        PROTECT(RI_Min  = AS_NUMERIC(RI_Min));
-        PROTECT(RI_Max  = AS_NUMERIC(RI_Max));
-        PROTECT(Mass    = AS_INTEGER(Mass));
-        PROTECT(Options = AS_INTEGER(Options));
-        PROTECT(useRT   = AS_INTEGER(useRT));
-
-        /* Copy protected elements to pointers */
-        myfile = R_alloc(strlen(CHAR(STRING_ELT(MyFile, 0))), sizeof(char));
-        strcpy(myfile, CHAR(STRING_ELT(MyFile, 0)));
-
-        ri_min = NUMERIC_POINTER(RI_Min);
-        ri_max = NUMERIC_POINTER(RI_Max);
-        mass   = INTEGER_POINTER(Mass);
-
-	ftype  = INTEGER_POINTER(Options)[0]; /* file type: 0 = TXT; 1 = DAT */
-	swap   = INTEGER_POINTER(Options)[1]; /* swap = 1 in big endian platforms */
-        sp_COL = INTEGER_POINTER(Options)[2]; /* Spectra column number */
-        ri_COL = INTEGER_POINTER(Options)[3]; /* R.I. column number */
-        rt_COL = INTEGER_POINTER(Options)[4]; /* R.T. column number */
-	use_rt = INTEGER_POINTER(useRT)[0];   /* use RT instead of RI */
-
-        libtotal = GET_LENGTH(Mass);
-
-        /****************************************/
-
-	if(ftype == 0) {
-		fp = fopen(myfile, "r");
-		is_open(fp, myfile, 5);
-		spectra = read_txt(fp, sp_COL, ri_COL, rt_COL);
-		if(!spectra)
-			error("Error reading file %s\n", myfile);
-	} else {
-		fp = fopen(myfile, "rb");
-		is_open(fp, myfile, 5);
-		spectra = read_dat(fp, swap);
-		if(!spectra)
-			error("Error reading file %s\n", myfile);
-	}
-        fclose(fp);
-
-        PROTECT(RI_Found  = NEW_NUMERIC(libtotal));
-        ri_found = NUMERIC_POINTER(RI_Found);
-        PROTECT(RT_Found  = NEW_NUMERIC(libtotal));
-        rt_found = NUMERIC_POINTER(RT_Found);
-        PROTECT(INT_Found = NEW_INTEGER(libtotal));
-        int_found = INTEGER_POINTER(INT_Found);
-
-        for (j = 0; j < libtotal; j++) {
-                if (ISNAN(ri_min[j]) || (mass[j] == NA_INTEGER) || ISNAN(ri_max[j])) {
-                        ri_found[j]  = NA_REAL;
-                        rt_found[j]  = NA_REAL;
-                        int_found[j] = NA_INTEGER;
-                        continue;
-                }
-
-                find_peak(ri_min[j], mass[j], ri_max[j], spectra,
-                        ri_found+j, int_found+j, rt_found+j, use_rt);
-        }
-
-        /* free_spectra(spectra, n_scans); */
-
-        /* Creating a list with 2 vector elements: ri_found and int_found */
-        PROTECT(result = allocVector(VECSXP, 3));
-        // Attaching elements
-        SET_VECTOR_ELT(result, 0, INT_Found);
-        SET_VECTOR_ELT(result, 1, RI_Found);
-        SET_VECTOR_ELT(result, 2, RT_Found);
-
-        UNPROTECT(10);
-        return result;
+	struct point_list_s *x = Calloc(1, struct point_list_s);
+	x->p = Calloc(size, struct point_s);
+	x->alloc = size;
+	x->length = 0;
+	return x;
 }
 
-void find_peak
-(double ri_min,int mass,double ri_max,SPECTRA *sp, double *ri_found,
-        int *int_found, double *rt_found, int use_rt)
+void
+add_point(struct point_list_s *x, struct point_s *p)
 {
-        int i, j, imax = -1;
-        int max = -1;
+	int k = x->length;
+	if(k == x->alloc) {
+		x->alloc *= 2;
+		x->p = Realloc(x->p, x->alloc, struct point_s);
+	}
+	x->p[k] = *p;
+	x->length++;
+}
+
+void
+free_point_list(struct point_list_s *x)
+{
+	Free(x->p);
+	Free(x);
+}
+
+/* Returns the index of the input array at which its value is between
+ * min and max. The algorith uses a binary search. -1 if nothing is found
+ * The array must be sorted. */
+
+int binsearch(double *x, int n, double min, double max)
+{
+	int imin=0, imax=n-1;
+	while(imax >= imin) {
+		int i = imin + (imax - imin) / 2;
+		if(x[i] >= min && x[i] <= max)
+			return i;
+		else if(x[i] < min)
+			imin = i + 1;
+		else
+			imax = i - 1;
+	}
+	return -1;
+}
+
+void
+find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
+		SPECTRA *sp, struct point_list_s *plist, int use_rt, int idx)
+{
+	int i, j;
 	int n_scans = sp->n_scans;
 	double *ri;
-
-/* I assume that RI is a linear function of the scan index and the RIs are
- * in ascendent order. This will speed up the search for the RI window */
+	struct point_s p;
 
 	/* uses RT or RI to perform the search */
 	ri = (use_rt == 0) ? sp->ri : sp->rt;
 
-        int m, b; /* slope and intercept */
-        m = (int) (ri[n_scans-1] - ri[0]) / (n_scans - 1);
-        b = ri[0];
+	/* This returns approximately the scan index of ri_min */
+	i = binsearch(ri, n_scans, ri_min, ri_max);
 
-        /* This returns approximately the scan index of ri_min */
-        i = (ri_min - b) / m;
+	while (i > 0 && ri_min < ri[i])
+		i--;
 
-        /* check array limits */
-        i = i < 0 ? 0 : i;
-        i = i > n_scans - 1 ? n_scans - 1 : i;
+	for (; i < n_scans; i++) {
+		if (ri_max < ri[i])
+			break;
+		else if (ri_min < ri[i] && ri_max > ri[i]) {
+			for (j = 0; j < sp->n[i]; j++) {
+				if (mass == sp->pk[i].mass[j]) {
+					p.rt = sp->rt[i];
+					p.ri = sp->ri[i];
+					p.in = sp->pk[i].in[j];
+					p.mz = sp->pk[i].mass[j];
+					p.idx = idx;
+					p.err = fabs(ri_exp - ri[i]);
+					add_point(plist, &p);
+				}
+			}
+		}
+	}
+}
 
-        while (i > 0 && ri_min < ri[i])
-                i--;
+struct point_list_s *
+filter_results(struct point_list_s *plist, SearchType st)
+{
+	struct point_list_s *result;
+	int prev = -1;
+	struct point_s *best = NULL;
 
-        for (; i < n_scans; i++) {
-                if (ri_min < ri[i] && ri_max > ri[i]) {
-                        for (j = 0; j < sp->n[i]; j++) {
-                                if (mass == sp->pk[i].mass[j] && max < sp->pk[i].in[j]) {
-                                        max = sp->pk[i].in[j];
-                                        imax = i;
-                                }
-                        }
-                }
-                else if (ri_max < ri[i])
-                        break;
-        }
-        if (imax != -1) {
-                *ri_found  = sp->ri[imax];
-                *rt_found  = sp->rt[imax];
-                *int_found = max;
-        }
-        else {
-                *ri_found  = NA_REAL;
-                *rt_found  = NA_REAL;
-                *int_found = NA_INTEGER;
-        }
+	if(st == ALL || plist->length <= 1)
+		return plist;
+
+	result = init_point_list(plist->length);
+
+	for(int i = 0; i < plist->length; i++) {
+		struct point_s *p = plist->p + i;
+		if(p->idx != prev) {
+			if(best != NULL) {
+				add_point(result, best);
+			}
+			prev = p->idx;
+			best = p;
+			continue;
+		}
+		if(st == MAXINT) {
+			if (best->in < p->in)
+				best = p;
+			continue;
+		}
+		if(st == MINRI) {
+			if (best->err > p->err)
+				best = p;
+			continue;
+		}
+	}
+	if(best != NULL) {
+		add_point(result, best);
+	}
+	return result;
+}
+
+SPECTRA *
+read_file(const char *file, int ftype, int swap, int sp_COL, int ri_COL, int rt_COL)
+{
+	FILE *fp;
+	SPECTRA *spectra;
+	if(ftype == 0) {
+		fp = fopen(file, "r");
+		if(fp == NULL)
+			error("Error opening file %s\n", file);
+		spectra = read_txt(fp, sp_COL, ri_COL, rt_COL);
+		if(!spectra)
+			error("Error reading file %s\n", file);
+	} else {
+		fp = fopen(file, "rb");
+		if(fp == NULL)
+			error("Error opening file %s\n", file);
+		spectra = read_dat(fp, swap);
+		if(!spectra)
+			error("Error reading file %s\n", file);
+	}
+	fclose(fp);
+	return spectra;
+}
+
+struct point_list_s *
+do_search(SPECTRA *spectra, int *mass, double *ri_exp, double *ri_min, double *ri_max,
+		int use_rt, SearchType st, int libtotal)
+{
+	struct point_list_s *plist = init_point_list(2 * libtotal);
+	struct point_list_s *res;
+
+	for (int j = 0; j < libtotal; j++) {
+		double ri = (ri_exp == NULL) ? 0.0 : ri_exp[j];
+		if (ISNAN(ri_min[j]) || (mass[j] == NA_INTEGER) || ISNAN(ri_max[j]))
+			continue;
+		find_all_peaks(mass[j], ri, ri_min[j], ri_max[j], spectra, plist, use_rt, j);
+	}
+	res = filter_results(plist, st);
+	if(plist != res)
+		free_point_list(plist);
+	return res;
+}
+
+/*
+  Find Peaks version 2.
+  Description:
+     Looks for peaks in a RI file. It returns either (1) all peaks found within
+     the time range, (2) the closest to the expected RI, or (3) the most intense.
+  Output:
+     1. vector of intensities.
+     2. vector of retention indexes.
+     3. vector of retention times
+     4. vector of indexes relative to the input.
+  Args:
+     RI_file. RI file (dat or txt)
+     Mass. vector of m/z values to search.
+     RIexp. Expected Retention Index (RI)
+     RI_Min. RI minimum value.
+     RI_Max. RI maximum value.
+     Options. Vector of file format options (see comment below).
+     useRT. Should use RT or RI. Obviouly RIexp, RI_Min, RI_max units should be
+            Time in seconds or Index units.
+     Search: 1. all peaks, 2. closest to expected RI, 3. most intense.
+  Notes:
+     RI_exp can be NULL, but filterResult cannot be 1. In this case RI_exp
+     is ignored.
+ */
+
+SEXP FindPeaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, SEXP Options,
+	SEXP useRT, SEXP Search)
+{
+	/* internal variables */
+	char *file;
+	int  libtotal = GET_LENGTH(Mass);
+	SPECTRA *spectra;
+	struct point_list_s *res;
+
+	/* R variables */
+	int *mass  = INTEGER(Mass);
+	int use_rt = LOGICAL(useRT)[0];
+	SearchType st  = (SearchType) INTEGER(Search)[0];
+	double *ri_min = REAL(RI_Min), *ri_max = REAL(RI_Max);
+	double *ri_exp = isNull(RI_exp) ? NULL : REAL(RI_exp);
+
+	/* output variables */
+	SEXP RI_Found, RT_Found, INT_Found, I_Found, result;
+
+	/* parse options */
+	int ftype  = INTEGER(Options)[0]; /* file type: 0 = TXT; 1 = DAT */
+	int swap   = INTEGER(Options)[1]; /* swap = 1 in big endian platforms */
+	int sp_COL = INTEGER(Options)[2]; /* Spectra column number */
+	int ri_COL = INTEGER(Options)[3]; /* R.I. column number */
+	int rt_COL = INTEGER(Options)[4]; /* R.T. column number */
+
+	/* Copy file name to a string */
+	file = R_alloc(strlen(CHAR(STRING_ELT(RI_file, 0))), sizeof(char));
+	strcpy(file, CHAR(STRING_ELT(RI_file, 0)));
+
+	/* parse file */
+	spectra = read_file(file, ftype, swap, sp_COL, ri_COL, rt_COL);
+
+	/* search peaks */
+	res = do_search(spectra, mass, ri_exp, ri_min, ri_max, use_rt, st, libtotal);
+
+	RI_Found  = PROTECT(allocVector(REALSXP, res->length));
+	RT_Found  = PROTECT(allocVector(REALSXP, res->length));
+	INT_Found = PROTECT(allocVector(INTSXP, res->length));
+	I_Found   = PROTECT(allocVector(INTSXP, res->length));
+
+	for(int j = 0; j < res->length; j++) {
+		struct point_s *p = res->p + j;
+		REAL(RI_Found)[j] = p->ri;
+		REAL(RT_Found)[j] = p->rt;
+		INTEGER(INT_Found)[j] = p->in;
+		INTEGER(I_Found)[j] = p->idx;
+	}
+	/* Creating a list with 2 vector elements: ri_found and int_found */
+	PROTECT(result = allocVector(VECSXP, 4));
+	// Attaching elements
+	SET_VECTOR_ELT(result, 0, INT_Found);
+	SET_VECTOR_ELT(result, 1, RI_Found);
+	SET_VECTOR_ELT(result, 2, RT_Found);
+	SET_VECTOR_ELT(result, 3, I_Found);
+
+	free_point_list(res);
+	UNPROTECT(5);
+	return result;
 }
 
