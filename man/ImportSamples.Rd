@@ -23,7 +23,7 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE,
   \item{ftype}{A character string giving the file type for RI files. Options are
 	"binary" and "text".}
   \item{ignore.case}{Logical. Should pattern-matching be case-insensitive?}
-  \item{\dots}{ Other options passed to \code{\link[utils]{read.delim}} function. }
+  \item{\dots}{ Other options passed to \code{\link[utils:read.table]{read.delim}} function. }
 }
 \details{
 	The sample file is a tab-delimited text file with at least two columns:
