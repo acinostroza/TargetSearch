@@ -1,0 +1,50 @@
+# low level search of peaks in a RI file.
+`getAllPeaks` <-
+function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
+         cols = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
+{
+    if(!all(c('mz', 'minRI', 'maxRI') %in% colnames(ref)))
+        stop("Error: missing columns in 'ref'")
+
+    opt <- as.integer(get.file.format.opt(file, cols))
+    searchType <- pmatch(searchType, c("all", "minRI", "maxInt"))
+    z <- .Call('FindPeaks', file, as.integer(ref[,'mz']), NULL,
+               as.numeric(ref[,'minRI']), as.numeric(ref[,'maxRI']), opt, useRT, searchType)
+    z <- do.call('cbind', z)
+    z[,4] <- z[,4] + 1
+    colnames(z) <- c('Int', 'RI', 'RT', 'rowid')
+    cbind(z, mz=ref[z[, 'rowid'],2])
+}
+
+`FindAllPeaks` <-
+function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
+         cols    = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
+         mz_type = c('selMass', 'quantMass', 'topMass'))
+{
+    if(is_nullOrNA(RI)) #
+        RI <- if(!is.na(medRI(refLib)[id])) medRI(refLib)[id] else libRI(refLib)[id]
+
+    if(is_nullOrNA(dev))
+        dev <- RIdev(refLib)[id, 1]
+
+    if(is_nullOrNA(mz)) {
+        method <- switch(match.arg(mz_type),
+                         selMass=selMass, quantMass=quantMass, topMass=topMass)
+        mz <- method(refLib)[[id]]
+    }
+
+    ref   <- cbind(minRI=RI-dev, mz=mz, maxRI=RI + dev)
+    peaks <- lapply(RIfiles(smpInfo), getAllPeaks, ref, cols=cols)
+
+    n  <- rep.int(1:length(peaks), sapply(peaks, nrow))
+    pk <- do.call('rbind', peaks)
+    pk <- cbind(pk, fid=n)
+
+    if(nrow(pk) == 0)
+        return(NULL)
+
+    rownames(pk) <- NULL
+    return(pk[, c('Int', 'RI', 'RT', 'mz', 'fid')])
+}
+
+# vim: set ts=4 sw=4 et:
