@@ -2,14 +2,14 @@ useDynLib(TargetSearch)
 
 import("methods")
 
-importFrom("graphics", "abline", "axis", "box", "boxplot", "legend",
-           "matplot", "par", "plot", "plot.new", "points", "text",
-           "title", "matlines", "mtext", "rect")
+importFrom("graphics", "abline", "axis", "box", "boxplot", "grid", "image",
+           "layout", "lcm",  "legend", "matlines", "matplot", "mtext",
+           "par", "plot", "plot.new", "points", "rect", "text", "title")
 
-importFrom("grDevices", "dev.off", "pdf", "gray")
+importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
 
-importFrom("stats", "approx", "cor", "cutree", "dist", "hclust", "lm",
-           "median", "predict", "sd", "smooth.spline", "as.dist")
+importFrom("stats", "approx", "as.dist", "coef", "cor", "cutree", "dist",
+           "hclust", "lm", "median", "predict", "sd", "smooth.spline")
 
 importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
            "tclVar", "tkbutton", "tkcheckbutton", "tkchooseDirectory",
