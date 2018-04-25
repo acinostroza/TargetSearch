@@ -97,6 +97,7 @@ exportMethods(
 export(
 	"FAMEoutliers",
 	"FindPeaks",
+	"FindAllPeaks",
 	"medianRILib",
 	"Profile",
 	"sampleRI",

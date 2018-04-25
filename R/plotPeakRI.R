@@ -32,7 +32,7 @@ function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
     if(is_nullOrNA(RI))
         RI <- if(!is.na(medRI(refLib)[id])) medRI(refLib)[id] else libRI(refLib)[id]
 
-    pk <- findAllPeaks(smpInfo, refLib, id, dev, mz, RI, mz_type='quantMass')
+    pk <- FindAllPeaks(smpInfo, refLib, id, dev, mz, RI, mz_type='quantMass')
 
     if(is.null(pk))
         return(invisible())

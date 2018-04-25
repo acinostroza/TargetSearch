@@ -1,12 +1,12 @@
 # low level search of peaks in a RI file.
 `getAllPeaks` <-
 function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
-         cols = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
+         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
 {
     if(!all(c('mz', 'minRI', 'maxRI') %in% colnames(ref)))
         stop("Error: missing columns in 'ref'")
 
-    opt <- as.integer(get.file.format.opt(file, cols))
+    opt <- as.integer(get.file.format.opt(file, columns))
     searchType <- pmatch(searchType, c("all", "minRI", "maxInt"))
     z <- .Call('FindPeaks', file, as.integer(ref[,'mz']), NULL,
                as.numeric(ref[,'minRI']), as.numeric(ref[,'maxRI']), opt, useRT, searchType)
@@ -17,24 +17,24 @@ function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
 }
 
 `FindAllPeaks` <-
-function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
-         cols    = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
-         mz_type = c('selMass', 'quantMass', 'topMass'))
+function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
+         mz_type = c('selMass', 'quantMass', 'topMass'),
+         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
 {
     if(is_nullOrNA(RI)) #
-        RI <- if(!is.na(medRI(refLib)[id])) medRI(refLib)[id] else libRI(refLib)[id]
+        RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
 
     if(is_nullOrNA(dev))
-        dev <- RIdev(refLib)[id, 1]
+        dev <- RIdev(Lib)[libID, 1]
 
     if(is_nullOrNA(mz)) {
         method <- switch(match.arg(mz_type),
                          selMass=selMass, quantMass=quantMass, topMass=topMass)
-        mz <- method(refLib)[[id]]
+        mz <- method(Lib)[[libID]]
     }
 
     ref   <- cbind(minRI=RI-dev, mz=mz, maxRI=RI + dev)
-    peaks <- lapply(RIfiles(smpInfo), getAllPeaks, ref, cols=cols)
+    peaks <- lapply(RIfiles(samples), getAllPeaks, ref, columns=columns)
 
     n  <- rep.int(1:length(peaks), sapply(peaks, nrow))
     pk <- do.call('rbind', peaks)
