@@ -116,6 +116,7 @@ export(
 	"plotPeakSimple",
 	"plotPeak",
 	"plotSpectra",
+	"plotPeakRI",
 	"plotAllSpectra",
 	"quantMatrix",
 	"ProfileCleanUp",

@@ -24,15 +24,15 @@ approxRT <- function(x, y) {
 }
 
 `plotPeakRI` <-
-function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
+function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          method=c('RI', 'Intensity'), useRI=TRUE, main=NULL,
          # graphical parameters:
          col=NULL, int_range=c(2,6), cex_range=c(.7,6), key_width=2)
 {
     if(is_nullOrNA(RI))
-        RI <- if(!is.na(medRI(refLib)[id])) medRI(refLib)[id] else libRI(refLib)[id]
+        RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
 
-    pk <- FindAllPeaks(smpInfo, refLib, id, dev, mz, RI, mz_type='quantMass')
+    pk <- FindAllPeaks(samples, Lib, libID, dev, mz, RI, mz_type='quantMass')
 
     if(is.null(pk))
         return(invisible())
@@ -41,8 +41,8 @@ function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
 
     best <- best_peak(pk, RI, method)
 
-    tmp <- rep(NA, length(smpInfo))
-    names(tmp) <- sampleNames(smpInfo)
+    tmp <- rep(NA, length(samples))
+    names(tmp) <- sampleNames(samples)
     tmp[pk[best, 'fid']] <- pk[best, 'RI']
 
     RTtime <- if(useRI) 'RT' else 'RI'
@@ -50,10 +50,10 @@ function(smpInfo, refLib, id, dev=NULL, mz=NULL, RI=NULL,
 
     mz   <- pk[1, 'mz']
     if(is.null(main)) {
-        main <- sprintf("%s (%s) (%d)", libName(refLib)[id], names(libName(refLib)[id]), mz)
+        main <- sprintf("%s (%s) (%d)", libName(Lib)[libID], names(libName(Lib)[libID]), mz)
     }
     baseplot(pk[, 'fid'], pk[, RItime], log10(pk[, 'Int']), pk[, RTtime], best, main, RIexp=RI,
-             nSamp=length(smpInfo), col=col, int_range=int_range, cex_range=cex_range, key_width=key_width)
+             nSamp=length(samples), col=col, int_range=int_range, cex_range=cex_range, key_width=key_width)
     return(invisible(tmp))
 }
 
@@ -69,7 +69,7 @@ baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
 
     .scale <- function(x, a1, a2, b1, b2) (x - b1) / (b2 - b1) * (a2 - a1) + a1
     .colfun <- colorRamp(col, alpha=TRUE)
-    .colrgb <- function(x) rgb(x[,1], x[,2], x[,3], x[,4], max=255)
+    .colrgb <- function(x) rgb(x[,1], x[,2], x[,3], x[,4], maxColorValue=255)
     .limit  <- function(x, a, b) { x[x < a] <- a; x[x > b] <- b; x }
 
     zz   <- .limit(z, int_range[1], int_range[2])
@@ -93,7 +93,7 @@ baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
     }
 
     tmp <- approxRT(y, w)
-    axis(4, at=tmp[,1], label=tmp[,2])
+    axis(4, at=tmp[,1], labels=tmp[,2])
 
     # gradient
     par(mar=c(0,0,4.1, 3.1))
