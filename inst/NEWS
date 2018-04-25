@@ -1,3 +1,39 @@
+		CHANGES IN VERSION 1.36.0:
+
+NEW FEATURES
+
+   o	New dataset object TSExample. This dataset contains data that used to
+	be stored in package TargetSearchData.
+
+   o	New low-level function to search peaks (FindAllPeaks). This allows advanced
+	users to refine peak-searches.
+
+   o	New function to plot peaks across samples (plotPeakRI). Used for quality
+	checks of peak annotation and fine-tunning search parameters.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	Add extra checks when manipulating tsLib objects. Extra care needs to
+	be taken if changes to the quant/selective/top masses are changed.
+
+   o	Sample IDs (names) must be unique. These might generate errors when
+	loading old TargetSearch workspaces.
+
+BUG FIXES
+
+   o	tsLib: ensure that every slot in the object contain a library ID.
+
+   o	Fix warnings during R CMD check.
+
+   o	Refactor C code for finding peaks. It is possible to return all peaks
+	instead of only the most abundant. No visibles changes for the end user.
+
+   o	Refactor C code for NetCDF manipulation and peak finding to reduce
+	code duplication. No visible changes for the end user.
+
+   o	General R code houskeeping: Removal of mixed tabs and spaces, fix
+	tabulation, add Rbuildignore.
+
 		CHANGES IN VERSION 1.26.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
