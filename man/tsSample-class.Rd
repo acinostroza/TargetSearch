@@ -84,6 +84,11 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     of the file type and not the files themselves. To actually
     change the files, use the functions \code{\link{bin2text}}
     and \code{\link{text2bin}}.
+
+    Note that the slot \code{Names} (i.e., the sample names/identifiers) must
+    be unique. This allows sample selection by using sample identifiers as well
+    as indices. Also, if columns are selected, the output will be either a vector or
+    a \code{data.frame} depending on whether one or more columns were selected.
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{
@@ -124,12 +129,25 @@ smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))
 sampleDescription <- new("tsSample", Names = smp_names, CDFfiles = cdffiles, CDFpath = CDFpath,
     RIpath = RIpath, days = days, RIfiles = RIfiles, data = smp_data)
 
-# changing the sample names
+# change the sample names (they must be unique)
 sampleNames(sampleDescription) <- paste("Sample", 1:length(sampleDescription), sep = "_")
 
-# changing the file paths (relative to the working path)
+# chang the file paths (relative to the working path)
 CDFpath(sampleDescription) <- "my_cdfs/"
 RIpath(sampleDescription)  <- "my_RIs/"
+
+## sample subsetting.
+# select samples 1, 3 and 5
+(sampleset <- sampleDescription[c(1, 3, 5)])
+
+# or use sample IDs
+(sampleset <- sampleDescription[c("Sample_1", "Sample_3", "Sample_5")])
+
+## extract columns
+# select column 'GROUP'
+(group <- sampleDescription$GROUP)
+# or
+(group <- sampleDescription[, 'GROUP'])
 
 }
 \keyword{classes}

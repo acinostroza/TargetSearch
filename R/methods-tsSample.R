@@ -3,12 +3,12 @@
 #
 setGeneric("CDFfiles", function(obj) standardGeneric("CDFfiles"))
 setMethod("CDFfiles", "tsSample", function(obj) {
-	if(obj@CDFpath != ".")
-	 file.path(obj@CDFpath,obj@CDFfiles)
- 	else
-    obj@CDFfiles
+    if(obj@CDFpath != ".")
+        file.path(obj@CDFpath,obj@CDFfiles)
+    else
+        obj@CDFfiles
   })
-  
+
 setGeneric("CDFfiles<-", function(obj, value) standardGeneric("CDFfiles<-"))
 setReplaceMethod("CDFfiles", "tsSample", function(obj, value) {
 	obj@CDFfiles <- basename(value)
@@ -102,17 +102,34 @@ setValidity("tsSample", function(object) {
 	else TRUE
 })
 
-setMethod("[", "tsSample", function(x, i, j, ..., drop) {
-    x@Names <- x@Names[i]
-    x@CDFfiles <- x@CDFfiles[i]
-    x@RIfiles <- x@RIfiles[i]
-    x@days <- x@days[i]
-    x@data <- x@data[i,]
-    x
-})
+setMethod("[", "tsSample",
+          function(x, i, j, ..., drop=TRUE)
+          {
+              if(missing(i) & missing(j)) {
+                  validObject(x)
+                  return(x)
+              }
+
+              if(missing(j)) {
+                  if(is.character(i))
+                      i <- match(i, x@Names)
+                  x@Names <- x@Names[i]
+                  x@CDFfiles <- x@CDFfiles[i]
+                  x@RIfiles <- x@RIfiles[i]
+                  x@days <- x@days[i]
+                  x@data <- x@data[i,]
+                  validObject(x)
+                  return(x)
+              } else {
+                  x@data[i, j, drop=drop]
+              }
+          })
 
 setMethod("$", "tsSample", function(x, name) {
-    eval(substitute(sampleData(x)$NAME_ARG, list(NAME_ARG=name)))
+    ret <- eval(substitute(sampleData(x)$NAME_ARG, list(NAME_ARG=name)))
+    if(is.null(ret))
+        warning("Column `", name, "` does not exist")
+    ret
 })
 
 setMethod("initialize",
@@ -133,9 +150,11 @@ setMethod("initialize",
                 if(length(days) == 0)
                     days <- getDays(CDFfiles)
                 if(all(dim(data) == 0))
-                    data <- data.frame(Names = Names, CDF_FILE = CDFfiles, MEASUREMENT_DAY = days , RI_FILE = RIfiles)
+                    data <- data.frame(Names = Names, CDF_FILE = CDFfiles,
+                                       MEASUREMENT_DAY = days, RI_FILE = RIfiles,
+                                       stringsAsFactors = FALSE)
             }
-                    
+
             .Object@Names    <- Names
             .Object@CDFfiles <- CDFfiles
             .Object@RIfiles  <- RIfiles
@@ -171,3 +190,4 @@ setReplaceMethod("fileFormat", "tsSample", function(obj, value) {
 	obj
 })
 
+# vim: set ts=4 sw=4 et:
