@@ -201,4 +201,37 @@ function(cdf, retTime, Peaks, massRange, retIndex)
 		.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index)
 }
 
+# Description
+#  Update the retention index on the CDF files. The parameters observed
+#  and standard are the same as used in the rt2ri function.
+
+`update_retention_index_ncdf4` <-
+function(cdfFile, observed, standard)
+{
+	# first check that the file is not TS
+	if(!.is_ts_ncdf4(cdfFile)) {
+		stop('File "', cdfFile, '" is not a recognized TS format')
+	}
+
+	nc     <- nc_open(cdfFile, write=TRUE)
+	on.exit(nc_close(nc))
+	rtTime <- ncvar_get(nc, 'retention_time')
+	riTime <- rt2ri(rtTime, observed, standard)
+	ncvar_put(nc, 'retention_index', riTime)
+	ncatt_put(nc, 0, 'time_corrected', 1, prec='short')
+	invisible()
+}
+
+`convert_cdf_from_path` <-
+function(cdf_path, out_path)
+{
+	if(cdf_path == out_path)
+		stop("Input and output paths cannot be the same")
+	# scans CDF file
+	in_files  <- dir(cdf_path, pattern="\\.cdf$", full=TRUE)
+	out_files <- file.path(out_path, basename(in_files))
+	mapply(convert_to_ncdf4, in_files, out_files)
+	invisible(out_files)
+}
+
 # vim: set ts=4 sw=4:
