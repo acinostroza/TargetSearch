@@ -23,7 +23,7 @@
   \item{signalWindow}{The window size (number of points) used in the signal windowing step.}
   \item{method}{The method used to approximate the baseline. \code{"linear"} (default) uses
   linear interpolation. \code{"spline"} fits a cubic smoothing spline (warning: really slow). }
-  \item{ncData}{A list returned by the function \code{xcms:::netCDFRawData}}.
+  \item{ncData}{A list returned by the function \code{TargetSearch:::.open.ncdf}}.
   \item{baseline.opts}{A list with parameters to be passed to \code{baselineCorrection}
   function. For example \code{baseline.opts = list(threshold = 0.5, alpha = 0.95)}.}
 }
@@ -52,7 +52,7 @@ is calculated by subtracting \emph{B'} to the original signal.
                                                                                       
 The \code{baseline} function is called by the function \code{\link{NetCDFPeakFinding}}
 before the peak picking algorithm is performed. Since it is an internal function,
-it is not intended to be executed directly.
+it is not intended to be executed directly, but it is exported for debugging purposes.
 }
 \value{
 A matrix of the same dimensions of \code{int} with the baseline corrected intensities.
