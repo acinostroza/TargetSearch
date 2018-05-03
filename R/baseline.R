@@ -2,27 +2,30 @@
 
 baseline <- function(ncData, baseline.opts = NULL) {
 
-	foo <- function(x, y, si, pc) y[si[x] + 1:pc[x]]
-	if( all(ncData$point_count == ncData$point_count[1]) ) {
-    	int <- sapply(1:length(ncData$scanindex), foo, ncData$intensity, ncData$scanindex, ncData$point_count)
-    	stopifnot(is.matrix(int))
-   		int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
-    	ncData$intensity <- as.vector(int)
-	} else {
-		int <- t(.Call("peakExtraction", ncData$mz, ncData$intensity,
-            ncData$point_count, ncData$scanindex, range(ncData$mz),
-            PACKAGE = "TargetSearch"))
-        int <- do.call(baselineCorrection, append(list(int = int), baseline.opts)) 
-## updata ncData components...
-        int.id  <- lapply(1:length(ncData$scanindex), function(x) which( int[,x] > 0 ))
-        ncData$intensity <- as.vector( int[int > 0] )
-        ncData$mz <- range(ncData$mz)
-        ncData$mz <- ncData$mz[1]:ncData$mz[2]
-        ncData$mz <- unlist(sapply(int.id, function(x) ncData$mz[x]))
-        ncData$point_count  <- sapply(int.id, length)
-        ncData$scanindex  <- c(0, cumsum(ncData$point_count))[1:length(ncData$point_count)]
-	}
-	ncData
+    foo <- function(x, y, si, pc) y[si[x] + 1:pc[x]]
+
+    if(all(ncData$point_count == ncData$point_count[1]))
+    {
+        int <- sapply(seq_along(ncData$scanindex), foo, ncData$intensity, ncData$scanindex, ncData$point_count)
+        if(!is.matrix(int))
+            stop("Unexpected Error: Object 'int' is not a matrix")
+    }
+    else
+    {
+        massRange <- range(ncData$mz)
+        int <- t(.Call("ncdfToMatrix", ncData, massRange, PACKAGE="TargetSearch"))
+    }
+
+    int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
+    ## update ncData components...
+    int.id  <- lapply(1:length(ncData$scanindex), function(x) which( int[,x] > 0 ))
+    ncData$intensity <- as.vector( int[int > 0] )
+    ncData$mz <- range(ncData$mz)
+    ncData$mz <- ncData$mz[1]:ncData$mz[2]
+    ncData$mz <- unlist(sapply(int.id, function(x) ncData$mz[x]))
+    ncData$point_count  <- sapply(int.id, length)
+    ncData$scanindex  <- c(0, cumsum(ncData$point_count))[1:length(ncData$point_count)]
+    ncData
 }
 
 # baseline correction
@@ -30,7 +33,7 @@ baseline <- function(ncData, baseline.opts = NULL) {
 #   int : An intensity matrix where columns represent scan times and rows
 #         differents mass values.
 #   threshold: a threshold for the baseline. A value of one returns a baseline
-#              just above the noise, 0.5 in the middle of the noise and 0 below 
+#              just above the noise, 0.5 in the middle of the noise and 0 below
 #              the noise.
 #   alpha: alpha parameter for the high pass filter
 #   segments: the number of segments in which the time range is cut
@@ -67,7 +70,7 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
                 sm   <- windowingStep(tmp, n, signalWindow)
                 sm[1] <- sm[n] <- FALSE
                 if(met == 2) {
-                # Fit a cubic smoothing spline of the baseline using the points 
+                # Fit a cubic smoothing spline of the baseline using the points
                 # considerated noise.
                     sp <- smooth.spline((1:n)[!sm], x[!sm])
                     spx <- predict(sp, 1:n)
@@ -77,8 +80,8 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
                 spx$y + 2 * (threshold - 0.5) * 2 * stdn
         })
         int <- int - t(baseline)
-	int[int < 0] <- 0
-	int
+        int[int < 0] <- 0
+        int
 }
 
 # high pass filter
@@ -87,7 +90,7 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
 hpf <- function(x, alpha) {
         n <- length(x)
         .C("hpf", x = as.numeric(x), y = double(n), n = as.integer(n),
-		 a = as.numeric(alpha), PACKAGE="TargetSearch")$y
+            a = as.numeric(alpha), PACKAGE="TargetSearch")$y
 }
 
 windowingStep <- function(x, n, wm) {
@@ -96,3 +99,5 @@ windowingStep <- function(x, n, wm) {
                 n = as.integer(n), nidx = as.integer(x.len),  PACKAGE="TargetSearch" )
         as.logical(out$s)
 }
+
+# vim: set ts=4 sw=4 et:
