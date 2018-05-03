@@ -73,14 +73,14 @@
 }
 
 ###############################################################################
-# functions to detect netCDF format
+# functions to detect netCDF format 3 or 4
 
 #' Extract meta info from a netCDF file
 #'
 #' Returns a list with the NetCDF file format, and extracts the 'creator',
 #' 'version' and 'time_corrected' attributes.
 #'
-#' @param cdf  Path to the NetCDF file
+#' @param cdf Path to the NetCDF file
 #'
 #' @return a list with components \code{format} (the netCDF format),
 #' \code{creator} ('Unknown' if undefined), \core{version} (file version or empty
@@ -106,6 +106,99 @@
 {
 	nfo <- .get.ncdf.info(cdfFile)
 	nfo$creator == 'TargetSearch'
+}
+
+#' Convert a NetCDF file format 3 to format 4
+#
+#' Convert a NetCDF format 3 into a custom TargetSearch NetCDF format 4.
+#' The new NetCDF just contains an intensity matrix (time x m/z) in order
+#' to allow easier and faster data manipulation.
+#'
+#' @param cdfFile The NetCDF file to be converted
+#' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
+#'   file extension by \code{.nc4}. Valid extensions are \code{.cdf} or \code{.nc}. If
+#'   the file doesn't have a is valid extension, then \code{.nc4} is just appended.
+#' @param massRange The \code{m/z} range. A numeric vector of form (m/z min, m/z max) or
+#'   \code{NULL} for automatic convertion
+#'
+#' @note
+#' The generated CDF file is non-standard and very likely cannot be
+#' used outside targetSearch. For instance cannot be used in AMDIS.
+#' It is not possible reconstruct the original NetCDF file. On the other hand,
+#' if the NetCDF files are exported from the custom vendor files, then
+#' the NetCDF 3 files can be deleted safely (as long you keep your original
+#' files).
+#'
+#' @return A string. The path to the converted file or invisible.
+`convert_to_ncdf4` <-
+function(cdfFile, outFile=NULL, massRange=NULL)
+{
+	# first check that the file is not TS
+	if(.is_ts_ncdf4(cdfFile)) {
+		warning('File "', cdfFile, '" has already been converted')
+		return(invisible(outFile))
+	}
+
+	peaks <- peakCDFextraction(cdfFile, massRange)
+
+	if(is.null(outFile)) {
+		outFile <- sprintf("%s.nc4", sub("\\.cdf$", "", cdfFile, ignore.case=TRUE))
+	}
+
+	if(cdfFile == outFile)
+		stop('Intput and output files are the same. aborting...')
+
+	save_cdf4(outFile, peaks)
+
+	invisible(outFile)
+}
+
+`.save_cdf4_internal` <-
+function(cdf, retTime, Peaks, massRange, retIndex)
+{
+	n  <- ncol(Peaks)
+	if(length(retTime) != nrow(Peaks))
+		stop('length of retTime and nrow of Peaks must be equal')
+
+	# define dimensions
+	time_dim  <- ncdim_def('time', '', seq_along(retTime), create_dimvar=FALSE)
+	mass_dim  <- ncdim_def('mass', '', seq_len(ncol(Peaks)), create_dimvar=FALSE)
+	range_dim <- ncdim_def('range', '', 1:2, create_dimvar=FALSE)
+
+	# define variables
+	int_var <- ncvar_def('intensity', 'count', list(time_dim, mass_dim), prec='integer', compression=1)
+	RT_var  <- ncvar_def('retention_time', 'second', time_dim, prec='double', compression=1)
+	RI_var  <- ncvar_def('retention_index', 'unit',  time_dim, prec='double', compression=1)
+	mr_var  <- ncvar_def('mass_range', 'mz', range_dim, prec='integer')
+
+	ncnew <- nc_create(cdf, list(mr_var, int_var, RI_var, RT_var), force_v4=TRUE)
+	on.exit( nc_close(ncnew) )
+
+	ncvar_put( ncnew, mr_var, massRange)
+	ncvar_put( ncnew, int_var, Peaks)
+	ncvar_put( ncnew, RT_var, retTime)
+
+	ncatt_put( ncnew, 0, 'creator', 'TargetSearch')
+	ncatt_put( ncnew, 0, 'version', '1.0')
+
+	if(missing(retIndex)) {
+		ncvar_put( ncnew, RI_var, numeric(length(retTime)))
+			ncatt_put( ncnew, 0, 'time_corrected', 0, prec='short')
+	} else {
+		ncvar_put( ncnew, RI_var, retIndex)
+		ncatt_put( ncnew, 0, 'time_corrected', 1, prec='short')
+	}
+}
+
+# save peak structure to cdf4
+`save_cdf4` <- function(cdf, peaks)
+{
+	if(!all(c('Time', 'Peaks', 'massRange') %in% names(peaks)))
+		stop("Invalid list peaks. Missing names")
+	if(is.null(peaks$Index))
+		.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange)
+	else
+		.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index)
 }
 
 # vim: set ts=4 sw=4:
