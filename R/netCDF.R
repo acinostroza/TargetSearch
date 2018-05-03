@@ -40,7 +40,7 @@
 	.Call("cdffix", x, max_assigned, PACKAGE="TargetSearch")
 }
 
-# function to open a CDF file and perform all checks:
+# function to open a CDF file (version 3) and perform all checks
 #  1. m/z must be integer
 #  2. intensity must be integer
 #  3. data inconsistencies
@@ -70,6 +70,42 @@
 	}
 
 	return(ncData)
+}
+
+###############################################################################
+# functions to detect netCDF format
+
+#' Extract meta info from a netCDF file
+#'
+#' Returns a list with the NetCDF file format, and extracts the 'creator',
+#' 'version' and 'time_corrected' attributes.
+#'
+#' @param cdf  Path to the NetCDF file
+#'
+#' @return a list with components \code{format} (the netCDF format),
+#' \code{creator} ('Unknown' if undefined), \core{version} (file version or empty
+#' string if undefined) and \code{time_corrected} (1, 0, or NA_integer_ if undefined)
+#'
+`.get.ncdf.info` <- function(cdf)
+{
+	nc <- nc_open(cdf)
+	format   <- nc$format
+	creator <- ncatt_get(nc, 0, 'creator')
+	timecor <- ncatt_get(nc, 0, 'time_corrected')
+	version <- ncatt_get(nc, 0, 'version')
+	nc_close(nc)
+
+	creator <- if(creator$hasatt) creator$value else "Unknown"
+	version <- if(version$hasatt) version$value else ""
+	timecor <- if(timecor$hasatt) timecor$value else NA_integer_
+	list(format=format, creator=creator, version=version, time_corrected=timecor)
+}
+
+#' Checks that a cdfFile was created by TS
+`.is_ts_ncdf4` <- function(cdfFile)
+{
+	nfo <- .get.ncdf.info(cdfFile)
+	nfo$creator == 'TargetSearch'
 }
 
 # vim: set ts=4 sw=4:
