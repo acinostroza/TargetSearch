@@ -25,7 +25,7 @@ static const R_CallMethodDef R_CallDef[] = {
         {"FindPeaks", (DL_FUNC)&FindPeaks, 8},
         {"peak_finding", (DL_FUNC)&peak_finding, 7},
         {"ncdfToMatrix", (DL_FUNC)&ncdfToMatrix, 2},
-        {"ppc", (DL_FUNC)&ppc, 4},
+        {"ppc", (DL_FUNC)&ppc, 5},
         {"cdffix", (DL_FUNC)&cdffix, 2},
         {NULL, NULL, 0},
 };

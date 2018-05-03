@@ -46,8 +46,9 @@ matrix_t * get_intensity_mat(ncdf_t *x)
 	mat->mzmax = max;
 	mat->nc    = (max - min + 1);
 	mat->nr    = x->nscans;
-	n = (max - min + 1) * x->nscans;
+	mat->alloc = n = (max - min + 1) * x->nscans;
 	z = Calloc(n, int);
+
 	for(int s = 0; s < x->nscans; s++) {
 		for(int i = 0; i < x->p_count[s]; i++) {
 			z[(x->mass[x->scan_idx[s] + i]-min) * x->nscans + s] = x->in[x->scan_idx[s] + i];
@@ -55,6 +56,29 @@ matrix_t * get_intensity_mat(ncdf_t *x)
 	}
 	mat->x = z;
 	return mat;
+}
+
+/* tranform a R matrix of intensities into a matrix_t struct */
+matrix_t * from_matrix(SEXP Matrix)
+{
+	SEXP dim = GET_DIM(Matrix);
+	matrix_t *ret = NULL;
+	int *z;
+
+	if(isNull(dim))
+		return ret;
+
+	ret = Calloc(1, matrix_t);
+	ret->nr = INTEGER(dim)[0];
+	ret->nc = INTEGER(dim)[1];
+	ret->mzmin = 0;
+	ret->mzmax = ret->nc - 1;
+
+	ret->x  = INTEGER(AS_INTEGER(Matrix));
+
+	ret->alloc = 0; /* nothing was allocated */
+
+	return ret;
 }
 
 /* transform R object into a struct ncdf_t. It expects an already fixed cdf list
@@ -84,7 +108,8 @@ ncdf_t * new_ncdf(SEXP NCDF)
 
 void free_matrix(matrix_t *mat)
 {
-	Free(mat->x);
+	if(mat->alloc > 0)
+		Free(mat->x);
 	Free(mat);
 }
 

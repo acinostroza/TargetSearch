@@ -23,10 +23,12 @@ typedef struct
 	int nr;
 	int mzmin;
 	int mzmax;
+	int alloc;    /* total memory allocated or 0 */
 } matrix_t;
 
 matrix_t * get_intensity_mat(ncdf_t *);
 ncdf_t   * new_ncdf(SEXP);
+matrix_t * from_matrix(SEXP);
 void free_matrix(matrix_t *);
 
 /* fix a CDF with non-integer mass values (aka non-nominal mass) */
