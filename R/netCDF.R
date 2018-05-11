@@ -154,7 +154,7 @@ function(cdfFile, outFile=NULL, massRange=NULL)
 }
 
 `.save_cdf4_internal` <-
-function(cdf, retTime, Peaks, massRange, retIndex)
+function(cdf, retTime, Peaks, massRange, retIndex=NULL, chunksizes=c(500, 5))
 {
 	n  <- ncol(Peaks)
 	if(length(retTime) != nrow(Peaks))
@@ -166,7 +166,7 @@ function(cdf, retTime, Peaks, massRange, retIndex)
 	range_dim <- ncdim_def('range', '', 1:2, create_dimvar=FALSE)
 
 	# define variables
-	int_var <- ncvar_def('intensity', 'count', list(time_dim, mass_dim), prec='integer', compression=1)
+	int_var <- ncvar_def('intensity', 'count', list(time_dim, mass_dim), prec='integer', compression=1, chunksizes=chunksizes)
 	RT_var  <- ncvar_def('retention_time', 'second', time_dim, prec='double', compression=1)
 	RI_var  <- ncvar_def('retention_index', 'unit',  time_dim, prec='double', compression=1)
 	mr_var  <- ncvar_def('mass_range', 'mz', range_dim, prec='integer')
@@ -181,7 +181,7 @@ function(cdf, retTime, Peaks, massRange, retIndex)
 	ncatt_put( ncnew, 0, 'creator', 'TargetSearch')
 	ncatt_put( ncnew, 0, 'version', '1.0')
 
-	if(missing(retIndex)) {
+	if(is.null(retIndex)) {
 		ncvar_put( ncnew, RI_var, numeric(length(retTime)))
 			ncatt_put( ncnew, 0, 'time_corrected', 0, prec='short')
 	} else {
@@ -195,10 +195,7 @@ function(cdf, retTime, Peaks, massRange, retIndex)
 {
 	if(!all(c('Time', 'Peaks', 'massRange') %in% names(peaks)))
 		stop("Invalid list peaks. Missing names")
-	if(is.null(peaks$Index))
-		.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange)
-	else
-		.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index)
+	.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index)
 }
 
 # Description
