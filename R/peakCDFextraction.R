@@ -2,7 +2,7 @@
 function(cdfFile, massRange = NULL)
 {
 	if(.is_ts_ncdf4(cdfFile))
-		.peakCDFextraction4(cdfFile, massRange)
+		.peakCDFextraction4(cdfFile)
 	else
 		.peakCDFextraction3(cdfFile, massRange)
 }
@@ -29,7 +29,9 @@ function(cdfFile, massRange)
 	Time      <- ncvar_get(nc, 'retention_time')
 	peaks     <- ncvar_get(nc, 'intensity')
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
-	return(list(Time = Time, Peaks = peaks, massRange = massRange))
+	time_corrected <-  ncatt_get(nc, 0, 'time_corrected')
+	Index <- if(time_corrected$value==0) NULL else ncvar_get(nc, "retention_index")
+	return(list(Time = Time, Peaks = peaks, massRange = massRange, Index=Index))
 }
 
 # vim: set ts=4 sw=4:
