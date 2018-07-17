@@ -16,8 +16,8 @@ This git repository mirrors the TargetSearch git repository on bioconductor.
 Simply run in the R console.
 
 ```
-source("https://bioconductor.org/biocLite.R")
-biocLite("TargetSearch")
+install.packages("BiocManager")
+BiocManager::install("TargetSearch")
 ```
 
 ## Bugs
