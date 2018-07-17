@@ -44,7 +44,7 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
         return(NULL)
 
     rownames(pk) <- NULL
-    return(pk[, c('Int', 'RI', 'RT', 'mz', 'fid')])
+    return(pk[, c('Int', 'RI', 'RT', 'mz', 'fid'), drop=FALSE])
 }
 
 # vim: set ts=4 sw=4 et:
