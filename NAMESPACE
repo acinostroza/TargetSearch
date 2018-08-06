@@ -79,8 +79,6 @@ exportMethods(
 	"retTime<-",
 	"Intensity",
 	"Intensity<-",
-	"as.list.tsMSdata",
-	"as.list.tsProfile",
 	"profileInfo",
 	"profileInfo<-",
 	"profileInt",
@@ -93,6 +91,9 @@ exportMethods(
 	"fileFormat<-",
 	"show"
 )
+
+S3method("as.list", "tsMSdata")
+S3method("as.list", "tsProfile")
 
 export(
 	"FAMEoutliers",
