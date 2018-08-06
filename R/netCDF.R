@@ -37,7 +37,7 @@
 # max_assigned: number of m/z values assigned to the same integer (to detect
 #              high mass accuracy)
 .cdffix <- function(x, max_assigned=3L) {
-	.Call("cdffix", x, max_assigned, PACKAGE="TargetSearch")
+	.Call(c_cdffix, x, max_assigned, PACKAGE="TargetSearch")
 }
 
 # function to open a CDF file (version 3) and perform all checks

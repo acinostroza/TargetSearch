@@ -27,11 +27,11 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 		massRange <- range(ncData$mz)
 
 	if(method == 1)
-		peaks <- .Call("peak_finding", ncData$mz, ncData$intensity, ncData$point_count,
+		peaks <- .Call(c_peak_finding, ncData$mz, ncData$intensity, ncData$point_count,
 			ncData$scanindex, Window, massRange, IntThreshold, PACKAGE="TargetSearch")
 
 	if(method == 2)
-		peaks <- .Call("ppc", ncData, Window, massRange, IntThreshold, NULL, PACKAGE="TargetSearch")
+		peaks <- .Call(c_ppc, ncData, Window, massRange, IntThreshold, NULL, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
 	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange) )
 }
@@ -55,7 +55,7 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 		stop('Error: method not implemented for netCDF-4. use a netCDF-3 file')
 
 	if(method == 2)
-		peaks <- .Call("ppc", NULL, Window, NULL, IntThreshold, ncInt, PACKAGE="TargetSearch")
+		peaks <- .Call(c_ppc, NULL, Window, NULL, IntThreshold, ncInt, PACKAGE="TargetSearch")
 
 	colnames(peaks) <- as.character(mzRange[1]:mzRange[2])
 	list(Time = Time, Peaks = peaks, massRange=mzRange)

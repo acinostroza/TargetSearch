@@ -43,7 +43,7 @@ function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETE
         searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
 
         out  <- if(is.list(refLib)) {
-                    .Call("FindPeaks",
+                    .Call(c_find_peaks,
                             as.character(my.files[i]),   # MyFile
                             as.integer(mz),              # Mass
                             NULL,                        # RI_exp
@@ -54,7 +54,7 @@ function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETE
                             searchType,                  # max intensity
                             PACKAGE="TargetSearch")
                 } else {
-                    .Call("FindPeaks",
+                    .Call(c_find_peaks,
                             as.character(my.files[i]), # MyFile
                             as.integer(mz),            # Mass
                             NULL,                      # RI_exp

@@ -68,7 +68,7 @@ riMatrix <- function(samples, rim)
 	useRT <- TRUE
 	for (i in 1:length(ri.files)) {
 		opts <- get.file.format.opt(ri.files[i], cols)
-		out  <- .Call("FindPeaks",
+		out  <- .Call(c_find_peaks,
 						as.character(ri.files[i]), # MyFile
 						as.integer(mass),          # Mass
 						NULL,                      # RI_exp

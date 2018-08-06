@@ -1,4 +1,4 @@
-useDynLib(TargetSearch)
+useDynLib(TargetSearch, .registration = TRUE, .fixes = "c_")
 
 import("methods")
 

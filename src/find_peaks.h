@@ -25,6 +25,6 @@ void
 find_all_peaks(double, double, double, double, SPECTRA *,
 		struct point_list_s *, int, int);
 
-SEXP FindPeaks(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP find_peaks(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #endif

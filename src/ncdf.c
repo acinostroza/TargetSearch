@@ -277,7 +277,7 @@ cdffix(SEXP NCDF, SEXP MA)
 
 /* takes a CDF object and return a matrix *
  * this function replaces peakCDFextraction */
-SEXP ncdfToMatrix(SEXP NCDF, SEXP massRange)
+SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange)
 {
 	ncdf_t *nc = new_ncdf(NCDF);
 	matrix_t *mat = get_intensity_mat(nc);

@@ -402,7 +402,7 @@ SPECTRA pktosp(double *rt, double *ri, int *in, int *mass, int nscans)
 }
 
 /* R interface to write_dat function */
-void writePeaksDAT(char **fout, double *rt, double *ri, int *in, int *mass,
+void write_peaks_dat(char **fout, double *rt, double *ri, int *in, int *mass,
 	int *nscans, int *swap)
 {
 	FILE *fp;
@@ -421,7 +421,7 @@ void writePeaksDAT(char **fout, double *rt, double *ri, int *in, int *mass,
 }
 
 /* R interface to write_txt function */
-void writePeaksTXT(char **fout, double *rt, double *ri, int *in, int *mass,
+void write_peaks_text(char **fout, double *rt, double *ri, int *in, int *mass,
 	int *nscans, char **header)
 {
 	FILE *fp;
@@ -456,7 +456,7 @@ void write_txt(FILE *fp, SPECTRA *sp, char *header)
 }
 
 /* Function to convert from TXT to DAT format*/
-void txt2dat(char **infile, char **outfile, int *swap, int *cols)
+void text_to_dat(char **infile, char **outfile, int *swap, int *cols)
 {
 	FILE *fpin, *fpout;
 	SPECTRA *sp;
@@ -476,7 +476,7 @@ void txt2dat(char **infile, char **outfile, int *swap, int *cols)
 }
 
 /* Function to convert from DAT to TXT format*/
-void dat2txt(char **infile, char **outfile, int *swap, char **header)
+void dat_to_text(char **infile, char **outfile, int *swap, char **header)
 {
 	FILE *fpin, *fpout;
 	SPECTRA *sp;

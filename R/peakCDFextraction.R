@@ -15,7 +15,7 @@ function(cdfFile, massRange)
 	if(is.null(massRange))
 		massRange <- range(ncData$mz)
 
-	peaks <- .Call("ncdfToMatrix", ncData, massRange, PACKAGE="TargetSearch")
+	peaks <- .Call(c_ncdf_to_matrix, ncData, massRange, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
 	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange) )
 }

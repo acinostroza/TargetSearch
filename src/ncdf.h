@@ -35,6 +35,6 @@ void free_matrix(matrix_t *);
 SEXP cdffix(SEXP, SEXP);
 
 /* get the intensity matrix of a NCDF object */
-SEXP ncdfToMatrix(SEXP NCDF, SEXP massRange);
+SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange);
 
 #endif
