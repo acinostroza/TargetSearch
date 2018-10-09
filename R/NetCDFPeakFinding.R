@@ -1,43 +1,42 @@
 # function to find peaks in chromatograms
 # arguments:
 #    - cdfFile : The file
-#    - massRange: m/z range.
 #    - Window: Window to be used by method
 #    - IntThreshold: Intensity threshold
 #    - method: peak picking method. PPC / smoothing
+#    - massRange: m/z range (deprecated, it has no effect)
 
 NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
 	pp.method = "ppc", baseline = FALSE, baseline.opts = NULL) {
 
-	method <- pmatch(pp.method,c("smoothing", "ppc"))
+	method <- pmatch(pp.method,c("smoothing", "ppc", "gaussian"))
 
 	if(is.na(method))
 		stop("Invalid peak picking method.")
 
+	method <- c("s", "p", "g")[method]
+
+	refine <- min(c(round(Window / 3), 4))
+
 	# first check that the file is not TS
 	if(.is_ts_ncdf4(cdfFile)) {
-		return(.PeakFinding(cdfFile, Window, IntThreshold, method, baseline, baseline.opts))
+		return(.PeakFinding(cdfFile, method, Window, IntThreshold, refine, baseline, baseline.opts))
 	}
 
 	ncData <- .open.ncdf(cdfFile)
+	massRange <- range(ncData$mz)
+
 	if(baseline)
 		ncData <- baseline(ncData, baseline.opts)
 
-	if(is.null(massRange))
-		massRange <- range(ncData$mz)
+	peaks <- .Call(c_peak_detection_main, method, ncData, Window, refine, IntThreshold, NULL)
 
-	if(method == 1)
-		peaks <- .Call(c_peak_finding, ncData$mz, ncData$intensity, ncData$point_count,
-			ncData$scanindex, Window, massRange, IntThreshold, PACKAGE="TargetSearch")
-
-	if(method == 2)
-		peaks <- .Call(c_ppc, ncData, Window, massRange, IntThreshold, NULL, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
 	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange) )
 }
 
 # peak finding for version 4
-.PeakFinding <- function(cdfFile, Window, IntThreshold, method, baseline,
+.PeakFinding <- function(cdfFile, method, Window, IntThreshold, refine, baseline,
 	baseline.opts = NULL)
 {
 	nc      <- nc_open(cdfFile)
@@ -51,11 +50,7 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 		ncInt <- t(ncInt)
 	}
 
-	if(method == 1)
-		stop('Error: method not implemented for netCDF-4. use a netCDF-3 file')
-
-	if(method == 2)
-		peaks <- .Call(c_ppc, NULL, Window, NULL, IntThreshold, ncInt, PACKAGE="TargetSearch")
+	peaks <- .Call(c_peak_detection_main, method, NULL, Window, refine, IntThreshold, ncInt)
 
 	colnames(peaks) <- as.character(mzRange[1]:mzRange[2])
 	list(Time = Time, Peaks = peaks, massRange=mzRange)
