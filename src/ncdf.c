@@ -23,7 +23,7 @@ static SEXP get(SEXP list, const char *str)
 /* functions to manipulate CDF data in form of a list into a C structure */
 
 /* returns the mz limits */
-void mass_range(ncdf_t *x, int *min, int *max)
+static void mass_range(ncdf_t *x, int *min, int *max)
 {
 	int *mz = x->mass;
 	*min = *max = mz[0];
@@ -63,7 +63,6 @@ matrix_t * from_matrix(SEXP Matrix)
 {
 	SEXP dim = GET_DIM(Matrix);
 	matrix_t *ret = NULL;
-	int *z;
 
 	if(isNull(dim))
 		return ret;
@@ -106,13 +105,6 @@ ncdf_t * new_ncdf(SEXP NCDF)
 	return cdf;
 }
 
-void free_matrix(matrix_t *mat)
-{
-	if(mat->alloc > 0)
-		Free(mat->x);
-	Free(mat);
-}
-
 /******************************************************************************
  * Functions to correct netCDF data when mass values are not integers as
  * expected by TargetSearch. 'cdffix_core' assign each mass value to the
@@ -126,7 +118,7 @@ void free_matrix(matrix_t *mat)
 
 /* allocate a new ncdf_t object using transient allocation methods.
  * Note that 'new_ncdf' uses shared memory */
-ncdf_t *
+static ncdf_t *
 alloc_cdf(int ns, int np)
 {
 	ncdf_t *x   = Calloc(1, ncdf_t);
@@ -143,7 +135,7 @@ alloc_cdf(int ns, int np)
 }
 
 /* free allocated ncdf_t object. To be used in an transiently allocation object */
-void
+static void
 free_cdf(ncdf_t *x)
 {
 	Free(x->rt);
@@ -156,7 +148,7 @@ free_cdf(ncdf_t *x)
 }
 
 /* main function to fix a cdf data */
-int
+static int
 cdffix_core(ncdf_t *dest, ncdf_t *src, int max_assigned)
 {
 	int i, j, k, p=0, count = 0;
@@ -238,7 +230,10 @@ SEXP ncdf_sexp(ncdf_t *x)
 	return res;
 }
 
+/*************************/
 /* .Call interface to R  */
+/*************************/
+
 /* Fix a CDF file with non-integer mass values (no high mass accuracy)
  * Args:
  *   NCDF: a list of named elements holding the CDF structure:
@@ -293,7 +288,7 @@ SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange)
 			z[j + i*nc->nscans] = x[j];
 	}
 	Free(nc);
-	free_matrix(mat);
+	free_mat(mat);
 	UNPROTECT(1);
 	return ansMat;
 }

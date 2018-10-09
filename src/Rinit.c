@@ -2,18 +2,18 @@
 #include <Rdefines.h>
 #include <R_ext/Rdynload.h>
 
+/* .Call interface */
 /* FindPeaks */
 #include "find_peaks.h"
-/* peak_finding */
-#include "netcdf_peak_finding.h"
-/* ppc */
-#include "ppc.h"
-/* cdffix */
+/* cdffix and ncdf_to_matrix */
 #include "ncdf.h"
+/* from dectection.c */
+SEXP peak_detection_main(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
-/* hpf, windowing */
+/* .C interface */
+/* hpf, windowing for baseline correction */
 #include "hpf.h"
-/* writePeaksDAT, writePeaksTXT, txt2dat, dat2txt */
+/* write_peaks_dat, write_peaks_text, text_to_dat, dat_to_text */
 #include "file.h"
 
 /* Automate using sed or something. */
@@ -23,10 +23,9 @@ __declspec(dllexport)
 
 static const R_CallMethodDef R_CallDef[] = {
         {"find_peaks", (DL_FUNC)&find_peaks, 8},
-        {"peak_finding", (DL_FUNC)&peak_finding, 7},
         {"ncdf_to_matrix", (DL_FUNC)&ncdf_to_matrix, 2},
-        {"ppc", (DL_FUNC)&ppc, 5},
         {"cdffix", (DL_FUNC)&cdffix, 2},
+        {"peak_detection_main", (DL_FUNC)&peak_detection_main, 6},
         {NULL, NULL, 0},
 };
 
