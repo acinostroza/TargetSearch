@@ -15,11 +15,13 @@ typedef struct
 	int *in;        /* intensity */
 	int nscans;
 	int npoints;
+	int alloc;      /* indicates if memory was allocated by Calloc/Realloc */
 } ncdf_t;
 
 matrix_t * get_intensity_mat(ncdf_t *);
 ncdf_t   * new_ncdf(SEXP);
 matrix_t * from_matrix(SEXP);
+void free_cdf(ncdf_t *);
 
 /* fix a CDF with non-integer mass values (aka non-nominal mass) */
 SEXP cdffix(SEXP, SEXP);

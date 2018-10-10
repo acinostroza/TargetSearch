@@ -47,7 +47,7 @@ matrix_t * new_mat_alloc(int nc, int nr, int *data)
 	mat->mzmin = 0;
 	mat->mzmax = nc - 1;
 	mat->x     = data;
-	mat->alloc = nc * nr;
+	mat->alloc = 0;
 	return mat;
 }
 
@@ -69,7 +69,9 @@ void mat_add_mz(matrix_t * mat, int mz)
  */
 void free_mat(matrix_t * mat)
 {
-	if(mat->x != NULL)
+	if(mat == NULL)
+		return;
+	if(mat->alloc != 0)
 		Free(mat->x);
 	Free(mat);
 }

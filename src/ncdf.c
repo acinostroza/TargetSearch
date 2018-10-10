@@ -66,17 +66,7 @@ matrix_t * from_matrix(SEXP Matrix)
 
 	if(isNull(dim))
 		return ret;
-
-	ret = Calloc(1, matrix_t);
-	ret->nr = INTEGER(dim)[0];
-	ret->nc = INTEGER(dim)[1];
-	ret->mzmin = 0;
-	ret->mzmax = ret->nc - 1;
-
-	ret->x  = INTEGER(AS_INTEGER(Matrix));
-
-	ret->alloc = 0; /* nothing was allocated */
-
+	ret = new_mat_alloc(INTEGER(dim)[1], INTEGER(dim)[0], INTEGER(AS_INTEGER(Matrix)));
 	return ret;
 }
 
@@ -102,6 +92,7 @@ ncdf_t * new_ncdf(SEXP NCDF)
 	cdf->scan_idx = INTEGER(AS_INTEGER(ScanIndex));
 	cdf->mass = INTEGER(AS_INTEGER(MZ));
 	cdf->in = INTEGER(AS_INTEGER(Intensity));
+	cdf->alloc = 0; /* flag to indicate allocated memory */
 	return cdf;
 }
 
@@ -131,19 +122,24 @@ alloc_cdf(int ns, int np)
 	x->ri       = Calloc(ns, double);
 	x->nscans   = ns;
 	x->npoints  = np;
+	x->alloc    = 1;
 	return x;
 }
 
 /* free allocated ncdf_t object. To be used in an transiently allocation object */
-static void
+void
 free_cdf(ncdf_t *x)
 {
-	Free(x->rt);
-	Free(x->ri);
-	Free(x->mass);
-	Free(x->in);
-	Free(x->scan_idx);
-	Free(x->p_count);
+	if(x == NULL)
+		return;
+	if(x->alloc == 1) {
+		Free(x->rt);
+		Free(x->ri);
+		Free(x->mass);
+		Free(x->in);
+		Free(x->scan_idx);
+		Free(x->p_count);
+	}
 	Free(x);
 }
 
@@ -226,7 +222,6 @@ SEXP ncdf_sexp(ncdf_t *x)
 	SET_STRING_ELT(names, 4, mkChar("mz"));
 	SET_STRING_ELT(names, 5, mkChar("intensity"));
 	setAttrib(res, R_NamesSymbol, names);
-	UNPROTECT(1);
 	return res;
 }
 
@@ -266,7 +261,7 @@ cdffix(SEXP NCDF, SEXP MA)
 
 	Free(nc);
 	if(!isNull(res))
-		UNPROTECT(1);
+		UNPROTECT(2); /* unprotects call to ncdf_sexp */
 	return res;
 }
 
