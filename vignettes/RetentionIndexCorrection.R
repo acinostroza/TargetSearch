@@ -53,9 +53,9 @@ RIpath(samples.all) <- "."
 rimLimits <- ImportFameSettings(file.path(cdfPath,"rimLimits.txt"))
 rimLimits
 
-# run Retention index correction (massScanRange = 85-320; Intensity Threshold = 50;
+# run Retention index correction (Intensity Threshold = 50;
 # peak detection method = "ppc", window = 15)
-RImatrix <- RIcorrect(samples.all, rimLimits, massRange = c(85,320),
+RImatrix <- RIcorrect(samples.all, rimLimits,
             Window = 15, pp.method = "ppc", IntThreshold = 50)
 
 # Create a logical vector indicating the RI standards:

@@ -171,8 +171,7 @@ Initially, \Rpackage{TargetSearch} identifies the local apex intensities
 in all chromatograms, finds the retention time (RT) of the RI markers and converts
 RT to RI using linear interpolation \citep{VandenDool1963}.
 This is done by the function \Rfunction{RIcorrect()}. Parameter to this function are
-sample and retention time limits objects, the mass range to extract (\Rfunarg{
-MassRange = c(85,500)}), the intensity threshhold (\Rfunarg{IntThreshold = 10}),
+sample and retention time limits objects, the intensity threshhold (\Rfunarg{IntThreshold = 10}),
 the peak picking method (\Rfunarg{pp.method}) and a \Rfunarg{Window} parameter
 that will be used by said method. The function will return a matrix
 with the retention times of all RI markers and create a tab-delimited file (RI file)
@@ -181,7 +180,7 @@ These files contain the extracted peak list of the respective NetCDF file.
 
 
 <<RIcorrection>>=
-RImatrix <- RIcorrect(samples, rimLimits, massRange = c(85,500),
+RImatrix <- RIcorrect(samples, rimLimits,
             IntThreshold = 10, pp.method = "smoothing", Window = 15)
 @
 
@@ -462,10 +461,10 @@ the raw chromatogram and \Rfunction{plotPeak} to plot the peak (figure~\ref{fig:
 # we select the first sample
 sample.id <- 1
 cdf.file  <- file.path(cdf.path, cdffiles[sample.id])
-rawpeaks  <- peakCDFextraction(cdf.file, massRange = c(85,500))
+rawpeaks  <- peakCDFextraction(cdf.file)
 # which.met=3 (id of Valine)
 plotPeak(samples, lib, MetabProfile, rawpeaks, which.smp=sample.id,
-    which.met=3, massRange=c(85,500), corMass=FALSE)
+    which.met=3, corMass=FALSE)
 @
 \caption{Chromatographic peak of Valine.}\label{fig:04}
 \end{figure}
