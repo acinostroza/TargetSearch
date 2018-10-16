@@ -219,14 +219,20 @@ function(cdfFile, observed, standard)
 	invisible()
 }
 
+#' scans for CDF files and converts them to CDF4
+#'
+#' @param cdf_path the input path to scan for
+#' @param out_path the output path in which the files will be saved
 `convert_cdf_from_path` <-
-function(cdf_path, out_path)
+function(cdf_path, out_path=cdf_path)
 {
-	if(cdf_path == out_path)
-		stop("Input and output paths cannot be the same")
 	# scans CDF file
-	in_files  <- dir(cdf_path, pattern="\\.cdf$", full=TRUE)
-	out_files <- file.path(out_path, basename(in_files))
+	in_files  <- dir(cdf_path, pattern="\\.cdf$", full=TRUE, ignore.case=TRUE)
+	if(length(in_files) == 0)
+		stop(sprintf("No CDF files detected in dir `%s`", cdf_path))
+	out_files <- sub("\\.cdf$", ".nc4", basename(in_files), ignore.case=TRUE)
+	out_files <- file.path(out_path, out_files)
+
 	mapply(convert_to_ncdf4, in_files, out_files)
 	invisible(out_files)
 }
