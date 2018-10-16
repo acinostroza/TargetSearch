@@ -1,19 +1,19 @@
+# peak CDF extraction converts a cdf into a matrix.
+# The massRange is deprecated, so we ignore it
 `peakCDFextraction` <-
-function(cdfFile, massRange = NULL)
+function(cdfFile, massRange)
 {
 	if(.is_ts_ncdf4(cdfFile))
 		.peakCDFextraction4(cdfFile)
 	else
-		.peakCDFextraction3(cdfFile, massRange)
+		.peakCDFextraction3(cdfFile)
 }
 
 `.peakCDFextraction3` <-
-function(cdfFile, massRange)
+function(cdfFile)
 {
 	ncData <- .open.ncdf(cdfFile)
-
-	if(is.null(massRange))
-		massRange <- range(ncData$mz)
+	massRange <- range(ncData$mz)
 
 	peaks <- .Call(c_ncdf_to_matrix, ncData, massRange, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
@@ -21,7 +21,7 @@ function(cdfFile, massRange)
 }
 
 `.peakCDFextraction4` <-
-function(cdfFile, massRange)
+function(cdfFile)
 {
 	nc <- nc_open(cdfFile)
 	on.exit(nc_close(nc))
