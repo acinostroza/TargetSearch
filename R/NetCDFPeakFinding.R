@@ -16,6 +16,10 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 
 	method <- c("s", "p", "g")[method]
 
+	# methods smoothing and gaussian use W points, while ppc uses 2*W + 1
+	# make the number of points homogeneous,
+	Window <- switch(method, s=2*Window+1, p=Window, g=2*Window+1)
+
 	refine <- min(c(round(Window / 3), 4))
 
 	# first check that the file is not TS
