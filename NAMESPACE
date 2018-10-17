@@ -96,6 +96,7 @@ S3method("as.list", "tsMSdata")
 S3method("as.list", "tsProfile")
 
 export(
+	"checkRimLim",
 	"FAMEoutliers",
 	"FindPeaks",
 	"FindAllPeaks",
