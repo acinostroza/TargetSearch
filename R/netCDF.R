@@ -86,7 +86,7 @@
 #' \code{creator} ('Unknown' if undefined), \core{version} (file version or empty
 #' string if undefined) and \code{time_corrected} (1, 0, or NA_integer_ if undefined)
 #'
-`.get.ncdf.info` <- function(cdf)
+`.get_ncdf_info` <- function(cdf)
 {
 	nc <- nc_open(cdf)
 	format   <- nc$format
@@ -104,7 +104,7 @@
 #' Checks that a cdfFile was created by TS
 `.is_ts_ncdf4` <- function(cdfFile)
 {
-	nfo <- .get.ncdf.info(cdfFile)
+	nfo <- .get_ncdf_info(cdfFile)
 	nfo$creator == 'TargetSearch'
 }
 
@@ -118,8 +118,8 @@
 #' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
 #'   file extension by \code{.nc4}. Valid extensions are \code{.cdf} or \code{.nc}. If
 #'   the file doesn't have a is valid extension, then \code{.nc4} is just appended.
-#' @param massRange The \code{m/z} range. A numeric vector of form (m/z min, m/z max) or
-#'   \code{NULL} for automatic convertion
+#' @param massRange The \code{m/z} range. It is actually ignored but kept for compatibility
+#' @param force Logical. Set to \code{TRUE} to allow overwrites. Default to \code{FALSE}
 #'
 #' @note
 #' The generated CDF file is non-standard and very likely cannot be
@@ -131,15 +131,13 @@
 #'
 #' @return A string. The path to the converted file or invisible.
 `convert_to_ncdf4` <-
-function(cdfFile, outFile=NULL, massRange=NULL)
+function(cdfFile, outFile=NULL, massRange=NULL, force=FALSE)
 {
 	# first check that the file is not TS
 	if(.is_ts_ncdf4(cdfFile)) {
 		warning('File "', cdfFile, '" has already been converted')
 		return(invisible(outFile))
 	}
-
-	peaks <- peakCDFextraction(cdfFile, massRange)
 
 	if(is.null(outFile)) {
 		outFile <- sprintf("%s.nc4", sub("\\.cdf$", "", cdfFile, ignore.case=TRUE))
@@ -148,6 +146,11 @@ function(cdfFile, outFile=NULL, massRange=NULL)
 	if(cdfFile == outFile)
 		stop('Intput and output files are the same. aborting...')
 
+	if(file.exists(outFile) & !force) {
+		warning('File `', outFile, "' exists. Set `force' to overwrite")
+		return(invisible(outFile))
+    }
+	peaks <- peakCDFextraction(cdfFile, massRange)
 	save_cdf4(outFile, peaks)
 
 	invisible(outFile)
@@ -227,7 +230,7 @@ function(cdfFile, observed, standard)
 function(cdf_path, out_path=cdf_path)
 {
 	# scans CDF file
-	in_files  <- dir(cdf_path, pattern="\\.cdf$", full=TRUE, ignore.case=TRUE)
+	in_files  <- dir(cdf_path, pattern="\\.cdf$", full.names=TRUE, ignore.case=TRUE)
 	if(length(in_files) == 0)
 		stop(sprintf("No CDF files detected in dir `%s`", cdf_path))
 	out_files <- sub("\\.cdf$", ".nc4", basename(in_files), ignore.case=TRUE)
