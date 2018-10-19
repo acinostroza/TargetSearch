@@ -22,7 +22,8 @@ importFrom("tcltk", ".Tcl", "tclServiceMode", "tclvalue", "tclvalue<-",
 importFrom("utils", "edit", "head", "installed.packages", "read.delim",
            "setTxtProgressBar", "txtProgressBar", "write.table")
 
-importFrom("ncdf4", "nc_open", "ncvar_get", "nc_close")
+importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
+           "ncatt_get", "ncatt_put", "ncdim_def", "ncvar_def", "nc_create")
 
 exportClasses(
 	"tsLib",
