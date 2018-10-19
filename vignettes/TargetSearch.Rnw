@@ -165,6 +165,22 @@ If you do not use RI markers, you can skip this part by setting the parameter
 \Rfunarg{rimLimits} to \Robject{NULL} in \Rfunction{RIcorrect} function.
 Please note that in this case, no retention time correction will be performed.
 
+To make sure that you have correctly set the time ranges for the RI markers,
+the function \Rfunction{checkRimLim()} can be used. This function plots
+the $m/z$ of all the markers in one, randomly chosen, sample. Repeat
+the function to see other samples. In the figure~\ref{fig:chmrim}
+a example is shown. The gray area indicates the search window of each
+marker.
+
+\begin{figure}[htp]
+\centering
+<<checkRimLim, fig=true, width=7, height=7>>=
+checkRimLim(samples, rimLimits)
+@
+\caption{Example of the RI markers $m/z$ traces in one sample}\label{fig:chmrim}
+\end{figure}
+
+
 \section{Baseline correction, peak identification and RI correction}
 
 Initially, \Rpackage{TargetSearch} identifies the local apex intensities 
