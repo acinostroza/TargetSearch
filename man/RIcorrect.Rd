@@ -15,18 +15,18 @@ RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
   \item{samples}{ A \code{tsSample} object created by \code{ImportSamples} function. }
   \item{rimLimits}{ A \code{tsRim} object. If set to \code{NULL}, no retention
 	time will be performed. See \code{ImportFameSettings}.}
-  \item{massRange}{ A two component vector of m/z range used by the GC-MS machine
-	or \code{NULL}, in which case the range will be detected automatically. }
+  \item{massRange}{Deprecated. It is completely ignored but it is kept for
+	compatibility with old scripts.}
   \item{Window}{ The window used for smoothing. The number of points actually used
 	is \code{2*Window + 1}. It must be an integer. See details.}
   \item{IntThreshold}{ Apex intensities lower than this value will be removed from the RI files. }
-  \item{pp.method}{ Peak picking method. Options are either "smoothing" or "ppc". See details. }
+  \item{pp.method}{ Peak picking method. Options are "smoothing", "gaussian" and "ppc". See details. }
   \item{showProgressBar}{Logical. Should the progress bar be displayed?}
   \item{baseline}{Logical. Should baseline correction be performed?}
   \item{baseline.opts}{A list of options passed to \code{\link{baselineCorrection}}}.
 }
 \details{
-	There are two pick picking methods available: "ppc" and "smoothing".
+	There are three pick picking methods available: "ppc", "smoothing", "gaussian".
 
 	The "ppc" method (default) implements the peak detection method described in the \code{ppc}
 	package. It looks for the local maxima within a \code{2*Window + 1} scans for
@@ -36,6 +36,9 @@ RIcorrect(samples, rimLimits = NULL, massRange = NULL, Window, IntThreshold,
 	for every mass trace. Then it looks for a change of sign (from positive to negative) of
 	the difference between two consecutive points. Those points will be returned as
 	detected peaks.
+
+	The "gaussian" method behaves similar to the "smoothing" method, but instead
+	a gaussian smoother is used instead of the moving average.
 
 	To work out a suitable \code{Window} value, the following might be useful:
 	\code{Window = (SR * PW - 1) / 2}, where SR is the scan rate of the MS instrument and
@@ -64,18 +67,18 @@ list.files(cdfpath)
 CDFpath(sampleDescription) <- cdfpath
 # run RIcorrect (massScanRange = 85-320; Intensity Threshold = 50;
 # peak detection method = "ppc", window = 15)
-RImatrix <- RIcorrect(sampleDescription, rimLimits, massRange = c(85,320), 
+RImatrix <- RIcorrect(sampleDescription, rimLimits,
             Window = 15, pp.method = "ppc", IntThreshold = 50)
 
 # you can try other parameters and other peak picking algorithm.
-RImatrix <- RIcorrect(sampleDescription, rimLimits, massRange = c(85,320), 
+RImatrix <- RIcorrect(sampleDescription, rimLimits,
             Window = 15, pp.method = "smoothing", IntThreshold = 10)
 
-RImatrix <- RIcorrect(sampleDescription, rimLimits, massRange = c(85,320), 
+RImatrix <- RIcorrect(sampleDescription, rimLimits,
             Window = 15, pp.method = "ppc", IntThreshold = 100)
 
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
-\seealso{ \code{\link{ImportSamples}}, \code{\link{ImportFameSettings}}, 
+\seealso{ \code{\link{ImportSamples}}, \code{\link{ImportFameSettings}},
 \code{\link{NetCDFPeakFinding}}, \code{\link{FAMEoutliers}},
 \code{\linkS4class{tsSample}}, \code{\linkS4class{tsRim}}.}

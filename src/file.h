@@ -39,16 +39,16 @@ void swapp(void *, int, int);
 
 SPECTRA * read_dat(FILE *, int);
 void write_dat(FILE *, SPECTRA *, int);
-void writePeaksDAT(char **, double *, double *, int *, int *, int *, int *);
+void write_peaks_dat(char **, double *, double *, int *, int *, int *, int *);
 
 SPECTRA * read_txt(FILE *, int, int, int);
 int read_spectrum(char *, int *, int *);
 void write_txt(FILE *, SPECTRA *, char *);
-void writePeaksTXT(char **, double *, double *, int *, int *, int *, char **);
+void write_peaks_text(char **, double *, double *, int *, int *, int *, char **);
 
 SPECTRA pktosp(double *, double *, int *, int *, int);
 
-void txt2dat(char **, char **, int *, int *);
-void dat2txt(char **, char **, int *, char **);
+void text_to_dat(char **, char **, int *, int *);
+void dat_to_text(char **, char **, int *, char **);
 
 #endif

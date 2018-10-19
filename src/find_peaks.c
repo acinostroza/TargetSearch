@@ -207,7 +207,7 @@ do_search(SPECTRA *spectra, int *mass, double *ri_exp, double *ri_min, double *r
      is ignored.
  */
 
-SEXP FindPeaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, SEXP Options,
+SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, SEXP Options,
 	SEXP useRT, SEXP Search)
 {
 	/* internal variables */

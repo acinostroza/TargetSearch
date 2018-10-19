@@ -13,7 +13,7 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE,
 	ftype=c("binary", "text"))
 }
 \arguments{
-  \item{sampfile}{ A character string naming a sample file. See details. }
+  \item{sampfile}{ A character string naming a sample file or a \code{data.frame} See details. }
   \item{CDFpath}{ A character string naming a directory where the CDF files are
 	located. }
   \item{RIpath}{ A character string naming a directory where the RI corrected text
@@ -26,15 +26,22 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE,
   \item{\dots}{ Other options passed to \code{\link[utils:read.table]{read.delim}} function. }
 }
 \details{
-	The sample file is a tab-delimited text file with at least two columns:
-	
+	The sample file is a tab-delimited text file or, alternatively, a
+	\code{data.frame} like the one would get by calling
+	\code{\link[utils:read.table]{read.delim}}. The following two columns
+	are expected:
+
 	\itemize{
 	\item \code{CDF_FILE} - The list of baseline corrected CDF files.
-  \item \code{MEASUREMENT_DAY} - The day when the sample was measured.
+	\item \code{MEASUREMENT_DAY} - The day when the sample was measured.
 	}
 
-	The column names must be exactly as those indicated, but the column
-	order doesn't matter. Other columns could be included in that file.
+	The function first looks for columns matching those names. If they are not
+	found, then it looks for columns with the substrings 'cdf' and 'day' respectively.
+	If the 'cdf' column is not found, the function raises an error, but if 'day'
+	is not found, then it assumes the measurement day is the same for all.
+	In case of multiple matches, then it takes the first column.
+	The column order does not matter. Other columns could be included in that file.
 	They won't be used by the script, but will be included in the "sample"
 	R object.
 

@@ -14,12 +14,13 @@ NetCDFPeakFinding(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
 
 \arguments{
   \item{cdfFile}{A character string naming a netcdf file.}
-  \item{massRange}{A two component numeric vector with the scan mass range to extract
-	or \code{NULL}, in which case the range will be inferred from the cdf file.}
+  \item{massRange}{Deprecated. It is completely ignored but it is kept for
+                   compatibility with old scripts.}
   \item{Window}{The window used by peak picking method. The number of points actually used
-		is \code{2*Window + 1}.  }
+                is \code{2*Window + 1}. }
   \item{IntThreshold}{Apex intensities lower than this value will be removed from the RI files. }
-  \item{pp.method}{The pick picking method to be used. Options are \code{"smoothing"} and \code{"ppc"}.}
+  \item{pp.method}{The pick picking method to be used. Options are \code{"smoothing"},
+                   \code{"gaussian"} and \code{"ppc"}.}
   \item{baseline}{Logical. Should baseline correction be performed?}
   \item{baseline.opts}{A list of options passed to \code{\link{baselineCorrection}}}.
 }
@@ -28,24 +29,25 @@ NetCDFPeakFinding(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
 	The function expects the following NetCDF variables: \code{intensity_values},
 	\code{mass_values}, \code{scan_index}, \code{point_count} and \code{scan_acquisition_time}.
 	Otherwise, an error will be displayed.
-	
-	The \code{massRange} parameter is a numeric vector with two components: lower
-	and higher masses. All masses in that range will be extracted. Note that it is
-	not possible to extract a discontinuous mass range. It also can be \code{NULL},
-	in which case the mass range will be determined by scanning the cdf file.
-	
-	There are two peak picking algorithms that can be used. The \code{"smoothing"} method
-	smooths the m/z curves and then looks for a change of sign of the intensity difference
-	between two consecutive points. The \code{"ppc"} uses a sliding window and looks
-	for the local maxima. This method is based on R-package \code{ppc}.
 
+	Formerly, the \code{massRange} parameter was a numeric vector with two components: lower
+	and higher masses. Now, the mass range is detected automatically and it has no effect if
+	it is set. It is kept only for compatibility reasons.
+
+	There are three peak picking algorithms that can be used. The \code{"smoothing"} method
+	smooths the m/z curves by a moving average and then looks for a change of sign of the
+	intensity difference between two consecutive points. The \code{"gaussian"} is exactly
+	the same, but it uses a gaussian smoother instead of a moving average.
+
+	The \code{"ppc"} uses a sliding window and looks for the local maxima. This method is
+	based on R-package \code{ppc}.
 }
 
 \value{
-	A three component list.
+  A three component list.
   \item{Time}{The retention time vector.}
   \item{Peaks}{The intensity matrix. Rows are the retention times and columns are masses. The first
-	column is the lower mass value and the last one is the higher mass. }
+               column is the lower mass value and the last one is the higher mass. }
   \item{massRange}{The mass range.}
 }
 
@@ -57,8 +59,7 @@ CDFfiles <- dir(CDFpath, pattern = ".cdf$", full.names = TRUE)
 CDFfiles
 
 # extrac peaks of first chromatogram
-peaks.1 <- NetCDFPeakFinding(CDFfiles[1], massRange = c(85, 320), Window = 15,
-			 IntThreshold = 10, pp.method = "smoothing")
+peaks.1 <- NetCDFPeakFinding(CDFfiles[1], Window = 15, IntThreshold = 10, pp.method = "smoothing")
 # scan acquisition times
 head(peaks.1$Time)
 # peaks in matrix form. first column is mass 85, last one is mass 320.

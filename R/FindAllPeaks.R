@@ -8,7 +8,7 @@ function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
 
     opt <- as.integer(get.file.format.opt(file, columns))
     searchType <- pmatch(searchType, c("all", "minRI", "maxInt"))
-    z <- .Call('FindPeaks', file, as.integer(ref[,'mz']), NULL,
+    z <- .Call(c_find_peaks, file, as.integer(ref[,'mz']), NULL,
                as.numeric(ref[,'minRI']), as.numeric(ref[,'maxRI']), opt, useRT, searchType)
     z <- do.call('cbind', z)
     z[,4] <- z[,4] + 1

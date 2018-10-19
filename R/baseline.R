@@ -13,7 +13,7 @@ baseline <- function(ncData, baseline.opts = NULL) {
     else
     {
         massRange <- range(ncData$mz)
-        int <- t(.Call("ncdfToMatrix", ncData, massRange, PACKAGE="TargetSearch"))
+        int <- t(.Call(c_ncdf_to_matrix, ncData, massRange, PACKAGE="TargetSearch"))
     }
 
     int <- do.call(baselineCorrection, append(list(int = int), baseline.opts))
@@ -89,13 +89,13 @@ baselineCorrection <- function(int, threshold = 0.5, alpha = 0.95, bfraction = 0
 
 hpf <- function(x, alpha) {
         n <- length(x)
-        .C("hpf", x = as.numeric(x), y = double(n), n = as.integer(n),
+        .C(c_hpf, x = as.numeric(x), y = double(n), n = as.integer(n),
             a = as.numeric(alpha), PACKAGE="TargetSearch")$y
 }
 
 windowingStep <- function(x, n, wm) {
         x.len <- length(x)
-        out <- .C("windowing", s = integer(n), x = as.integer(x), wm = as.integer(wm),
+        out <- .C(c_windowing, s = integer(n), x = as.integer(x), wm = as.integer(wm),
                 n = as.integer(n), nidx = as.integer(x.len),  PACKAGE="TargetSearch" )
         as.logical(out$s)
 }

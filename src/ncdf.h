@@ -3,6 +3,7 @@
 
 #include <R.h>
 #include <Rdefines.h>
+#include "matrix.h"
 
 typedef struct
 {
@@ -14,25 +15,18 @@ typedef struct
 	int *in;        /* intensity */
 	int nscans;
 	int npoints;
+	int alloc;      /* indicates if memory was allocated by Calloc/Realloc */
 } ncdf_t;
-
-typedef struct
-{
-	int *x;
-	int nc;
-	int nr;
-	int mzmin;
-	int mzmax;
-} matrix_t;
 
 matrix_t * get_intensity_mat(ncdf_t *);
 ncdf_t   * new_ncdf(SEXP);
-void free_matrix(matrix_t *);
+matrix_t * from_matrix(SEXP);
+void free_cdf(ncdf_t *);
 
 /* fix a CDF with non-integer mass values (aka non-nominal mass) */
 SEXP cdffix(SEXP, SEXP);
 
 /* get the intensity matrix of a NCDF object */
-SEXP ncdfToMatrix(SEXP NCDF, SEXP massRange);
+SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange);
 
 #endif

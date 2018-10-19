@@ -15,7 +15,7 @@ function(in.files, out.files=NULL)
 	for(i in 1:length(in.files)) {
 		opt <- get.file.format.opt(in.files[i], "none")
 		if(opt[1] != 1) stop("Incorrect file format")
-		res <- .C("dat2txt", as.character(in.files[i]), as.character(out.files[i]),
+		res <- .C(c_dat_to_text, as.character(in.files[i]), as.character(out.files[i]),
 				as.integer(swap), as.character(header), PACKAGE="TargetSearch")
 	}
 	invisible(out.files)
@@ -35,7 +35,7 @@ function(in.files, out.files=NULL,
 	for(i in 1:length(in.files)) {
 		opt <- get.file.format.opt(in.files[i], columns)
 		if(opt[1] != 0) stop("Incorrect file format")
-		res <- .C("txt2dat", as.character(in.files[i]), as.character(out.files[i]),
+		res <- .C(c_text_to_dat, as.character(in.files[i]), as.character(out.files[i]),
 				as.integer(swap), as.integer(opt[3:5]), PACKAGE="TargetSearch")
 	}
 	invisible(out.files)

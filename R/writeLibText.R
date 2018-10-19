@@ -11,8 +11,8 @@ writeLibText <- function(lib, file)
 	libdata$SEL_MASS <- sapply(selMass(lib), function(x) paste(x, collapse=";"))
 	libdata$TOP_MASS <- sapply(topMass(lib), function(x) paste(x, collapse=";"))
 	if(length(spectra(lib)) > 0) {
-		libdata$SPECTRUM <- sapply(spectra(lib), function(x) {
-			paste(apply(x,1, function(y) paste(y[1],y[2],sep=":")), collapse=" ")})
+		libdata$SPECTRUM <- sapply(spectra(lib), function(x)
+					    paste(x[,1], x[,2], sep=":", collapse=" "))
 	}
 	extra <- !colnames(libData(lib)) %in% colnames(libdata)
 	if(any(extra))

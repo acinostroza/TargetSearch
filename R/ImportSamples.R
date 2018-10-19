@@ -1,26 +1,86 @@
+#' check if files exist and warn if not
+#'
+#' @param path the file path
+#' @param files the files to check
+#' @param quiet logical, be quiet
+#' @return logical. whether the files exist
+
+`.check.file.exists` <-
+function(path, files, quiet=FALSE)
+{
+    z <- file.exists(file.path(path, files))
+    if(quiet | all(z))
+        return(z)
+    cat(sprintf("=> Notice: Some files were not found in path `%s`", path), sep="\n")
+    cat(sprintf("   - %s", files[!z]), sep="\n")
+    warning("some files are missing")
+    invisible(z)
+}
+
+#' detect file extension if not present
+#'
+#' tries extensions cdf or nc4 if missing. Returns the files if they exist
+#' or just assumes cdf extension
+#' @param path the file path
+#' @param files the files to check
+#' @return a character vector with file names
+`.detect.file.ext` <-
+function(path, files)
+{
+    ret <- regexpr("\\.(cdf|nc4)", files)
+    if(all(ret != -1)) # files have extension
+        return(files)
+    a <- file.path(path, sprintf("%s.cdf", files))
+    b <- file.path(path, sprintf("%s.nc4", files))
+    ret <- mapply(function(a, b, f) {
+                      if(file.exists(a)) return(a)
+                      if(file.exists(b)) return(b)
+                      f}, a, b, files)
+    basename(unname(ret))
+}
+
 `ImportSamples` <-
-function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...) {
-	ftype <- pmatch(ftype[1], c("binary", "text"))
-	stopifnot(!is.na(ftype))
+function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...)
+{
+    ftype <- pmatch(ftype[1], c("binary", "text"))
+    stopifnot(!is.na(ftype))
 
-	Samples <- read.delim(sampfile, ...)
-	if(is.null(Samples$CDF_FILE)) stop("Column 'CDF_FILE' is missing!!")
-	Samples$CDF_FILE <- as.character(Samples$CDF_FILE)
-	if(is.null(Samples$MEASUREMENT_DAY)) {
-		Samples$MEASUREMENT_DAY <- "1"
-		warning("Column 'MEASUREMENT_DAY' not found. Using default setting.")
-	}
-	cdf.idx <- grep("\\.cdf$", Samples$CDF_FILE, ignore.case = T)
-	if(length(cdf.idx) != nrow(Samples)) {
-		warning("Some CDF file names don't have a CDF extension. Those rows will be removed.")
-		Samples <- Samples[cdf.idx,]
-	}
+    Samples <- if(is.data.frame(sampfile)) sampfile else
+                   read.delim(sampfile, ...)
 
-	ext     <- c("dat","txt")[ftype]
-	RIfiles <- sub("cdf$", ext, paste("RI_" , Samples$CDF_FILE, sep = ""), ignore.case = T)
-	Names   <- gsub(".cdf", "", Samples$CDF_FILE)
-	new("tsSample", Names = Names, CDFfiles = Samples$CDF_FILE, days = as.character(Samples$MEASUREMENT_DAY),
-		RIfiles = RIfiles, CDFpath = CDFpath, RIpath = RIpath, data = Samples)
+    # look for column 'CDF_FILE' and 'MEASUREMENT_DAY'
+    cdf <- 'CDF_FILE'
+    day <- 'MEASUREMENT_DAY'
+
+    if(!cdf %in% colnames(Samples)) {
+        # greps for 'CDF'
+        k <- grep('cdf', colnames(Samples), ignore.case=TRUE)
+        if(length(k) == 0)
+            stop("Column 'CDF_FILE' is missing!!")
+        cdf <- colnames(Samples)[k][1]
+        message("Note: Using '", cdf, "' as CDF column")
+    }
+
+    Samples[[ cdf ]] <- as.character(Samples[, cdf])
+
+    if(!day %in% colnames(Samples)) {
+        # greps for 'DAY'
+        k <- grep('day', colnames(Samples), ignore.case=TRUE)
+        if(length(k) == 0) {
+            Samples[[ day ]] <- "1"
+            warning("Column 'MEASUREMENT_DAY' not found. Using default setting.")
+        } else {
+            day <- colnames(Samples)[k][1]
+        }
+    }
+    CDFfiles <- .detect.file.ext(CDFpath, Samples[[ cdf ]])
+    chk     <- .check.file.exists(CDFpath, CDFfiles)
+    ext     <- c("dat","txt")[ftype]
+    RIfiles <- paste0("RI_", CDFfiles, ".", ext)
+    RIfiles <- sub("\\.(cdf|nc4)\\.", ".", RIfiles, ignore.case = T)
+    Names   <- gsub(".(cdf|nc4)$", "", Samples[[ cdf ]], ignore.case = T)
+    new("tsSample", Names = Names, CDFfiles = CDFfiles, days = as.character(Samples[[ day ]]),
+        RIfiles = RIfiles, CDFpath = CDFpath, RIpath = RIpath, data = Samples)
 }
 
 # function to extract the /measurement day/ of a set of names.
@@ -72,3 +132,4 @@ function(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE, ftype=c("binary", "text")
 
     new('tsSample', CDFfiles=cdffiles,RIpath=CDFpath,CDFpath=CDFpath, ftype=ftype)
 }
+# vim: set ts=4 sw=4 et:

@@ -23,7 +23,7 @@ static SEXP get(SEXP list, const char *str)
 /* functions to manipulate CDF data in form of a list into a C structure */
 
 /* returns the mz limits */
-void mass_range(ncdf_t *x, int *min, int *max)
+static void mass_range(ncdf_t *x, int *min, int *max)
 {
 	int *mz = x->mass;
 	*min = *max = mz[0];
@@ -46,8 +46,9 @@ matrix_t * get_intensity_mat(ncdf_t *x)
 	mat->mzmax = max;
 	mat->nc    = (max - min + 1);
 	mat->nr    = x->nscans;
-	n = (max - min + 1) * x->nscans;
+	mat->alloc = n = (max - min + 1) * x->nscans;
 	z = Calloc(n, int);
+
 	for(int s = 0; s < x->nscans; s++) {
 		for(int i = 0; i < x->p_count[s]; i++) {
 			z[(x->mass[x->scan_idx[s] + i]-min) * x->nscans + s] = x->in[x->scan_idx[s] + i];
@@ -55,6 +56,18 @@ matrix_t * get_intensity_mat(ncdf_t *x)
 	}
 	mat->x = z;
 	return mat;
+}
+
+/* tranform a R matrix of intensities into a matrix_t struct */
+matrix_t * from_matrix(SEXP Matrix)
+{
+	SEXP dim = GET_DIM(Matrix);
+	matrix_t *ret = NULL;
+
+	if(isNull(dim))
+		return ret;
+	ret = new_mat_alloc(INTEGER(dim)[1], INTEGER(dim)[0], INTEGER(AS_INTEGER(Matrix)));
+	return ret;
 }
 
 /* transform R object into a struct ncdf_t. It expects an already fixed cdf list
@@ -79,13 +92,8 @@ ncdf_t * new_ncdf(SEXP NCDF)
 	cdf->scan_idx = INTEGER(AS_INTEGER(ScanIndex));
 	cdf->mass = INTEGER(AS_INTEGER(MZ));
 	cdf->in = INTEGER(AS_INTEGER(Intensity));
+	cdf->alloc = 0; /* flag to indicate allocated memory */
 	return cdf;
-}
-
-void free_matrix(matrix_t *mat)
-{
-	Free(mat->x);
-	Free(mat);
 }
 
 /******************************************************************************
@@ -101,7 +109,7 @@ void free_matrix(matrix_t *mat)
 
 /* allocate a new ncdf_t object using transient allocation methods.
  * Note that 'new_ncdf' uses shared memory */
-ncdf_t *
+static ncdf_t *
 alloc_cdf(int ns, int np)
 {
 	ncdf_t *x   = Calloc(1, ncdf_t);
@@ -114,6 +122,7 @@ alloc_cdf(int ns, int np)
 	x->ri       = Calloc(ns, double);
 	x->nscans   = ns;
 	x->npoints  = np;
+	x->alloc    = 1;
 	return x;
 }
 
@@ -121,17 +130,21 @@ alloc_cdf(int ns, int np)
 void
 free_cdf(ncdf_t *x)
 {
-	Free(x->rt);
-	Free(x->ri);
-	Free(x->mass);
-	Free(x->in);
-	Free(x->scan_idx);
-	Free(x->p_count);
+	if(x == NULL)
+		return;
+	if(x->alloc == 1) {
+		Free(x->rt);
+		Free(x->ri);
+		Free(x->mass);
+		Free(x->in);
+		Free(x->scan_idx);
+		Free(x->p_count);
+	}
 	Free(x);
 }
 
 /* main function to fix a cdf data */
-int
+static int
 cdffix_core(ncdf_t *dest, ncdf_t *src, int max_assigned)
 {
 	int i, j, k, p=0, count = 0;
@@ -209,11 +222,13 @@ SEXP ncdf_sexp(ncdf_t *x)
 	SET_STRING_ELT(names, 4, mkChar("mz"));
 	SET_STRING_ELT(names, 5, mkChar("intensity"));
 	setAttrib(res, R_NamesSymbol, names);
-	UNPROTECT(1);
 	return res;
 }
 
+/*************************/
 /* .Call interface to R  */
+/*************************/
+
 /* Fix a CDF file with non-integer mass values (no high mass accuracy)
  * Args:
  *   NCDF: a list of named elements holding the CDF structure:
@@ -246,13 +261,13 @@ cdffix(SEXP NCDF, SEXP MA)
 
 	Free(nc);
 	if(!isNull(res))
-		UNPROTECT(1);
+		UNPROTECT(2); /* unprotects call to ncdf_sexp */
 	return res;
 }
 
 /* takes a CDF object and return a matrix *
  * this function replaces peakCDFextraction */
-SEXP ncdfToMatrix(SEXP NCDF, SEXP massRange)
+SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange)
 {
 	ncdf_t *nc = new_ncdf(NCDF);
 	matrix_t *mat = get_intensity_mat(nc);
@@ -268,7 +283,7 @@ SEXP ncdfToMatrix(SEXP NCDF, SEXP massRange)
 			z[j + i*nc->nscans] = x[j];
 	}
 	Free(nc);
-	free_matrix(mat);
+	free_mat(mat);
 	UNPROTECT(1);
 	return ansMat;
 }
