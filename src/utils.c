@@ -96,7 +96,7 @@ int find_peak_diff(const double *x, int n, int *ans)
 void refine_peak(const int *x, int n, int w, int *ans, int np)
 {
 	int k = 0;
-	int *peaks = malloc(np * sizeof(int));
+	int *peaks = Calloc(np, int);
 
 	/* save detected peaks */
 	for(int i = 0; i < n; i++) {
