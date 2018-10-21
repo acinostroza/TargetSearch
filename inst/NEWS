@@ -1,3 +1,34 @@
+		CHANGES IN VERSION 1.38.0:
+
+NEW FEATURES
+
+   o	New function `checkRimLim` to vizualise a retention index markers
+	before the actual time correction. It can be useful to fix the search
+	limits.
+
+   o	Peak detection method (NetCDFPeakFinding) has the option to use a gaussian
+	smoothing in addition to usual moving average.
+
+   o	Detects if CDF files are not found during sample description import. In
+	addition, search for column names matching a pattern if the expected names
+	are not found.
+
+   o	Add support for a custom CDF file for faster data retrieval.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	The parameter `massRange` (m/z mass range) which used to be needed in
+	some functions is deprected. It was used mostly as a hint and usually
+	detected automatically. If it is passed, there would be no effect.
+
+BUG FIXES
+
+   o	Big refactor of C code to eliminate duplicated code and to separate
+	what is R-C code (ie, SEXP structs) out of the C code that actually does
+	something.
+
+   o	General R code refactoring and housekeeping.
+
 		CHANGES IN VERSION 1.36.0:
 
 NEW FEATURES
@@ -14,7 +45,7 @@ NEW FEATURES
 SIGNIFICANT USER-VISIBLE CHANGES
 
    o	Add extra checks when manipulating tsLib objects. Extra care needs to
-	be taken if changes to the quant/selective/top masses are changed.
+	be taken if changes to the quant/selective/top masses are done.
 
    o	Sample IDs (names) must be unique. These might generate errors when
 	loading old TargetSearch workspaces.
