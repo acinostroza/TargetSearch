@@ -1,51 +1,41 @@
-%\VignetteIndexEntry{RI correction}
-%\VignetteDepends{TargetSearchData}
+%\VignetteIndexEntry{RI correction extra}
 %\VignetteKeywords{preprocess, GC-MS, analysis}
 %\VignettePackage{TargetSearch}
+%\VignetteEngine{knitr::knitr}
 
-\documentclass[11pt]{article}
+\documentclass[a4paper]{article}
 
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage[authoryear,round]{natbib}
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
 
-\newcommand{\Robject}[1]{{\texttt{#1}}}
-\newcommand{\Rfunction}[1]{{\texttt{#1}}}
-\newcommand{\Rpackage}[1]{{\textit{#1}}}
-\newcommand{\Rclass}[1]{{\textit{#1}}}
-\newcommand{\Rmethod}[1]{{\textit{#1}}}
-\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+\usepackage{booktabs}
 
-\textwidth=6.2in
-\textheight=8.5in
-%\parskip=.3cm
-\oddsidemargin=.1in
-\evensidemargin=.1in
-\headheight=-.3in
-
-\SweaveOpts{keep.source=TRUE}
-
-\title{RI correction when standards are not co-injected with biological samples}
-\author{\'Alvaro Cuadros-Inostroza\\
-\small{Max Planck Institute for Molecular Plant Physiology}\\
-\small{Potsdam, Germany}\\
-\small{\url{http://www.mpimp-golm.mpg.de/}}
-}
+\title{RI Correction Extra}
+\author{\'Alvaro Cuadros-Inostroza}
+\affil{Max Planck Institute for Molecular Plant Physiology, Potsdam, Germnay}
 
 \begin{document}
-% Sweave options
-\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=1em,fontsize=\small}
-\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=1em,fontsize=\small}
-\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=1em,fontsize=\small}
-\fvset{listparameters={\setlength{\topsep}{0pt}}}
-\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
 
 \maketitle
-\parskip=.3cm
+
+\begin{abstract}
+This vignette explains how to transform retention time (RT) to retention
+index (RI) when the RI markers are not spiked in the samples. The
+same principle can be applied to other uncommon scenarios.
+\end{abstract}
+
+\packageVersion{\Sexpr{BiocStyle::pkg_ver("TargetSearch")}}
+
+Report issues on \url{https://github.com/acinostroza/TargetSearch/issues}
+
+\newpage
+
+\tableofcontents
 
 \section{Motivation}
 
-The \Rpackage{TargetSearch} package assumes that the retention index
+The \Biocpkg{TargetSearch} package assumes that the retention index
 markers (RIM), such as n-alkanes or FAMEs (fatty acid methyl esters),
 are injected together with the biological samples. A different approach
 often used is to inject the RIMs separately, alternating between
@@ -53,11 +43,10 @@ RIMs and biological samples. For example, a GC-MS run may look like
 the list shown in Table~\ref{tab:01}.
 
 \begin{table}[ht]
-\centering
 \begin{tabular}{cc}
-\hline
+\toprule
 Measurement Order & Sample Type \\
-\hline
+\midrule
 1  & Alkanes \\
 2  & Biological \\
 3  & Biological \\
@@ -73,9 +62,9 @@ Measurement Order & Sample Type \\
 13 & Biological \\
 14 & Biological \\
 15 & Biological \\
-\hline
+\bottomrule
 \end{tabular}
-\caption{An example of a GC-MS run. ``Alkanes'' samples are retention
+\caption{An example of a GC-MS run. \emph{Alkanes} samples are retention
 index markers (RIMs).}
 \label{tab:01}
 \end{table}
@@ -84,14 +73,10 @@ In the example (Table~\ref{tab:01}), samples 1, 6, 11 are RIMs and the rest
 are biological samples. The assumption is that the retention time shifts
 between consecutive runs are not significant, so sample \#1 is used to correct
 samples \#2-5, sample \#6 corrects samples \#7-10, and so on. This document
-shows how to perform RI correction in such case with \Rpackage{TargetSearch}, using
-the available chromatograms of the \Rpackage{TargetSearchData} package.
+shows how to perform RI correction in such case with \Biocpkg{TargetSearch}, using
+the available chromatograms of the \Biocpkg{TargetSearchData} package.
 
 \section{Retention Index correction}
-
-<<options, echo = FALSE, results = hide>>=
-options(width=80)
-@
 
 First, we load the required packages
 <<LibraryPreload>>=
@@ -100,7 +85,7 @@ library(TargetSearchData)
 @
 
 Specify the directory where the CDF files are. In this example we will
-use the CDF files of \Rpackage{TargetSearchData} package.
+use the CDF files of \Biocpkg{TargetSearchData} package.
 
 <<cdffiles>>=
 cdfPath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
@@ -118,7 +103,7 @@ RIpath(samples.all) <- "."
 @
 
 Import retention index marker times limits. We will use the
-ones defined in \Rpackage{TargetSearchData}.
+ones defined in \Biocpkg{TargetSearchData}.
 
 <<rim>>=
 rimLimits <- ImportFameSettings(file.path(cdfPath,"rimLimits.txt"))
@@ -143,7 +128,7 @@ are no RIMs inyected in the biological samples, the RTs of the
 RIMs found in \Robject{RImatrix} will make no sense, so you don't need
 to check them.
 
-Up to now we have run the usual \Rpackage{TargetSearch} workflow
+Up to now we have run the usual \Biocpkg{TargetSearch} workflow
 which you can find in the main vignette. To correct the RI of
 the biological samples, the following procedure can be used.
 
@@ -155,9 +140,9 @@ vector like this.
 isRIMarker <- c(T, F, F, F, F, T, F, F, F, F, T, F, F, F, F)
 @
 
-where \Robject{isRIMarker} is \Robject{TRUE} if the respective
-sample is a RIM and \Robject{FALSE} otherwise. Note that here
-we have set components 1, 6, 11 to \Robject{TRUE} just like
+where \Robject{isRIMarker} is \Rcode{TRUE} if the respective
+sample is a RIM and \Rcode{FALSE} otherwise. Note that here
+we have set components 1, 6, 11 to \Rcode{TRUE} just like
 the example in Table~\ref{tab:01}.
 
 Then we have to copy the RIM columns of \Robject{RImatrix} to
@@ -199,12 +184,21 @@ samples <- samples.all[!isRIMarker]
 RImatrix <- RImatrix2[, !isRIMarker]
 @
 
-After that, we can continue we the normal \Rpackage{TargetSearch}
+After that, we can continue we the normal \Biocpkg{TargetSearch}
 workflow. If you prefer to use the GUI, run \Rfunction{TargetSearchGUI()}
-from this point and import the RI files by selecting the option ``Apex Data''
-(don't import the standard files).
+from this point and import the RI files by selecting the option \emph{Apex Data}
+(do not import the standard files).
 
-You could find a copy of all the commands used in this document
-in the \texttt{doc} directory of the \Rpackage{TargetSearch} package.
+A script with all the commands used in this document is located
+in the \file{doc} directory of the \Biocpkg{TargetSearch} package.
+
+\section{Session info}
+
+Output of \Rfunction{sessionInfo()} on the system on which
+this document was compiled.
+
+<<sessionInfo, results="asis", echo=FALSE>>=
+toLatex(sessionInfo())
+@
 
 \end{document}
