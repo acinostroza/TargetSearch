@@ -1,8 +1,8 @@
 Package: TargetSearch
 Type: Package
 Title: A package for the analysis of GC-MS metabolite profiling data
-Version: 1.37.7
-Date: 2018-10-20
+Version: 1.37.8
+Date: 2018-10-24
 Author: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>,
         Jan Lisec,
         Henning Redestig,
@@ -10,7 +10,8 @@ Author: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>,
 Maintainer: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>
 Depends: ncdf4
 Imports: graphics, grDevices, methods, stats, tcltk, utils
-Suggests: TargetSearchData
+Suggests: TargetSearchData, BiocStyle, knitr
+VignetteBuilder: knitr
 Description: This packages provides a targeted pre-processing method for GC-MS data. 
 biocViews: MassSpectrometry, Preprocessing, DecisionTree 
 License: GPL (>= 2)
