@@ -1,4 +1,6 @@
 TargetSearchGUI <- function() {
+  .deprecate_gui()
+  .Deprecated("null")
   envirGUI <- new.env()
   TS_GUI <- tktoplevel()
   tkwm.deiconify(TS_GUI)
@@ -649,4 +651,21 @@ TargetSearchGUI <- function() {
   tclServiceMode(TRUE)
   assign("TSPar", fncInitialParameters(), envir=envirGUI)
 invisible()
-}  
+}
+
+# Add a message to deprecate to GUI
+`.deprecate_gui` <- function()
+{
+    msg <- ("
+  W A R N I N G
+  ~~~~~~~~~~~~~
+
+  The TargetSearch Graphical User Interface (GUI) is DEPRECATED, and it will
+  be permantly REMOVED in the next TargetSearch release. Reasons for this
+  are unmaintainable code, the dependence on `tcltk`, and lack of time and
+  interest.
+
+  The source code is (and will be) available at: https://github.com/acinostroza/TargetSearchGUI
+")
+    message(msg)
+}

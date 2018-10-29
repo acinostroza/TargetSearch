@@ -1,10 +1,13 @@
 \name{TargetSearchGUI}
 \alias{TargetSearchGUI}
+\alias{TargetSearchGUI-deprecated}
 \title{A GUI for TargetSearch}
 \description{
     Opens a Graphical User Interface (GUI, written using Tcl/Tk) to allow easy
     setting and manipulation of most processing parameters which control GC-MS
     Data Evaluation with \emph{TargetSearch}.
+
+    NOTE: This function has been deprecated. Use the command line instead.
 }
 \usage{
     TargetSearchGUI()
