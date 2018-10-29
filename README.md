@@ -16,7 +16,8 @@ This git repository mirrors the TargetSearch git repository on bioconductor.
 Simply run in the R console.
 
 ```
-install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+   install.packages("BiocManager")
 BiocManager::install("TargetSearch")
 ```
 
