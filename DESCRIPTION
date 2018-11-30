@@ -1,8 +1,8 @@
 Package: TargetSearch
 Type: Package
 Title: A package for the analysis of GC-MS metabolite profiling data
-Version: 1.38.0
-Date: 2018-10-24
+Version: 1.38.1
+Date: 2018-11-30
 Author: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>,
         Jan Lisec,
         Henning Redestig,
@@ -13,7 +13,7 @@ Imports: graphics, grDevices, methods, stats, tcltk, utils
 Suggests: TargetSearchData, BiocStyle, knitr
 VignetteBuilder: knitr
 Description: This packages provides a targeted pre-processing method for GC-MS data. 
-biocViews: MassSpectrometry, Preprocessing, DecisionTree 
+biocViews: MassSpectrometry, Preprocessing, DecisionTree, ImmunoOncology
 License: GPL (>= 2)
 URL: https://github.com/acinostroza/TargetSearch
 BugReports: https://github.com/acinostroza/TargetSearch/issues
