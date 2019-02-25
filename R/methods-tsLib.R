@@ -213,8 +213,14 @@ setMethod("initialize",
 
 .setLibrary <- function(lib)
 {
+    # remove NAs and take unique
+    uniqrm <- function(x) {
+        y <- x[ !is.na(x) ]
+        unique(y)
+    }
+
     ma <- function(...) mapply(..., SIMPLIFY=FALSE)
-    uf <- function(...) unique(c(...))
+    uf <- function(...) uniqrm(c(...))
 
     id <- lib@libData$libID
 
@@ -229,6 +235,7 @@ setMethod("initialize",
 
     lib@selMass <- ma(uf, lib@quantMass, lib@selMass)
     lib@topMass <- ma(uf, lib@quantMass, lib@selMass, lib@topMass)
+    lib@quantMass <- sapply(lib@topMass, getElement, 1)
 
     rownames(lib@RIdev) <- rownames(dat) <- id
     colnames(lib@RIdev) <- sprintf("Win_%d", 1:3)
