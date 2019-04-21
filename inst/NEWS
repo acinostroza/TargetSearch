@@ -1,3 +1,16 @@
+		CHANGES IN VERSION 1.40.0:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	The graphical user interface (TargetSearchGUI) is being deprecated.
+	This is due to old source code, lack of time for maintenance, and
+	lack of interest. The GUI it is still part of this release and it
+	will be removed in the next release, ie, 1.42.0
+
+BUG FIXES
+
+   o	Fix NA handling in quantMass method.
+
 		CHANGES IN VERSION 1.38.0:
 
 NEW FEATURES
