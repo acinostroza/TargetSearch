@@ -4,14 +4,16 @@
 \alias{fixRIcorrection}
 \alias{fixRIcorrection-defunct}
 
-\title{Defunct functions in package \pkg{TargetSearch}}
-\description{
-    Functions listed here have been made defunct.
-}
+\title{Defunct functions in package \sQuote{TargetSearch}}
 
-\usage{
-    fixRIcorrection(...)
+\description{
+  Functions listed here are defunct and no longer available.
 }
 \details{
-    \code{fixRIcorrection} has been replaced by \code{\link{fixRI}}.
+  These function have been removed from \sQuote{TargetSearch} and no
+  longer available. Use the replacement if any.
+
+  \itemize{
+    \item \code{fixRIcorrection} has been replaced by \code{\link{fixRI}}.
+  }
 }

@@ -8,7 +8,10 @@
     removed as soon as of the next release.
 }
 \details{
-    \code{\link{TargetSearchGUI}} has been deprecated. There are neither
+    These functions are deprecated. Use the replacement if available.
+    \itemize{
+    \item \code{\link{TargetSearchGUI}} has been deprecated. There are neither
     equivalent or replacements because everything can be achived by using
     common \sQuote{TargetSearch} functions.
+    }
 }
