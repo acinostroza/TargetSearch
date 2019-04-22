@@ -1,6 +1,5 @@
-%\name{TargetSearch-package}
-\name{TargetSearch}
-%\alias{TargetSearch-package}
+\name{TargetSearch-package}
+\alias{TargetSearch-package}
 \alias{TargetSearch}
 \docType{package}
 \title{

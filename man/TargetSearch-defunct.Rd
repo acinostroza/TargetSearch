@@ -1,9 +1,9 @@
-\name{Defunct functions}
+\name{TargetSearch-defunct}
+\alias{TargetSearch-defunct}
 
 \alias{fixRIcorrection}
 \alias{fixRIcorrection-defunct}
 
-\alias{TargetSearch-defunct}
 \title{Defunct functions in package \pkg{TargetSearch}}
 \description{
     Functions listed here have been made defunct.
@@ -15,4 +15,3 @@
 \details{
     \code{fixRIcorrection} has been replaced by \code{\link{fixRI}}.
 }
-\keyword{internal}

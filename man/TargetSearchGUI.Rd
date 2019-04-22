@@ -80,4 +80,4 @@
     parameters and saving output to \emph{Working Directory}. \emph{Quit} closes the GUI.
     }
 }
-\author{Jan Lisec}
+\author{Alvaro Cuadros, Jan Lisec}
