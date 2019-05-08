@@ -19,6 +19,6 @@
 
     \item \code{TargetSearchGUI} has been removed. Please use regular
     \sQuote{TargetSearch} functions. The old source code is archived at
-    \url{https://www.github.com/acinostroza/TargetSearchGUI}.
+    \url{https://github.com/acinostroza/TargetSearchGUI}.
   }
 }

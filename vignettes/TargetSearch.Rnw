@@ -488,96 +488,13 @@ and \Rfunction{plotSpectra} for further options not covered here.
 
 \section{TargetSearch GUI}
 
-\warning{The GUI has been deprecated due to lack of interest and time
-for maintenance. In the next TargetSearch Release it will be removed definitely.
-Please use the normal functions.}
+\warning{The graphical user interface (GUI) has been removed from
+\Biocpkg{TargetSearch}. Please use the regular functions.}
 
-We provide a grahical user interface intended to facilitate the use
-of \Biocpkg{TargetSearch} for users unfamiliar with R. Many parameters that
-would be set calling the individual \Biocpkg{TargetSearch} functions as
-described in this document can be set here ``in one go'' before running the
-complete analysis. A screenshot of the GUI is shown in figure~\ref{fig:05}.
+Nevertheless, the old GUI is still available in my github repository.
+Please follow the instructions if you want to install it.
 
-\begin{figure}[htp]
-\centering
-\includegraphics[width=0.8\textwidth]{tsGUI.png}
-\caption{The \Biocpkg{TargetSearch} GUI.}\label{fig:05}
-\end{figure}
-
-This is a descript of all the GUI options.
-
-\begin{description}
-\item[Working Directory]: Use the \emph{Browse}-button to select the folder
-on your hard drive containing all your GC-MS data files. The output of
-\Biocpkg{TargetSearch} will be written to this folder too.
-
-\item[File Import]: Clicking \emph{NetCDF Data} or \emph{Apex Data} radio buttons will open
-a file select dialog. Choose the files you would like to be processed. You
-may check your selection pressing the \emph{Show}-button.
-
-\item[Baseline Correction]: Clicking \emph{on/off} button will perform
-baseline correction before peak detection. If selected, the \Robject{threshold}
-parameter is a numeric value between 0 and 1. A value of one returns a baseline
-above the noise, 0.5 in the middle of the noise and 0 below the noise. See
-\Rfunction{baselineCorrection} documentation for further details.
-
-\item[Peak Detection]: \emph{Intensity Counts
-threshold} defines the minimum apex intensity incorporated in the analysis.
-A value of 1 would include all peaks. \emph{Mass Range} allows to limit the mass
-values ($m/z$) to be included in the analysis. \emph{Smoothing} averages raw data
-to eliminate some inherent noise leading to multiple peaks otherwise.
-
-\item[Retention Index Correction]: Retention Index Correction is neccessary and
-applied only if you supply NetCDF Data (Apex Data contain already Retention
-Indices). You may \emph{Load} or \emph{Create} the search windows for your RI-Markers
-here.
-
-\item[Library]: A Library (to detect metabolites) usable by \Biocpkg{TargetSearch} contains
-at least information about the metabolite `Name', its expected `RI' and the
-selective masses in its spectrum `SEL\_MASS'. You may \emph{Load} or \emph{Create} one
-yourself using the respective buttons. A more detailed description of
-the file formats can be found in \Rfunction{ImportLibrary}.
-\emph{Search Windows} refers to the allowed RI deviation of your
-metabolites which are narrowed in 3 consecutive searches.
-\emph{No. of top masses} is the number of most abundant masses that will be
-selected from the spectra, besides the selected masses.
-\emph{ExcludeMasses} is only used when masses are obtained from the spectra.
-For example, "126,147:149,160" means that the masses 126, 147, 148, 149,
-and 160 will be excluded from the analysis (unless they are used as selected
-masses).
-
-\item[Normalization]: This selects how the data will be normalized during
-the metabolite search. Options are \Robject{dayNorm}, a day based median
-normalization, \Robject{medianNorm}, normalization using the median of all the intensities
-of a given mass, and \Robject{none}, no normalization at all.
-
-\item[Final Profiles]: Here you may set the parameters used by the functions
-\Rfunction{Profile} and \Rfunction{ProfileCleanUp}. \emph{timesplit} sets an
-RI window that will be used to look for metabolites that could have been redundanly
-identified. \emph{correl. thr.} is the correlation threshold and \emph{min. number
-of correlation samples} is a threshold used to make sure that correlations are
-computed with at least said number of observations. \emph{prioritization}
-is used to resolv ambiguities by taking the metabolite with the most correlating
-masses (\emph{corr. mass}) or the highest similarity \emph{score}.
-Metabolites with corr. mass and score higher than the thresholds will be
-suggested above the one that do not pass the thresholds, which are marked
-as ``unidentified.''
-
-\item[Quantification Mass]: This section is used to generate an intensity
-matrix based on one quantification mass. The quantification mass can
-be specified in the library file (column "QUANT\_MASS") or selected
-automatically by choosing \emph{max intensity} or \emph{max observations}.
-\emph{max intensity} selects the mass with the highest intensity across the
-samples, while \emph{max observation} takes the mass with less missing
-values.
-
-\item[Parameters]: You may \emph{Save} the current parameters as an \texttt{*.RData}
-file or \emph{Load} previously saved parameters to compare the outcome of different settings or
-just repeat the analysis.
-
-\item[Program]: \emph{Run} starts to process all currently selected files using the current
-parameters and saving output to \emph{Working Directory}. \emph{Quit} closes the GUI.
-\end{description}
+\url{https://github.com/acinostroza/TargetSearchGUI}
 
 \section{Untargeted search}
 
