@@ -488,9 +488,9 @@ and \Rfunction{plotSpectra} for further options not covered here.
 
 \section{TargetSearch GUI}
 
-\textbf{WARNING}: The GUI has been deprecated due to lack of interest and time
+\warning{The GUI has been deprecated due to lack of interest and time
 for maintenance. In the next TargetSearch Release it will be removed definitely.
-Please use the normal functions.
+Please use the normal functions.}
 
 We provide a grahical user interface intended to facilitate the use
 of \Biocpkg{TargetSearch} for users unfamiliar with R. Many parameters that
