@@ -17,6 +17,9 @@ best_peak <- function(peaks, RI, method=c('RI', 'Intensity'))
 
 # function to approximate  RT/RI (y vector) from the RI/RT (x vector)
 approxRT <- function(x, y) {
+    # fix corner case in which sd of `y` is zero.
+    if(sd(y) == 0 | sd(x) == 0)
+        return(cbind(xa=mean(x), ya=mean(y)))
     m  <- coef(lm(y ~ x))
     ya <- pretty( m[1] + m[2]*x )
     xa <- (ya - m[1])/m[2]
