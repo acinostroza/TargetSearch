@@ -175,3 +175,106 @@ int peak_detection_ppc(int *x, int ispan, int n, int *ans)
         return 1;
 }
 
+/**
+ * Section for baseline correction
+ */
+
+/**
+ * quantile on sorted data. Implementes R's quantiles type 7.
+ *
+ * @param xs pointer to a sorted vector
+ * @param p the probabily 0 <= p <= 1
+ * @param n length of the vector
+ * @return the computed sample quantile or NAN if error
+ * @note The function does not check whether the vector is actuatlly sorted.
+ *       In addition, NAN's are not handled.
+ */
+double quantile(double *xs, double p, int n)
+{
+#define _assert(x) do{ if(!(x)) return NAN; } while(0)
+	int k = 0;
+	_assert(p >= 0 && p <= 1);
+	/* trivial cases */
+	if(p == 0) return xs[0];
+	if(p == 1) return xs[n - 1];
+
+	while(((double) k) / ((double) n - 1) < p)
+		k++;
+	_assert(k < n && k > 0);
+	double pk1 = ((double) (k-1)) / ((double) n - 1);
+	return xs[k - 1] + (n-1) * (xs[k] - xs[k-1]) * (p - pk1);
+#undef _assert
+}
+
+/**
+ * find indices from a to b in a sorted vector.
+ *
+ * Find indices i* = min(i), j* = max(j), such that
+ *    x[i] > a && x[j] < b, if eq == 0
+ *    x[i] >= a && x[j] <= b, if eq == 1
+ * where i,j = 0, ..., n-1
+ *
+ * @param x a sorted vector
+ * @param a the lower limit
+ * @param b the upper limit
+ * @param n the length of x
+ * @param eq the equivalence parameter (see above)
+ * @param pa a pointer to the resulting index pa (see above)
+ * @param pb a pointer to the resulting index pb (see above)
+ */
+
+void find(double *x, double a, double b, int n, int eq, int *pa, int *pb)
+{
+	int flag = 0;
+	static int ii = 0, jj = 0;
+
+	ii = findInterval(x, n, a, TRUE, FALSE, ii, &flag);
+	if(eq == 1 && flag == 0 && a == x[ii - 1])
+		ii--;
+
+	jj = findInterval(x, n, b, TRUE, FALSE, jj, &flag);
+	if(eq == 0 && x[jj] == b)
+		jj--;
+	*pa = ii;
+	*pb = jj;
+}
+
+/**
+ * compute sliding quantiles.
+ *
+ * @param x intensity vector.
+ * @param t retention time vector (in arbitrary units, usually seconds).
+ * @param qntl the quantile probability to use. 0.5 is the recommended value.
+ * @param win the time window around a particular time point (half window to
+ *        the left, half window to the right).
+ * @param step compute the quantile every `step` steps. This parameter is used
+ *        to speed up the computations.
+ * @param n the length of vectors `x` and `t`. There is no check that their
+ *        length is actually equal.
+ * @param ans pointer to where the quantiles will be stored.
+ * @return the length of the `ans` vector.
+ *
+ * @note
+ *    It is expected that enough memory has been allocated in the array `ans`.
+ *    To be on the safe side, allocate memory to the same length of vectors
+ *    `x` and `t`.
+ */
+int qntl_win(double *x, double *t, double qntl, double win, int step, int n, double *ans)
+{
+	int a, b, eq = 1, len, k = 0;
+	double *tmp = Calloc(n, double);
+
+	for(int i = 0; i < n; i+= step) {
+		find(t, t[i] - win / 2.0, t[i] + win / 2.0, n, eq, &a, &b);
+		len = b - a + 1;
+		if(len <= 0) {
+			ans[k++] = NAN;
+			continue;
+		}
+		Memcpy(tmp, x + a, len);
+		R_rsort(tmp, len);
+		ans[k++] = quantile(tmp, qntl, len);
+	}
+	Free(tmp);
+	return k;
+}
