@@ -30,16 +30,16 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 		# mass range has no effect, so we ignore
 		massRange <- Peaks$massRange
 
-		# check that the mass of rimLimits is within the mass range
-		if(any(mass < massRange[1] | mass > massRange[2]))
-			stop(sprintf(
+		if(is.null(rimLimits) == FALSE) {
+			# check that the mass of rimLimits is within the mass range
+			if(any(mass < massRange[1] | mass > massRange[2]))
+				stop(sprintf(
 					paste("m/z of markers out of range:",
 						" => file: '%s' | m/z range: %d, %d | m/z out of range: %s",
 						sep="\n"),
 					manyFiles[i], massRange[1], massRange[2],
 					paste(mass[mass < massRange[1] | mass > massRange[2]], collapse=", ")))
 
-		if(is.null(rimLimits) == FALSE) {
 			fameTimes <- findRetentionTime(Peaks$Time, Peaks$Peaks[, mass - massRange[1] + 1], rLimits)
 			RIcheck[,i] <- fameTimes
 			riInde <- rt2ri(Peaks$Time, fameTimes, standard)
