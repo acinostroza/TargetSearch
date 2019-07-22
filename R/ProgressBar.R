@@ -7,21 +7,12 @@
 #  - winProgressBar option removed. Reason: R CMD check doesn't work in linux.
 
 ProgressBar <- function(title, label) {
-	pb <- NULL
-	if(getOption("menu.graphics")) {
-		pb <- tkProgressBar(title, label)
-	} else {
-		message("  ", title)
-		pb <- txtProgressBar(style = 3, width = 72)
-	}
+	message("  ", title)
+	pb <- txtProgressBar(style = 3, width = 72)
 	return(pb)
 }
 
 setProgressBar <-
 function(pb, value, title, label) {
-	if(getOption("menu.graphics")) {
-		setTkProgressBar(pb, value, title, label)
-	} else {
-		setTxtProgressBar(pb, value)
-	}
+	setTxtProgressBar(pb, value)
 }
