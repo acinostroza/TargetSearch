@@ -60,4 +60,22 @@ is_nullOrNA <- function(x)
     e <- sprintf("\\.(%s)$", e)
     str_remove(files, regex(e, ignore_case=TRUE))
 }
+
+#' add file extension
+#'
+#' add file extensions to extension trimmed file names and checks if
+#' the file exists. In case of ambiguity, takes the first
+#' @param a list of file paths
+#' @param a list of file extensions
+#' @return take the first path/extension combo that exists, if none exists
+#'         take the first.
+.add_file_ext <- function(files, exts)
+{
+    f <- lapply(exts, function(e) paste(files, e, sep="."))
+    f <- lapply(seq(files), function(i) sapply(f, getElement, i))
+    sapply(f, function(z) {
+               y <- file.exists(z)
+               if(all(!y)) z[1] else z[y][1] })
+}
+
 # vim: set ts=4 sw=4 et:
