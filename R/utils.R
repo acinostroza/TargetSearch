@@ -45,4 +45,19 @@ is_nullOrNA <- function(x)
     file.path(new, basename(old))
 }
 
+#' trim file extension
+#'
+#' remove known file extensions from file path. if none found, then does
+#' not do anything.
+#'
+#' @param files file names
+#' @param exts  file extensions to trim. the extensions are converted to
+#'              to regular expressions
+#' @return files with extension trimmed.
+.trim_file_ext <- function(files, exts)
+{
+    e <- paste(exts, collapse="|")
+    e <- sprintf("\\.(%s)$", e)
+    str_remove(files, regex(e, ignore_case=TRUE))
+}
 # vim: set ts=4 sw=4 et:
