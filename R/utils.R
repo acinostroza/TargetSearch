@@ -6,3 +6,43 @@ is_nullOrNA <- function(x)
     if(any(is.na(x))) return(TRUE)
     FALSE
 }
+
+#' like `dirname`, but checks if all dirs are the same
+#'
+#' @param x a vector of file paths
+#' @return the dirname for each member of x. If all names are equal, return
+#'         the unique value
+.dirname <- function(x)
+{
+    ret <- dirname(x)
+    unq <- unique(ret)
+    if(length(unq) == 1)
+        return(unq)
+    return(ret)
+}
+
+#' update file path
+#'
+#' Updates the path of new files. If the length of new is 1, then apply the
+#' the same path to all files. if NULL or NA, return old paths
+#' Assumes that both length are equal or the paths can be recycled. Raises
+#' and error if it is not possible
+#'
+#' @param old a vector of file paths
+#' @param new a vector of new paths
+#' @return the updated file paths
+.setpath <- function(old, new)
+{
+    if(is_nullOrNA(new))
+        return(old)
+    if(length(old) %% length(new) != 0)
+        stop("lengths must be multiples of each other")
+    if(length(new) > length(old)) {
+        warning('length of `new` is longer than `old`. Extra elements will be ignored')
+        new <- new[seq(length(old))]
+    }
+    new <- rep(new, length(old)/length(new))
+    file.path(new, basename(old))
+}
+
+# vim: set ts=4 sw=4 et:
