@@ -1,34 +1,30 @@
 #
 # tsSample class methods
 #
+._cdf_ext <- c('nc4', 'cdf')
+
 setGeneric("CDFfiles", function(obj) standardGeneric("CDFfiles"))
 setMethod("CDFfiles", "tsSample", function(obj) {
-    if(obj@CDFpath != ".")
-        file.path(obj@CDFpath,obj@CDFfiles)
-    else
-        obj@CDFfiles
-  })
+    .add_file_ext(obj@CDFfiles, ._cdf_ext)
+})
 
 setGeneric("CDFfiles<-", function(obj, value) standardGeneric("CDFfiles<-"))
 setReplaceMethod("CDFfiles", "tsSample", function(obj, value) {
-	obj@CDFfiles <- basename(value)
-	validObject(obj)
-	obj
+    obj@CDFfiles <- .trim_file_ext(value, ._cdf_ext)
+    validObject(obj)
+    obj
 })
 
 setGeneric("RIfiles", function(obj) standardGeneric("RIfiles"))
 setMethod("RIfiles", "tsSample", function(obj) {
-	if(obj@RIpath != ".")
-		file.path(obj@RIpath,obj@RIfiles)
-	else
-	obj@RIfiles
+    obj@RIfiles
 })
 
 setGeneric("RIfiles<-", function(obj, value) standardGeneric("RIfiles<-"))
 setReplaceMethod("RIfiles", "tsSample", function(obj, value) {
-	obj@RIfiles <- basename(value)
-	validObject(obj)
-	obj
+    obj@RIfiles <- value
+    validObject(obj)
+    obj
 })
 
 setGeneric("sampleNames", function(obj) standardGeneric("sampleNames"))
@@ -50,19 +46,21 @@ setReplaceMethod("sampleDays", "tsSample", function(obj, value) {
 })
 
 setGeneric("CDFpath", function(obj) standardGeneric("CDFpath"))
-setMethod("CDFpath", "tsSample", function(obj) obj@CDFpath )
+setMethod("CDFpath", "tsSample", function(obj) .dirname(obj@CDFfiles) )
 setGeneric("CDFpath<-", function(obj, value) standardGeneric("CDFpath<-"))
 setReplaceMethod("CDFpath", "tsSample", function(obj, value) {
-	obj@CDFpath <- value
-	obj
+    obj@CDFfiles <- .setpath(obj@CDFfiles, value)
+    validObject(obj)
+    obj
 })
 
 setGeneric("RIpath", function(obj) standardGeneric("RIpath"))
-setMethod("RIpath", "tsSample", function(obj) obj@RIpath )
+setMethod("RIpath", "tsSample", function(obj) .dirname(obj@RIpath) )
 setGeneric("RIpath<-", function(obj, value) standardGeneric("RIpath<-"))
 setReplaceMethod("RIpath", "tsSample", function(obj, value) {
-	obj@RIpath <- value
-	obj
+    obj@RIfiles <- .setpath(obj@RIfiles, value)
+    validObject(obj)
+    obj
 })
 
 setGeneric("sampleData", function(obj) standardGeneric("sampleData"))
@@ -74,14 +72,11 @@ setReplaceMethod("sampleData", "tsSample", function(obj, value) {
 	obj
 })
 
-
 setMethod("length", "tsSample", function(x) length(x@CDFfiles))
 setMethod("show", "tsSample", function(object) {
 	cat("An object of class 'tsSample':\n")
-	cat(" Number of samples:  ", length(object), "\n")
-	cat(" CDF files directory:", object@CDFpath, "\n")
-	cat(" RI files directory: ", object@RIpath, "\n")
-	cat(" Measurement days:   ", unique(sampleDays(object)), "\n")
+	cat(" Total samples : ", length(object), "\n")
+	cat(" Msrt. days    : ", unique(sampleDays(object)), "\n")
 	cat("\nSample Data:\n")
 	print(head(sampleData(object), 5))
 	if(length(object) > 5) cat("    ", length(object) - 5,"lines more...\n")
@@ -99,6 +94,8 @@ setValidity("tsSample", function(object) {
 		paste("Unequal number of CDF files and Sample Data: ", n,", ", nrow(object@data), sep = "")
 	else if(any(duplicated(object@Names)))
 		paste("sample names must be unique. duplicated names found")
+	else if(!all(object@Names == rownames(object@data)))
+		paste("Invalid object data. Column `Names` must be equal in metadata")
 	else TRUE
 })
 
@@ -134,32 +131,29 @@ setMethod("$", "tsSample", function(x, name) {
 
 setMethod("initialize",
           "tsSample",
-          function(.Object, Names    = character(0), CDFfiles = character(0),
-                            RIfiles  = character(0), CDFpath  = ".", RIpath   = ".",
-                            days     = character(0), data     = data.frame(),
-                            ftype    = "binary") {
-            if (length(CDFfiles) > 0) {
-                if(length(Names) == 0)
-                    Names <- gsub(".cdf", "", CDFfiles, ignore.case = T)
-                if(length(RIfiles) == 0) {
-                    ftype <- pmatch(ftype, c("binary","text"))[1]
-                    stopifnot(!is.na(ftype))
-                    ext <- c("dat","txt")[ftype]
-                    RIfiles <- sub("cdf$", ext, paste("RI_", CDFfiles, sep = ""), ignore.case = T)
-                }
-                if(length(days) == 0)
-                    days <- getDays(CDFfiles)
-                if(all(dim(data) == 0))
-                    data <- data.frame(Names = Names, CDF_FILE = CDFfiles,
-                                       MEASUREMENT_DAY = days, RI_FILE = RIfiles,
-                                       stringsAsFactors = FALSE)
+          function(.Object, CDFfiles, Names = NULL, RIfiles = NULL, days = NULL, data = NULL, ftype = "binary")
+          {
+            if(is.null(Names))
+                Names <- .trim_file_ext(basename(CDFfiles), ._cdf_ext)
+
+            if(is.null(RIfiles)) {
+                ftype <- match.arg(ftype)
+                ext <- c(binary="dat",text="txt")[ftype]
+                RIfiles <- sub("cdf$", ext, paste("RI_", CDFfiles, sep = ""), ignore.case = T)
             }
+            if(is.null(days))
+                days <- getDays(CDFfiles)
+
+            if(is.null(data))
+                data <- data.frame(Names = Names, stringsAsFactors = FALSE, row.names = Names)
+            else
+                rownames(data) <- Names
 
             .Object@Names    <- Names
-            .Object@CDFfiles <- CDFfiles
+            .Object@CDFfiles <- .trim_file_ext(CDFfiles, ._cdf_ext)
             .Object@RIfiles  <- RIfiles
-            .Object@CDFpath  <- CDFpath
-            .Object@RIpath   <- RIpath
+            .Object@CDFpath  <- "" # unused
+            .Object@RIpath   <- "" # unused
             .Object@days     <- days
             .Object@data     <- data
             validObject(.Object)
@@ -188,6 +182,31 @@ setReplaceMethod("fileFormat", "tsSample", function(obj, value) {
 		obj@data$RI_FILE <- obj@RIfiles
 	validObject(obj)
 	obj
+})
+
+# warn if tsSample is old
+.check_ts_sample <- function(obj, quiet=FALSE)
+{
+    if(all(c(obj@CDFpath, obj@RIpath) == ""))
+        return(TRUE)
+    if(!quiet)
+        warning("Old `tsSample` object detected. Update it by calling `tsUpdate`")
+    return(FALSE)
+}
+
+setGeneric("tsUpdate", function(obj) standardGeneric("tsUpdate"))
+setMethod("tsUpdate", "tsSample", function(obj) {
+    if(.check_ts_sample(obj, TRUE))
+        return(obj)
+    obj@CDFfiles <- .setpath(obj@CDFfiles, obj@CDFpath)
+    obj@RIfiles <- .setpath(obj@RIfiles, obj@RIpath)
+
+    obj@CDFfiles <- .trim_file_ext(obj@CDFfiles, ._cdf_ext)
+    obj@RIfiles <- .trim_file_ext(obj@RIfiles, ._cdf_ext)
+    obj@CDFpath <- obj@RIpath <- ""
+    rownames(obj@data) <- obj@Names
+    validObject(obj)
+    obj
 })
 
 # vim: set ts=4 sw=4 et:
