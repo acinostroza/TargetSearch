@@ -1,51 +1,11 @@
 # auxiliary functions to NetCDFPeakFinding and peakCDFextraction
 
-# test whether the mass values are integers of double.
-# if double, then checks whether they correspond with high mass
-# accuracy data or not. If not, the mz values are rounded
-# to the closes integer value.
-
-.check.mz.precision <- function(x, force=FALSE) {
-	mz <- sample(x$mz, min(c(5000, length(x$mz))))
-	z <- sum(abs(mz - round(mz)))
-	w <- all.equal(z, 0L)
-
-	if(is.logical(w)) {
-		if(w) {
-			return(x)
-		}
-	}
-
-	if(force) {
-		x$mz <- as.integer(round(x$mz))
-		return(.cdffix(x, max_assigned=100000L))
-	}
-
-	k <- which.max(x$point_count)
-	mz <- x$mz[ x$scanindex[k] + c(1:x$point_count[k])]
-	z  <- sum(diff(mz) < 0.1)
-	if( z / x$point_count[k] < 0.05 ) {
-		x$mz <- as.integer(round(x$mz))
-		res <- .cdffix(x)
-		return(res)
-	}
-	else {
-		return(NULL)
-	}
-}
-
-# max_assigned: number of m/z values assigned to the same integer (to detect
-#              high mass accuracy)
-.cdffix <- function(x, max_assigned=3L) {
-	.Call(c_cdffix, x, max_assigned, PACKAGE="TargetSearch")
-}
-
-# function to open a CDF file (version 3) and perform all checks
-#  1. m/z must be integer
-#  2. intensity must be integer
+# function to open a CDF file (version 3)
+#  1. m/z can be integer or double. Data will be converted to nominal mass.
+#  2. intensity must be integer. Check if an overflow could occurr (R uses 32-bit integers)
 #  3. data inconsistencies
 
-.open.ncdf <- function(cdfFile, force=FALSE) {
+.open.ncdf <- function(cdfFile) {
 	nc <- nc_open(cdfFile)
 	ncData <- list()
 	ncData$point_count <- ncvar_get(nc, "point_count")
@@ -61,13 +21,10 @@
 		stop('Unable to processs file. Aborting.')
 	}
 
-	ncData$intensity <- as.integer(ncData$intensity)
-
-	ncData <- .check.mz.precision(ncData, force)
-	if(is.null(ncData)) {
-		stop(paste("Error processing file '", cdfFile, "'. It seems to contains",
-			"high mass accuracy data.", sep=" "))
-	}
+	# check intensity range
+	if(max(ncData$intensity) > 2147483647)
+		stop(paste("File", cdfFile, ": Intensity values cannot be coerced as",
+			"integers as they will create an integer overflow. Aborting."))
 
 	return(ncData)
 }
