@@ -24,7 +24,7 @@ peak_detection_main(SEXP Method, SEXP ncData, SEXP Window, SEXP Search,
 
 	peak_detection(method[0], mat, win, search, min_int, ans);
 
-	free_cdf(nc);
+	free_ncdf(nc);
 	free_mat(mat);
 	free_mat(ans);
 	UNPROTECT(1);

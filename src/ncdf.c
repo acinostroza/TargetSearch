@@ -70,9 +70,10 @@ matrix_t * from_matrix(SEXP Matrix)
 	return ret;
 }
 
-/* transform R object into a struct ncdf_t. It expects an already fixed cdf list
- * in which masses and intensities are integers. remember to call `Free' on the
- * generated object
+/* transform R object into a struct ncdf_t. It expects that the m/z and intensity
+ * values have been already rounded in R (as it is not necessary to implement this
+ * in C).
+ * To free the memory, call free_ncdf
  */
 ncdf_t * new_ncdf(SEXP NCDF)
 {
@@ -85,6 +86,7 @@ ncdf_t * new_ncdf(SEXP NCDF)
 	SEXP Intensity  = get(NCDF, "intensity");
 	cdf->nscans     = GET_LENGTH(RT);
 	cdf->npoints    = GET_LENGTH(MZ);
+
 	/* retention index might be null if not set */
 	cdf->ri = isNull(RI) ? NULL : REAL(AS_NUMERIC(RI));
 	cdf->rt = REAL(AS_NUMERIC(RT));
@@ -97,18 +99,15 @@ ncdf_t * new_ncdf(SEXP NCDF)
 }
 
 /******************************************************************************
- * Functions to correct netCDF data when mass values are not integers as
- * expected by TargetSearch. 'cdffix_core' assign each mass value to the
- * nearest integer taking the highest intensity in case of ambiguities.
- * There is a limit in the number of ambiguities give by constant MAX_ASSIGNED
- * (currently 3).
- *
+ * Functions to transform netCDF data to nominal mass when the mass values are
+ * not integers. 'cdf_to_nominal' assign each mass value to the nearest integer
+ * summing up the intensities of duplicated mass values.
  * Note:
- * This functions are not intended for high mass accuracy data.
+ * These functions are intended for centroid data, though it may also work
+ * for profile data. There is of course loss of information due to the rounding.
  ******************************************************************************/
 
-/* allocate a new ncdf_t object using transient allocation methods.
- * Note that 'new_ncdf' uses shared memory */
+/* allocate a new ncdf_t object using transient allocation methods. */
 static ncdf_t *
 alloc_cdf(int ns, int np)
 {
@@ -126,9 +125,11 @@ alloc_cdf(int ns, int np)
 	return x;
 }
 
-/* free allocated ncdf_t object. To be used in an transiently allocation object */
+/* free allocated ncdf_t object. checks whether transiently allocation memory
+ * was used, ie, does not free shared memory.
+ */
 void
-free_cdf(ncdf_t *x)
+free_ncdf(ncdf_t *x)
 {
 	if(x == NULL)
 		return;
@@ -143,54 +144,37 @@ free_cdf(ncdf_t *x)
 	Free(x);
 }
 
-/* main function to fix a cdf data */
+/* main function to transform CDF data to nominal mass. Duplicated intensities are
+ * summed up */
 static int
-cdffix_core(ncdf_t *dest, ncdf_t *src, int max_assigned)
+nominal_core(ncdf_t *dest, ncdf_t *src)
 {
-	int i, j, k, p=0, count = 0;
-	int *scan_idx = src->scan_idx, *p_count = src->p_count;
-	int *in = src->in, *m = src->mass;
-	ncdf_t *x = dest;
+	int k = 0;
 
-	for(i = 0; i < x->nscans; i++) {
-		count = x->p_count[i] = 0;
-		for(j = 0; j < p_count[i]; j++) {
-			k = j + scan_idx[i];
+	for(int i = 0; i < src->nscans; i++) {
+		int si = src->scan_idx[i];
+		int pc = src->p_count[i];
 
-			if(p == 0) {
-				x->mass[p] = m[k];
-				x->in[p]   = in[k];
-				x->p_count[i]++;
-				p++;
-				continue;
+		for(int j = si; j < si + pc; j++) {
+			if(j == si || src->mass[j] != src->mass[j - 1]) {
+				dest->mass[k] = src->mass[j];
+				dest->in[k] = src->in[j];
+				dest->p_count[i]++;
+				k++;
 			}
-
-			if(m[k] == x->mass[p-1]) {
-				count++;
-				/* abort function when there're too many
-				 * masses assigned to the same integer */
-				if(count >= max_assigned)
-					return FALSE;
-
-				if(in[k] > x->in[p-1])
-					x->in[p-1] = in[k];
-			} else {
-				x->mass[p] = m[k];
-				x->in[p]   = in[k];
-				x->p_count[i]++;
-				count = 0;
-				p++;
+			else {
+				dest->in[k - 1] += src->in[j];
 			}
 		}
 	}
-	x->npoints = p;
+	dest->npoints = k;
+	dest->scan_idx[0] = 0;
 
-	x->scan_idx[0] = 0;
-	for(i = 0; i < x->nscans; i++) {
+	for(int i = 0; i < dest->nscans; i++) {
 		if(i > 0)
-			x->scan_idx[i] = x->scan_idx[i-1] + x->p_count[i-1];
-		x->ri[i] = (src->ri != NULL) ? src->ri[i] : 0.0;
-		x->rt[i] = src->rt[i];
+			dest->scan_idx[i] = dest->scan_idx[i-1] + dest->p_count[i-1];
+		dest->ri[i] = (src->ri != NULL) ? src->ri[i] : 0.0;
+		dest->rt[i] = src->rt[i];
 	}
 	return TRUE;
 }
@@ -229,12 +213,12 @@ SEXP ncdf_sexp(ncdf_t *x)
 /* .Call interface to R  */
 /*************************/
 
-/* Fix a CDF file with non-integer mass values (no high mass accuracy)
+/* Transform a CDF to nominal mass, ie, non-integer mass values
  * Args:
  *   NCDF: a list of named elements holding the CDF structure:
  *      rt : Retention time (double)
  *      ri : Retention time index (double)
- *      mz: m/z values (integer)
+ *      mz: m/z values (integer, duplicated values allowed)
  *      intensity: intensity values (integer)
  *      scanindex: scan index (integer)
  *      point_count: number of points per scan (integer).
@@ -248,20 +232,21 @@ SEXP ncdf_sexp(ncdf_t *x)
  */
 
 SEXP
-cdffix(SEXP NCDF, SEXP MA)
+nominal(SEXP NCDF)
 {
-	ncdf_t *dst, *nc = new_ncdf(NCDF);
-	SEXP  res  = R_NilValue;
-	dst = alloc_cdf(nc->nscans, nc->npoints);
-	int max_assigned = isNull(MA) ? 10000000 : INTEGER(MA)[0];
+	ncdf_t *src = new_ncdf(NCDF);
+	ncdf_t *dst = alloc_cdf(src->nscans, src->npoints);
+	SEXP res = R_NilValue;
 
-	if(cdffix_core(dst, nc, max_assigned) == TRUE)
+	if(nominal_core(dst, src) == TRUE)
 		res = ncdf_sexp(dst);
-	free_cdf(dst);
 
-	Free(nc);
+	free_ncdf(dst);
+	free_ncdf(src);
+
 	if(!isNull(res))
 		UNPROTECT(2); /* unprotects call to ncdf_sexp */
+
 	return res;
 }
 

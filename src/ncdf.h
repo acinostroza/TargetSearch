@@ -21,10 +21,10 @@ typedef struct
 matrix_t * get_intensity_mat(ncdf_t *);
 ncdf_t   * new_ncdf(SEXP);
 matrix_t * from_matrix(SEXP);
-void free_cdf(ncdf_t *);
+void free_ncdf(ncdf_t *);
 
-/* fix a CDF with non-integer mass values (aka non-nominal mass) */
-SEXP cdffix(SEXP, SEXP);
+/* transform a CDF with non-integer mass values to non-nominal mass */
+SEXP nominal(SEXP);
 
 /* get the intensity matrix of a NCDF object */
 SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange);

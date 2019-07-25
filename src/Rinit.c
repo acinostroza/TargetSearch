@@ -27,7 +27,7 @@ __declspec(dllexport)
 static const R_CallMethodDef R_CallDef[] = {
         {"find_peaks", (DL_FUNC)&find_peaks, 8},
         {"ncdf_to_matrix", (DL_FUNC)&ncdf_to_matrix, 2},
-        {"cdffix", (DL_FUNC)&cdffix, 2},
+        {"nominal", (DL_FUNC)&nominal, 1},
         {"peak_detection_main", (DL_FUNC)&peak_detection_main, 6},
         {"baseline", (DL_FUNC)&baseline, 5},
         {NULL, NULL, 0},
