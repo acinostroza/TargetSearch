@@ -26,6 +26,14 @@
 		stop(paste("File", cdfFile, ": Intensity values cannot be coerced as",
 			"integers as they will create an integer overflow. Aborting."))
 
+	if(!is.integer(ncData$intensity))
+		ncData$intensity <- as.integer(ncData$intensity)
+
+	# check if we need to transform to nominal mass
+	if(!is.integer(ncData$mz)) {
+		ncData$mz <- round(ncData$mz)
+		ncData <- .Call(c_nominal, ncData)
+	}
 	return(ncData)
 }
 
