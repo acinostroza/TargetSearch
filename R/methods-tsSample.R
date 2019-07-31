@@ -40,9 +40,10 @@ setGeneric("sampleDays", function(obj) standardGeneric("sampleDays"))
 setMethod("sampleDays", "tsSample", function(obj) obj@days )
 setGeneric("sampleDays<-", function(obj, value) standardGeneric("sampleDays<-"))
 setReplaceMethod("sampleDays", "tsSample", function(obj, value) {
-	obj@days <- value
-	validObject(obj)
-	obj
+    n <- length(obj@CDFfiles)
+    obj@days <- if(length(value) == 1) rep(value, n) else value
+    validObject(obj)
+    obj
 })
 
 setGeneric("CDFpath", function(obj) standardGeneric("CDFpath"))
@@ -142,7 +143,9 @@ setMethod("initialize",
                 RIfiles <- sub("cdf$", ext, paste("RI_", CDFfiles, sep = ""), ignore.case = T)
             }
             if(is.null(days))
-                days <- getDays(CDFfiles)
+                days <- getDays(basename(CDFfiles))
+            else if(length(days) == 1)
+                days <- rep(days, length(CDFfiles))
 
             if(is.null(data))
                 data <- data.frame(Names = Names, stringsAsFactors = FALSE, row.names = Names)
