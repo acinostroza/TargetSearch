@@ -65,8 +65,8 @@ is_nullOrNA <- function(x)
 #'
 #' add file extensions to extension trimmed file names and checks if
 #' the file exists. In case of ambiguity, takes the first
-#' @param a list of file paths
-#' @param a list of file extensions
+#' @param files a list of file paths
+#' @param exts a list of file extensions
 #' @return take the first path/extension combo that exists, if none exists
 #'         take the first.
 .add_file_ext <- function(files, exts)
@@ -78,4 +78,20 @@ is_nullOrNA <- function(x)
                if(all(!y)) z[1] else z[y][1] })
 }
 
+#' make RI files
+#'
+#' Takes a list of CDF files and create a list of RI files by appending
+#' RI_ to the file. It takes care of paths.
+#' @param files a list of file paths
+#' @param exts a list of file extensions
+#' @return take the first path/extension combo that exists, if none exists
+.make_RI_files <- function(files, type, exts)
+{
+    bs <- basename(files)
+    dr <- dirname(files)
+    mapply(function(d, b) {
+              z <- sprintf("RI_%s.%s", .trim_file_ext(b, exts), type)
+              if(d == ".") z else file.path(d, z)
+        }, dr, bs, USE.NAMES=FALSE)
+}
 # vim: set ts=4 sw=4 et:

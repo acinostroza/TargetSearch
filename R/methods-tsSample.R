@@ -1,6 +1,8 @@
 #
 # tsSample class methods
 #
+
+# valid CDF extensions
 ._cdf_ext <- c('nc4', 'cdf')
 
 setGeneric("CDFfiles", function(obj) standardGeneric("CDFfiles"))
@@ -31,9 +33,11 @@ setGeneric("sampleNames", function(obj) standardGeneric("sampleNames"))
 setMethod("sampleNames", "tsSample", function(obj) obj@Names )
 setGeneric("sampleNames<-", function(obj, value) standardGeneric("sampleNames<-"))
 setReplaceMethod("sampleNames", "tsSample", function(obj, value) {
-	obj@Names <- value
-	validObject(obj)
-	obj
+    obj@Names <- value
+    # make sure rownames are equal
+    rownames(obj@data) <- obj@Names
+    validObject(obj)
+    obj
 })
 
 setGeneric("sampleDays", function(obj) standardGeneric("sampleDays"))
@@ -56,7 +60,7 @@ setReplaceMethod("CDFpath", "tsSample", function(obj, value) {
 })
 
 setGeneric("RIpath", function(obj) standardGeneric("RIpath"))
-setMethod("RIpath", "tsSample", function(obj) .dirname(obj@RIpath) )
+setMethod("RIpath", "tsSample", function(obj) .dirname(obj@RIfiles) )
 setGeneric("RIpath<-", function(obj, value) standardGeneric("RIpath<-"))
 setReplaceMethod("RIpath", "tsSample", function(obj, value) {
     obj@RIfiles <- .setpath(obj@RIfiles, value)
@@ -68,9 +72,11 @@ setGeneric("sampleData", function(obj) standardGeneric("sampleData"))
 setMethod("sampleData", "tsSample", function(obj) obj@data )
 setGeneric("sampleData<-", function(obj, value) standardGeneric("sampleData<-"))
 setReplaceMethod("sampleData", "tsSample", function(obj, value) {
-	obj@data <- value
-	validObject(obj)
-	obj
+    obj@data <- value
+    # make sure rownames are equal
+    rownames(obj@data) <- obj@Names
+    validObject(obj)
+    obj
 })
 
 setMethod("length", "tsSample", function(x) length(x@CDFfiles))
@@ -96,7 +102,7 @@ setValidity("tsSample", function(object) {
 	else if(any(duplicated(object@Names)))
 		paste("sample names must be unique. duplicated names found")
 	else if(!all(object@Names == rownames(object@data)))
-		paste("Invalid object data. Column `Names` must be equal in metadata")
+		paste("Invalid object data. Rownames must be equal in metadata")
 	else TRUE
 })
 
@@ -132,25 +138,32 @@ setMethod("$", "tsSample", function(x, name) {
 
 setMethod("initialize",
           "tsSample",
-          function(.Object, CDFfiles, Names = NULL, RIfiles = NULL, days = NULL, data = NULL, ftype = "binary")
+          function(.Object, CDFfiles, Names, RIfiles, days, data,
+                   CDFpath, RIpath, ftype = c("binary", "text"))
           {
-            if(is.null(Names))
+            if(missing(Names))
                 Names <- .trim_file_ext(basename(CDFfiles), ._cdf_ext)
 
-            if(is.null(RIfiles)) {
+            if(missing(RIfiles)) {
                 ftype <- match.arg(ftype)
                 ext <- c(binary="dat",text="txt")[ftype]
-                RIfiles <- sub("cdf$", ext, paste("RI_", CDFfiles, sep = ""), ignore.case = T)
+                RIfiles <- .make_RI_files(CDFfiles, ext, ._cdf_ext)
             }
-            if(is.null(days))
+            if(missing(days))
                 days <- getDays(basename(CDFfiles))
             else if(length(days) == 1)
                 days <- rep(days, length(CDFfiles))
 
-            if(is.null(data))
+            if(missing(data))
                 data <- data.frame(Names = Names, stringsAsFactors = FALSE, row.names = Names)
             else
                 rownames(data) <- Names
+
+            # update paths
+            if(!missing(CDFpath))
+                CDFfiles <- .setpath(CDFfiles, CDFpath)
+            if(!missing(RIpath))
+                RIfiles <- .setpath(RIfiles, RIpath)
 
             .Object@Names    <- Names
             .Object@CDFfiles <- .trim_file_ext(CDFfiles, ._cdf_ext)

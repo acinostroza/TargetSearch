@@ -56,8 +56,8 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{Names}:}{\code{"character"}, the sample names.}
     \item{\code{CDFfiles}:}{\code{"character"}, the list of CDF file names. }
     \item{\code{RIfiles}:}{\code{"character"}, the list of RI file names. }
-    \item{\code{CDFpath}:}{\code{"character"}, CDF files path. }
-    \item{\code{RIpath}:}{\code{"character"}, RI file path. }
+    \item{\code{CDFpath}:}{\code{"character"}, CDF files path. Deprecated. See Notes. }
+    \item{\code{RIpath}:}{\code{"character"}, RI file path. Deprecated. See Notes. }
     \item{\code{days}:}{\code{"character"}, measurement days.}
     \item{\code{data}:}{\code{"data.frame"}, additional sample information.}
   }
@@ -89,6 +89,13 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     be unique. This allows sample selection by using sample identifiers as well
     as indices. Also, if columns are selected, the output will be either a vector or
     a \code{data.frame} depending on whether one or more columns were selected.
+    More over, it is required that the rownames of the \code{data} slot are
+    equal to the sample names slots. This is handled internally.
+
+    The slots \code{CDFpath} and \code{RIpath} are deprecated and not used.
+    However, the methods to set or get the paths will still work. The file
+    paths is stored on the \code{CDFfiles} and \code{RIfiles} slots.
+
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{
@@ -100,15 +107,24 @@ showClass("tsSample")
 # get a list of CDF files from a directory
 require(TargetSearchData)
 CDFpath <- system.file("gc-ms-data", package = "TargetSearchData")
-cdffiles <- dir(CDFpath, "cdf")
+cdffiles <- dir(CDFpath, "cdf", full=TRUE)
 
 # define the RI file path 
 RIpath  <- "."
 
+# create a tsSample object with minimal info
+sampleDescription <- new("tsSample", CDFfiles = cdffiles, RIpath = RIpath)
+
+## ## ## ## ##
+
+# Alternatively, the CDF path and CDF file names can be given separatedly
+# (this was the old TargetSearch behavior)
+cdffiles <- basename(cdffiles)
+
 # create the sample object
 sampleDescription <- new("tsSample", CDFfiles = cdffiles, CDFpath = CDFpath, RIpath = RIpath) 
 
-##
+## ## ## ## ##
 
 # More parameters could be defined:
 # define the RI files and the RI path
@@ -133,8 +149,8 @@ sampleDescription <- new("tsSample", Names = smp_names, CDFfiles = cdffiles, CDF
 sampleNames(sampleDescription) <- paste("Sample", 1:length(sampleDescription), sep = "_")
 
 # chang the file paths (relative to the working path)
-CDFpath(sampleDescription) <- "my_cdfs/"
-RIpath(sampleDescription)  <- "my_RIs/"
+CDFpath(sampleDescription) <- "my_cdfs"
+RIpath(sampleDescription)  <- "my_RIs"
 
 ## sample subsetting.
 # select samples 1, 3 and 5
@@ -149,5 +165,10 @@ RIpath(sampleDescription)  <- "my_RIs/"
 # or
 (group <- sampleDescription[, 'GROUP'])
 
+## change the measurement days (sets the same day for all samples)
+sampleDays(sampleDescription) <- "1"
+
+## Note: the length of `measurement days` variable must be 1 or equal
+## to the number of samples, otherwise an error will be thrown
 }
 \keyword{classes}
