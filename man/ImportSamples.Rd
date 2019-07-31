@@ -72,8 +72,8 @@ sampleDescription <- ImportSamples(sample.file, CDFpath = cdfpath, RIpath = RIpa
 sampleNames(sampleDescription) <- paste("Sample", 1:length(sampleDescription), sep = "_")
 
 # change the file paths (relative to the working path)
-CDFpath(sampleDescription) <- "my_cdfs/"
-RIpath(sampleDescription)  <- "my_RIs/"
+CDFpath(sampleDescription) <- "my_cdfs"
+RIpath(sampleDescription)  <- "my_RIs"
 
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }

@@ -42,8 +42,7 @@ function(path, files)
 `ImportSamples` <-
 function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...)
 {
-    ftype <- pmatch(ftype[1], c("binary", "text"))
-    stopifnot(!is.na(ftype))
+    ftype <- match.arg(ftype)
 
     Samples <- if(is.data.frame(sampfile)) sampfile else
                    read.delim(sampfile, ...)
@@ -75,7 +74,7 @@ function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...)
     }
     CDFfiles <- .detect.file.ext(CDFpath, Samples[[ cdf ]])
     chk     <- .check.file.exists(CDFpath, CDFfiles)
-    ext     <- c("dat","txt")[ftype]
+    ext <- c(binary="dat",text="txt")[ftype]
     RIfiles <- paste0("RI_", CDFfiles, ".", ext)
     RIfiles <- sub("\\.(cdf|nc4)\\.", ".", RIfiles, ignore.case = T)
     Names   <- gsub(".(cdf|nc4)$", "", Samples[[ cdf ]], ignore.case = T)
