@@ -121,7 +121,7 @@ setMethod("[", "tsSample",
                   x@CDFfiles <- x@CDFfiles[i]
                   x@RIfiles <- x@RIfiles[i]
                   x@days <- x@days[i]
-                  x@data <- x@data[i,]
+                  x@data <- x@data[i,,drop=FALSE] # must be data.frame
                   validObject(x)
                   return(x)
               } else {
