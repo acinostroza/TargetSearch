@@ -84,7 +84,8 @@ exportMethods(
 	"profileRT<-",
 	"fileFormat",
 	"fileFormat<-",
-	"show"
+	"show",
+	"tsUpdate"
 )
 
 S3method("as.list", "tsMSdata")
