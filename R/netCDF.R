@@ -61,12 +61,15 @@
 	creator <- ncatt_get(nc, 0, 'creator')
 	timecor <- ncatt_get(nc, 0, 'time_corrected')
 	version <- ncatt_get(nc, 0, 'version')
+	basecor <- ncatt_get(nc, 0, 'baseline_corrected')
 	nc_close(nc)
 
 	creator <- if(creator$hasatt) creator$value else "Unknown"
 	version <- if(version$hasatt) version$value else ""
 	timecor <- if(timecor$hasatt) timecor$value else NA_integer_
-	list(format=format, creator=creator, version=version, time_corrected=timecor)
+	basecor <- if(basecor$hasatt) basecor$value else 0
+	list(format=format, creator=creator, version=version,
+		 time_corrected=timecor, baseline_corrected=basecor)
 }
 
 #' Checks that a cdfFile was created by TS
@@ -125,7 +128,7 @@ function(cdfFile, outFile=NULL, massRange=NULL, force=FALSE)
 }
 
 `.save_cdf4_internal` <-
-function(cdf, retTime, Peaks, massRange, retIndex=NULL, chunksizes=c(500, 5))
+function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksizes=c(500, 5))
 {
 	n  <- ncol(Peaks)
 	if(length(retTime) != nrow(Peaks))
@@ -150,11 +153,12 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, chunksizes=c(500, 5))
 	ncvar_put( ncnew, RT_var, retTime)
 
 	ncatt_put( ncnew, 0, 'creator', 'TargetSearch')
-	ncatt_put( ncnew, 0, 'version', '1.0')
+	ncatt_put( ncnew, 0, 'version', '1.1')
+	ncatt_put( ncnew, 0, 'baseline_corrected', as.integer(baseline[1]), prec='short')
 
 	if(is.null(retIndex)) {
 		ncvar_put( ncnew, RI_var, numeric(length(retTime)))
-			ncatt_put( ncnew, 0, 'time_corrected', 0, prec='short')
+		ncatt_put( ncnew, 0, 'time_corrected', 0, prec='short')
 	} else {
 		ncvar_put( ncnew, RI_var, retIndex)
 		ncatt_put( ncnew, 0, 'time_corrected', 1, prec='short')
@@ -166,7 +170,10 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, chunksizes=c(500, 5))
 {
 	if(!all(c('Time', 'Peaks', 'massRange') %in% names(peaks)))
 		stop("Invalid list peaks. Missing names")
-	.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index)
+	if(is.null(peaks$baselineCorrected))
+		peaks$baselineCorrected <- FALSE
+	.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index,
+		peaks$baselineCorrected)
 }
 
 # Description
