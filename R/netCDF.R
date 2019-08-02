@@ -15,7 +15,7 @@
 	ncData$rt          <- ncvar_get(nc, "scan_acquisition_time")
 	nc_close(nc)
 
-	if(any(ncData$scanindex < 0)) {
+	if(any(ncData$scanindex < 0) | any(diff(ncData$scanindex) < 0)) {
 		message('Error:')
 		message(sprintf('The NetCDF file %s seems to be corrupted.', cdfFile))
 		stop('Unable to processs file. Aborting.')
@@ -25,6 +25,9 @@
 	if(max(ncData$intensity) > 2147483647)
 		stop(paste("File", cdfFile, ": Intensity values cannot be coerced as",
 			"integers as they will create an integer overflow. Aborting."))
+
+	# sanity checks
+	ncData <- .ncdf_sanity(ncData)
 
 	if(!is.integer(ncData$intensity))
 		ncData$intensity <- as.integer(ncData$intensity)
@@ -204,5 +207,36 @@ function(cdf_path, out_path=cdf_path)
 	mapply(convert_to_ncdf4, in_files, out_files)
 	invisible(out_files)
 }
+
+# CDF sanity check
+.ncdf_sanity <- function(ncdf)
+{
+	si <- ncdf$scanindex
+	pc <- ncdf$point_count
+	ln <- length(ncdf$mz)
+	ns <- length(si)
+
+	if(ln != length(ncdf$intensity))
+		stop("`mz` and `intensity` do no have equal lengths")
+
+	if(any(ns != c(length(pc), length(ncdf$rt))))
+		stop("invalid CDF file. data lengths are not equal")
+
+	# check point count
+	if(ln != sum(pc))
+	{
+		warning("Invalid `point_count` data. Trying `scanindex` instead...")
+		pc <- diff(c(si,ln))
+		if(ln != sum(pc))
+			stop("Invalid CDF. `point_count` can be recovered")
+		ncdf$point_count <- pc
+	}
+	else if(!all(pc == diff(c(si,ln)))) {
+		warning("Invalid `scanindex` data. Trying `point_count` instead")
+		ncdf$scanindex <- c(0, cumsum(p[-m]))
+	}
+	ncdf
+}
+
 
 # vim: set ts=4 sw=4:
