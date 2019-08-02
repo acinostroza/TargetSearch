@@ -17,7 +17,8 @@ function(cdfFile)
 
 	peaks <- .Call(c_ncdf_to_matrix, ncData, massRange, PACKAGE="TargetSearch")
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
-	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange) )
+	return( list(Time = ncData$rt, Peaks = peaks, massRange=massRange, Index=NULL,
+				 baselineCorrected=FALSE) )
 }
 
 `.peakCDFextraction4` <-
@@ -31,7 +32,12 @@ function(cdfFile)
 	colnames(peaks) <- as.character(massRange[1]:massRange[2])
 	time_corrected <-  ncatt_get(nc, 0, 'time_corrected')
 	Index <- if(time_corrected$value==0) NULL else ncvar_get(nc, "retention_index")
-	return(list(Time = Time, Peaks = peaks, massRange = massRange, Index=Index))
+
+	basecor <- ncatt_get(nc, 0, 'baseline_corrected')
+	basecor <- if(basecor$hasatt) basecor$value else 0
+
+	return(list(Time = Time, Peaks = peaks, massRange = massRange, Index=Index,
+				baselineCorrected=as.logical(basecor)))
 }
 
 #' Validates a NCDF strict (better with S4 class)
