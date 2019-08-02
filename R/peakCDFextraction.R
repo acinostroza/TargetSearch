@@ -34,4 +34,45 @@ function(cdfFile)
 	return(list(Time = Time, Peaks = peaks, massRange = massRange, Index=Index))
 }
 
+#' Validates a NCDF strict (better with S4 class)
+.validNCDF <- function(x) {
+	if(!is.list(x))
+		stop("Object must be a list")
+	if(is.null(x$Time))
+		stop("Missing `Time` attribute")
+	if(is.null(x$Peaks))
+		stop("Missing `Peaks` attribute")
+	if(is.null(x$massRange))
+		stop("Missing `massRange` attribute")
+	nScan <- length(x$Time)
+	nInd <- if(!is.null(x$Index)) length(x$Index) else nScan
+	if(x$massRange[2] - x$massRange[1] + 1 != ncol(x$Peaks))
+		stop("Invalid `massRange` or `Peaks` attribute. Not equal dims")
+	if(nScan != nInd)
+		stop("Invalid length of scans and indices")
+	if(nrow(x$Peaks) != nScan)
+		stop("Invalid length of scans and peak data")
+	return(TRUE)
+}
+
+#'
+#' Open CDF file and extract peaks or check CDF data.
+#'
+#' Detects whether the input is a string, in which case it assumes
+#' is a CDF file and extracts it. If is a list, then it checks that
+#' it is a valid CDF structure. In any other case, throws an error.
+#'
+#' @param ncdf a file name, ncdf list or matrix
+#' @return a ncdf list struct.
+`.peakExtractWrap` <- function(ncdf)
+{
+	if(is.character(ncdf))
+		return(peakCDFextraction(ncdf[1]))
+	if(is.list(ncdf)) {
+		.validNCDF(ncdf)
+		return(ncdf)
+	}
+	stop("Invalid parameter `ncdf`. Expecting a list or a file name")
+}
+
 # vim: set ts=4 sw=4:
