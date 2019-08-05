@@ -1,10 +1,22 @@
 # auxiliary functions to NetCDFPeakFinding and peakCDFextraction
 
-# function to open a CDF file (version 3)
-#  1. m/z can be integer or double. Data will be converted to nominal mass.
-#  2. intensity must be integer. Check if an overflow could occurr (R uses 32-bit integers)
-#  3. data inconsistencies
-
+#' Function to open a CDF3 file
+#'
+#' Opens and NetCDF format 3, normally exported from a software instrument,
+#' and returns a list with the CDF data.
+#'
+#' The mass values can be integers or doubles. Because TargetSearch does not
+#' use exact mass, they will converted to nominal mass by summing up
+#' the intensity values closest to the nearest integer.
+#'
+#' The intensity values will be coerced to integers. If it is not possible,
+#' the function will throw an error.
+#'
+#' Some sanity checks and performed and in some cases the data can be fixed,
+#' otherwise an error will be thrown
+#'
+#' @param cdfFile A path to a CDF format 3 file
+#' @return A list representing a CDF structure (which is quite standard)
 .open.ncdf <- function(cdfFile) {
 	nc <- nc_open(cdfFile)
 	ncData <- list()
@@ -46,15 +58,15 @@
 #' Extract meta info from a netCDF file
 #'
 #' Returns a list with the NetCDF file format, and extracts the 'creator',
-#' 'version' and 'time_corrected' attributes.
+#' 'version', 'time_corrected' and 'baseline_corrected' attributes.
 #'
 #' @param cdf Path to the NetCDF file
 #'
-#' @return a list with components \code{format} (the netCDF format),
+#' @return A list with components \code{format} (the netCDF format),
 #' \code{creator} ('Unknown' if undefined), \core{version} (file version or empty
-#' string if undefined) and \code{time_corrected} (1, 0, or NA_integer_ if undefined)
-#'
-`.get_ncdf_info` <- function(cdf)
+#' string if undefined), \code{time_corrected} (1, 0, or NA_integer_ if undefined)
+#' and \code{baseline_corrected} (1 if yes, 0 if not or unknown).
+`.ncdf_info` <- function(cdf)
 {
 	nc <- nc_open(cdf)
 	format   <- nc$format
@@ -73,35 +85,51 @@
 }
 
 #' Checks that a cdfFile was created by TS
+#'
+#' @param cdfFile Path to a CDF file
+#' @return \code{TRUE} if is a TargetSearch file, \code{FALSE} otherwise.
 `.is_ts_ncdf4` <- function(cdfFile)
 {
-	nfo <- .get_ncdf_info(cdfFile)
+	nfo <- .ncdf_info(cdfFile)
 	nfo$creator == 'TargetSearch'
 }
 
-#' Convert a NetCDF file format 3 to format 4
+#' Convert from a NetCDF file format 3 to format 4
 #
-#' Convert a NetCDF format 3 into a custom TargetSearch NetCDF format 4.
+#' Convert from NetCDF format 3 into a custom TargetSearch NetCDF format 4.
 #' The new NetCDF just contains an intensity matrix (time x m/z) in order
 #' to allow easier and faster data manipulation.
 #'
 #' @param cdfFile The NetCDF file to be converted
 #' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
-#'   file extension by \code{.nc4}. Valid extensions are \code{.cdf} or \code{.nc}. If
-#'   the file doesn't have a is valid extension, then \code{.nc4} is just appended.
+#'   file extension (which should be \code{.cdf}) by \code{.nc4}. If the file
+#'   extension is not \code{.cdf}, then \code{.nc4} is just appended.
 #' @param massRange The \code{m/z} range. It is actually ignored but kept for compatibility
-#' @param force Logical. Set to \code{TRUE} to allow overwrites. Default to \code{FALSE}
+#' @param force Logical. Set to \code{TRUE} to allow overwrites. Default to \code{FALSE}.
 #'
 #' @note
+#' This function is intended for internal use (or advanced users); it is exported
+#' for convenience.
+#'
 #' The generated CDF file is non-standard and very likely cannot be
-#' used outside targetSearch. For instance cannot be used in AMDIS.
-#' It is not possible reconstruct the original NetCDF file. On the other hand,
-#' if the NetCDF files are exported from the custom vendor files, then
-#' the NetCDF 3 files can be deleted safely (as long you keep your original
-#' files).
+#' used outside targetSearch. For instance cannot be used by AMDIS.
+#' Moreover, the mass values are converted to nominal mass (if they are not),
+#' meaning there is data loss.
+#'
+#' Currently, it is not possible to reconstruct the original NetCDF file
+#' from the converted file. On the other hand, if the NetCDF files are exported
+#' from the custom vendor files, then the NetCDF 3 files can be deleted safely
+#' (as long you keep your original chromatograms).
 #'
 #' @return A string. The path to the converted file or invisible.
-`convert_to_ncdf4` <-
+#' @example
+#' require(TargetSearchData)
+#' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+#' cdf <- file.path(cdfpath, '7235eg04.cdf')
+#' nc4 <- '7235eg04.nc4' # save file in current path
+#' ret <- ncdf4_convert(cdf, nc4)
+#' stopifnot(ret == nc4)
+`ncdf4_convert` <-
 function(cdfFile, outFile=NULL, massRange=NULL, force=FALSE)
 {
 	# first check that the file is not TS
@@ -122,12 +150,21 @@ function(cdfFile, outFile=NULL, massRange=NULL, force=FALSE)
 		return(invisible(outFile))
     }
 	peaks <- peakCDFextraction(cdfFile, massRange)
-	save_cdf4(outFile, peaks)
+	ncdf4_write(outFile, peaks)
 
 	invisible(outFile)
 }
 
-`.save_cdf4_internal` <-
+#' Internal function for saving data into a cdf4
+#'
+#' @param cdf Path to the CDF file.
+#' @param retTime vector of retention times.
+#' @param Peaks matrix of intensities.
+#' @param massRange the mass range. A vector of length 2 (mz min, mz max).
+#' @param retIndex the retention indices or NULL if not available.
+#' @param baseline whether the intensity data was baseline corrected by TS.
+#' @param chunksizes vector of chunk sizes for compression (see ncdf4)
+`.ncdf4_write` <-
 function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksizes=c(500, 5))
 {
 	n  <- ncol(Peaks)
@@ -165,22 +202,37 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksiz
 	}
 }
 
-# save peak structure to cdf4
-`save_cdf4` <- function(cdf, peaks)
+#' Save peak structure to cdf4
+#'
+#' Save a NCDF list to a CDF4 for. The structure is usually generated
+#' by the function [peakCDFextraction()].
+#' @param cdf A path to a CDF file to be written
+#' @param peaks A list representing a NCDF4 structure. The list is generated
+#'        by [peakCDFextraction()].
+#' @note
+#' This function is meant to be used internally. It is exposed for convenience.
+`ncdf4_write` <- function(cdf, peaks)
 {
 	if(!all(c('Time', 'Peaks', 'massRange') %in% names(peaks)))
 		stop("Invalid list peaks. Missing names")
 	if(is.null(peaks$baselineCorrected))
 		peaks$baselineCorrected <- FALSE
-	.save_cdf4_internal(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index,
+	.ncdf4_write(cdf, peaks$Time, peaks$Peaks, peaks$massRange, peaks$Index,
 		peaks$baselineCorrected)
 }
 
-# Description
-#  Update the retention index on the CDF files. The parameters observed
-#  and standard are the same as used in the rt2ri function.
-
-`update_retention_index_ncdf4` <-
+#' Update retention time index on a NCDF4 file
+#'
+#' Performs retention time index (RI) correction on a CDF file, using the
+#' using the retention markers found by [RIcorrect()]. It wraps around
+#' the function rt2ri()].
+#'
+#' @param cdfFile Path to the CDF file
+#' @param observed The observed RI markers retention times'.
+#' @param standard The RI of said markers.
+#' @note
+#' This function is meant to be used internally. It is exposed for convenience.
+`ncdf4_update_ri` <-
 function(cdfFile, observed, standard)
 {
 	# first check that the file is not TS
@@ -201,7 +253,7 @@ function(cdfFile, observed, standard)
 #'
 #' @param cdf_path the input path to scan for
 #' @param out_path the output path in which the files will be saved
-`convert_cdf_from_path` <-
+`ncdf4_convert_from_path` <-
 function(cdf_path, out_path=cdf_path)
 {
 	# scans CDF file
@@ -211,11 +263,14 @@ function(cdf_path, out_path=cdf_path)
 	out_files <- sub("\\.cdf$", ".nc4", basename(in_files), ignore.case=TRUE)
 	out_files <- file.path(out_path, out_files)
 
-	mapply(convert_to_ncdf4, in_files, out_files)
+	mapply(ncdf4_convert, in_files, out_files)
 	invisible(out_files)
 }
 
 # CDF sanity check
+# checks that the point count match the respective scan indices. If not
+# then uses one of those to compute the other. The checks are not exhaustive.
+# A C-based check will be better.
 .ncdf_sanity <- function(ncdf)
 {
 	si <- ncdf$scanindex
@@ -244,6 +299,5 @@ function(cdf_path, out_path=cdf_path)
 	}
 	ncdf
 }
-
 
 # vim: set ts=4 sw=4:
