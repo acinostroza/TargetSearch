@@ -103,32 +103,55 @@ getDays <- function(x) {
 }
 
 `ImportSamplesFromDir` <-
-function(CDFpath=".", RIfiles=FALSE, ignore.case=TRUE, ftype=c("binary", "text")) {
+function(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"), verbose=FALSE, ...)
+{
+    trim <- function(x, e)
+        unique(.trim_file_ext(x, e))
 
     if(RIfiles == TRUE) {
-        cdffiles <- dir(path=CDFpath, pattern='^RI_', ignore.case=ignore.case)
-        ext <- unique(substring(tolower(cdffiles), nchar(cdffiles)-2))
-        if(!all(ext %in% c("dat","txt")))
-            stop("RI file extension error. It must be either 'dat' or 'txt'")
+        ftype <- match.arg(ftype)
+        ext <- switch(ftype, binary='dat', text='txt')
+        pattern <- sprintf('^RI_(.*)\\.%s$', ext)
+        rifiles <- dir(path=CDFpath, pattern=pattern, full.names=TRUE, ...)
 
-        if(length(ext) == 1) {
-            cdffiles <- gsub("RI_", "", gsub(ext, "cdf", cdffiles, ignore.case=ignore.case))
-            ftype <- if(ext=="dat") "binary" else "text"
-        } else {
-            ft <- pmatch(ftype, c("binary", "text"))[1]
-            if(is.null(ft) | is.na(ft) | length(ft)==0)
-                stop(paste("Binary and text RI files found. Please select one file type",
-                           "with the parameter 'ftype'."))
-            pattern <- c("\\.dat$","\\.txt$")[ft]
-            cdffiles <- gsub("RI_", "", gsub(pattern, ".cdf", cdffiles, ignore.case=ignore.case))
-            cdffiles <- grep("cdf", cdffiles, value=TRUE, ignore.case=ignore.case)
+        if(verbose) {
+            cat("Searching for RI files\n======================", sep="\n")
+            cat(paste("File Path      :", CDFpath), sep="\n")
+            cat(paste("File Extension :", ext), sep="\n")
+            cat(paste("File Pattern   :", pattern), sep="\n")
+            cat("Detected Files :", sep="\n")
+            cat(rifiles, fill=TRUE, labels=" ->")
         }
-    } else {
-        cdffiles <- dir(path=CDFpath, pattern='\\.cdf$', ignore.case=ignore.case)
-    }
-    if(length(cdffiles) == 0)
-        stop('Error: No CDF files were find in the directory')
 
-    new('tsSample', CDFfiles=cdffiles,RIpath=CDFpath,CDFpath=CDFpath, ftype=ftype)
+        if(length(rifiles) == 0)
+            stop('Error: No RI files were found in the directory')
+
+        pattern <- regex(pattern, ignore_case=TRUE)
+        path    <- dirname(rifiles)
+        cdffiles <- str_replace(basename(rifiles), pattern, "\\1.nc4")
+        cdffiles <- file.path(path, cdffiles)
+        ret <- new('tsSample', CDFfiles=cdffiles, RIfiles=rifiles, ftype=ftype)
+    } else {
+        pattern <- '\\.(cdf|nc4)$'
+        cdffiles <- dir(path=CDFpath, pattern=pattern, full.names=TRUE, ...)
+
+        if(verbose) {
+            cat("Searching for CDF files\n======================", sep="\n")
+            cat(paste("File Path      :", CDFpath), sep="\n")
+            cat(paste("File Extension : cdf, nc4"), sep="\n")
+            cat(paste("File Pattern   :", pattern), sep="\n")
+            cat("Detected Files :", sep="\n")
+            cat(cdffiles, fill=TRUE, labels=" ->")
+        }
+
+        if(length(cdffiles) == 0)
+            stop('Error: No CDF files were find in the directory')
+
+        cdffiles <- trim(cdffiles, c('nc4', 'cdf'))
+
+        ret <- new('tsSample', CDFfiles=cdffiles, ftype=ftype)
+    }
+    ret
 }
+
 # vim: set ts=4 sw=4 et:
