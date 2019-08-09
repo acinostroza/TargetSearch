@@ -7,12 +7,12 @@
 
 setGeneric("CDFfiles", function(obj) standardGeneric("CDFfiles"))
 setMethod("CDFfiles", "tsSample", function(obj) {
-    .add_file_ext(obj@CDFfiles, ._cdf_ext)
+    obj@CDFfiles
 })
 
 setGeneric("CDFfiles<-", function(obj, value) standardGeneric("CDFfiles<-"))
 setReplaceMethod("CDFfiles", "tsSample", function(obj, value) {
-    obj@CDFfiles <- .trim_file_ext(value, ._cdf_ext)
+    obj@CDFfiles <- value
     validObject(obj)
     obj
 })
@@ -155,7 +155,7 @@ setMethod("initialize",
                 days <- rep(days, length(CDFfiles))
 
             if(missing(data))
-                data <- data.frame(Names = Names, stringsAsFactors = FALSE, row.names = Names)
+                data <- data.frame(SAMPLE_NAME = Names, stringsAsFactors = FALSE, row.names = Names)
             else
                 rownames(data) <- Names
 
@@ -166,11 +166,11 @@ setMethod("initialize",
                 RIfiles <- .setpath(RIfiles, RIpath)
 
             .Object@Names    <- Names
-            .Object@CDFfiles <- .trim_file_ext(CDFfiles, ._cdf_ext)
+            .Object@CDFfiles <- CDFfiles
             .Object@RIfiles  <- RIfiles
             .Object@CDFpath  <- "" # unused
             .Object@RIpath   <- "" # unused
-            .Object@days     <- days
+            .Object@days     <- as.character(days)
             .Object@data     <- data
             validObject(.Object)
             .Object
@@ -217,8 +217,8 @@ setMethod("tsUpdate", "tsSample", function(obj) {
     obj@CDFfiles <- .setpath(obj@CDFfiles, obj@CDFpath)
     obj@RIfiles <- .setpath(obj@RIfiles, obj@RIpath)
 
-    obj@CDFfiles <- .trim_file_ext(obj@CDFfiles, ._cdf_ext)
-    obj@RIfiles <- .trim_file_ext(obj@RIfiles, ._cdf_ext)
+    obj@CDFfiles <- obj@CDFfiles
+    obj@RIfiles <- obj@RIfiles
     obj@CDFpath <- obj@RIpath <- ""
     rownames(obj@data) <- obj@Names
     validObject(obj)
