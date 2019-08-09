@@ -6,50 +6,54 @@
 #' @return logical. whether the files exist
 
 `.check.file.exists` <-
-function(path, files, quiet=FALSE)
+function(files, quiet=FALSE)
 {
-    z <- file.exists(file.path(path, files))
+    z <- file.exists(files)
     if(quiet | all(z))
         return(z)
-    cat(sprintf("=> Notice: Some files were not found in path `%s`", path), sep="\n")
-    cat(sprintf("   - %s", files[!z]), sep="\n")
-    warning("some files are missing")
+    cat("Note: Some files were not found in specified path", sep="\n")
+    cat(files[!z], fill=TRUE, labels=" ->")
+    warning("Some files are missing!")
     invisible(z)
 }
 
-#' detect file extension if not present
+#' check file extensions
 #'
-#' tries extensions cdf or nc4 if missing. Returns the files if they exist
-#' or just assumes cdf extension
-#' @param path the file path
+#' If a file has a proper file extension, we leave it. If not, then tries
+#' to find an appropiate extension. If found, then returns, if not, return
+#' the file unchanged.
 #' @param files the files to check
 #' @return a character vector with file names
-`.detect.file.ext` <-
-function(path, files)
+`.detect.files` <-
+function(files)
 {
-    ret <- regexpr("\\.(cdf|nc4)", files)
-    if(all(ret != -1)) # files have extension
-        return(files)
-    a <- file.path(path, sprintf("%s.cdf", files))
-    b <- file.path(path, sprintf("%s.nc4", files))
-    ret <- mapply(function(a, b, f) {
-                      if(file.exists(a)) return(a)
-                      if(file.exists(b)) return(b)
-                      f}, a, b, files)
-    basename(unname(ret))
+    fun <- function(x) {
+        k <- str_match(x, regex("\\.(cdf|nc4)$", ignore_case=TRUE))
+        if(all(!is.na(k)))
+            return(x)
+        for(e in c('.nc4', '.cdf', '.CDF')) {
+            f <- paste0(x, e)
+            if(file.exists(f))
+                return(f)
+       }
+       return(x)
+    }
+    sapply(files, fun, USE.NAMES=FALSE)
 }
 
 `ImportSamples` <-
-function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...)
+function(sampfile, CDFpath, RIpath, ftype=c("binary", "text"), ...)
 {
     ftype <- match.arg(ftype)
+    as_chr <- as.character
 
     Samples <- if(is.data.frame(sampfile)) sampfile else
                    read.delim(sampfile, ...)
 
-    # look for column 'CDF_FILE' and 'MEASUREMENT_DAY'
+    # look for column 'CDF_FILE' and 'MEASUREMENT_DAY' and 'SAMPLE_NAME'
     cdf <- 'CDF_FILE'
     day <- 'MEASUREMENT_DAY'
+    snm <- 'SAMPLE_NAME'
 
     if(!cdf %in% colnames(Samples)) {
         # greps for 'CDF'
@@ -60,26 +64,56 @@ function(sampfile, CDFpath = ".", RIpath = ".", ftype=c("binary", "text"), ...)
         message("Note: Using '", cdf, "' as CDF column")
     }
 
-    Samples[[ cdf ]] <- as.character(Samples[, cdf])
+    CDFfiles <- as_chr(Samples[, cdf])
 
     if(!day %in% colnames(Samples)) {
         # greps for 'DAY'
-        k <- grep('day', colnames(Samples), ignore.case=TRUE)
-        if(length(k) == 0) {
-            Samples[[ day ]] <- "1"
+        day <- grep('day', colnames(Samples), ignore.case=TRUE, value=TRUE)
+        if(length(day) == 0) {
+            days <- "1"
             warning("Column 'MEASUREMENT_DAY' not found. Using default setting.")
         } else {
-            day <- colnames(Samples)[k][1]
+            days <- Samples[, day[1]]
+            message("Note: Using '", day[1], "' as MEASUREMENT_DAY column")
         }
+    } else {
+        days <- Samples[, day]
     }
-    CDFfiles <- .detect.file.ext(CDFpath, Samples[[ cdf ]])
-    chk     <- .check.file.exists(CDFpath, CDFfiles)
-    ext <- c(binary="dat",text="txt")[ftype]
-    RIfiles <- paste0("RI_", CDFfiles, ".", ext)
-    RIfiles <- sub("\\.(cdf|nc4)\\.", ".", RIfiles, ignore.case = T)
-    Names   <- gsub(".(cdf|nc4)$", "", Samples[[ cdf ]], ignore.case = T)
-    new("tsSample", Names = Names, CDFfiles = CDFfiles, days = as.character(Samples[[ day ]]),
-        RIfiles = RIfiles, CDFpath = CDFpath, RIpath = RIpath, data = Samples)
+
+    if(!snm %in% colnames(Samples)) {
+        k <- FALSE
+        patterns <- c('^sample.?id', '^sample.?name', 'name')
+        for(p in patterns) {
+            k <- grepl(p, colnames(Samples), ignore.case=TRUE)
+            if(any(k))
+                break
+        }
+        if(any(k)) {
+            col <- colnames(Samples)[k][1]
+            message("Note: Using '", col, "' as sample names")
+            Names <- as_chr(Samples[, col])
+        } else {
+            Names <- .trim_file_ext(basename(CDFfiles), c('nc4','cdf'))
+        }
+    } else {
+        Names <- as_chr(Samples[, snm])
+    }
+
+    if(any(duplicated(Names)))
+        stop('Duplicated sample names detected.')
+
+    if(!missing(CDFpath))
+        CDFfiles <- file.path(CDFpath, CDFfiles)
+
+    # warn and print missing samples.
+    CDFfiles <- .detect.files(CDFfiles)
+    nul <- .check.file.exists(CDFfiles)
+
+    if(missing(RIpath))
+        RIpath <- dirname(CDFfiles)
+
+    new("tsSample", Names = Names, CDFfiles = CDFfiles, days = days,
+        RIpath = RIpath, data = Samples)
 }
 
 # function to extract the /measurement day/ of a set of names.
@@ -105,9 +139,6 @@ getDays <- function(x) {
 `ImportSamplesFromDir` <-
 function(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"), verbose=FALSE, ...)
 {
-    trim <- function(x, e)
-        unique(.trim_file_ext(x, e))
-
     if(RIfiles == TRUE) {
         ftype <- match.arg(ftype)
         ext <- switch(ftype, binary='dat', text='txt')
@@ -147,7 +178,7 @@ function(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"), verbose=FALSE, .
         if(length(cdffiles) == 0)
             stop('Error: No CDF files were find in the directory')
 
-        cdffiles <- trim(cdffiles, c('nc4', 'cdf'))
+        cdffiles <- .find_uniq_files(cdffiles, c('nc4', 'cdf'))
 
         ret <- new('tsSample', CDFfiles=cdffiles, ftype=ftype)
     }
