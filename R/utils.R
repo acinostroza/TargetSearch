@@ -45,6 +45,20 @@ is_nullOrNA <- function(x)
     file.path(new, basename(old))
 }
 
+#' parse file names
+#'
+#' A simple parser for file names
+.parse_file_names <- function(files, exts)
+{
+    e <- paste(exts, collapse="|")
+    e <- sprintf("^(.+)\\.(%s)$", e)
+    z <- str_match(files, regex(e, ignore_case=TRUE))
+    name <- z[,2]
+    extension  <- z[,3]
+    name[ is.na(name) ] <- files[ is.na(name) ]
+    cbind(name, extension)
+}
+
 #' trim file extension
 #'
 #' remove known file extensions from file path. if none found, then does
@@ -56,9 +70,7 @@ is_nullOrNA <- function(x)
 #' @return files with extension trimmed.
 .trim_file_ext <- function(files, exts)
 {
-    e <- paste(exts, collapse="|")
-    e <- sprintf("\\.(%s)$", e)
-    str_remove(files, regex(e, ignore_case=TRUE))
+    .parse_file_names(files, exts)[,1]
 }
 
 #' add file extension
@@ -94,4 +106,17 @@ is_nullOrNA <- function(x)
               if(d == ".") z else file.path(d, z)
         }, dr, bs, USE.NAMES=FALSE)
 }
+
+`.find_uniq_files` <- function(files, exts)
+{
+    if(length(files) <= 1)
+        return(files)
+    p <- .parse_file_names(files, exts)
+    p <- cbind(files, p)
+    k <- match(tolower(p[, 'extension']), tolower(exts))
+    k[is.na(k)] <- 1
+    p <- p[order(k, p[, 'name']),,drop=FALSE]
+    p[ !duplicated(p[, 'name']), 'files']
+}
+
 # vim: set ts=4 sw=4 et:
