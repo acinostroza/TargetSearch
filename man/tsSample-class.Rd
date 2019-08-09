@@ -90,7 +90,9 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     as indices. Also, if columns are selected, the output will be either a vector or
     a \code{data.frame} depending on whether one or more columns were selected.
     More over, it is required that the rownames of the \code{data} slot are
-    equal to the sample names slots. This is handled internally.
+    equal to the sample names slots. This is handled internally. If the \code{Names}
+    are not provided, then the CDF files are used instead (directories and
+    extension are removed). In this case the file names must be unique.
 
     The slots \code{CDFpath} and \code{RIpath} are deprecated and not used.
     However, the methods to set or get the paths will still work. The file
@@ -109,7 +111,7 @@ require(TargetSearchData)
 CDFpath <- system.file("gc-ms-data", package = "TargetSearchData")
 cdffiles <- dir(CDFpath, "cdf", full=TRUE)
 
-# define the RI file path 
+# define the RI file path
 RIpath  <- "."
 
 # create a tsSample object with minimal info
@@ -122,7 +124,7 @@ sampleDescription <- new("tsSample", CDFfiles = cdffiles, RIpath = RIpath)
 cdffiles <- basename(cdffiles)
 
 # create the sample object
-sampleDescription <- new("tsSample", CDFfiles = cdffiles, CDFpath = CDFpath, RIpath = RIpath) 
+sampleDescription <- new("tsSample", CDFfiles = cdffiles, CDFpath = CDFpath, RIpath = RIpath)
 
 ## ## ## ## ##
 
@@ -135,8 +137,8 @@ RIpath  <- "."
 # example)
 days <- substring(cdffiles, 1, 4)
 
-# sample names 
-smp_names <- sub(".cdf", "", cdffiles, fixed = TRUE)
+# sample names (must be unique)
+smp_names <- paste("Sample", 1:length(sampleDescription), sep = "_")
 
 # add some sample info
 smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))
@@ -145,19 +147,19 @@ smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))
 sampleDescription <- new("tsSample", Names = smp_names, CDFfiles = cdffiles, CDFpath = CDFpath,
     RIpath = RIpath, days = days, RIfiles = RIfiles, data = smp_data)
 
-# change the sample names (they must be unique)
-sampleNames(sampleDescription) <- paste("Sample", 1:length(sampleDescription), sep = "_")
-
 # chang the file paths (relative to the working path)
 CDFpath(sampleDescription) <- "my_cdfs"
 RIpath(sampleDescription)  <- "my_RIs"
+
+# change sample Names
+sampleNames(sampleDescription) <- sprintf("S\%03d", 1:length(sampleDescription))
 
 ## sample subsetting.
 # select samples 1, 3 and 5
 (sampleset <- sampleDescription[c(1, 3, 5)])
 
 # or use sample IDs
-(sampleset <- sampleDescription[c("Sample_1", "Sample_3", "Sample_5")])
+(sampleset <- sampleDescription[c("S001", "S003", "S005")])
 
 ## extract columns
 # select column 'GROUP'
