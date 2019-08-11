@@ -225,4 +225,18 @@ setMethod("tsUpdate", "tsSample", function(obj) {
     obj
 })
 
+setGeneric("ncdf4Convert", function(obj, path, ...) standardGeneric("ncdf4Convert"))
+setMethod("ncdf4Convert", "tsSample", function(obj, path, ...) {
+    if(!.check_ts_sample(obj))
+        stop("Object Update required")
+
+    nc4 <- sprintf("%s.nc4", .trim_file_ext(obj@CDFfiles, c('cdf', 'nc4')))
+    if(!missing(path))
+        nc4 <- .setpath(nc4, path)
+    nil <- mapply(ncdf4_convert, obj@CDFfiles, nc4, MoreArgs=list(...))
+    obj@CDFfiles <- nc4
+    validObject(obj)
+    obj
+})
+
 # vim: set ts=4 sw=4 et:

@@ -17,7 +17,7 @@ importFrom("utils", "edit", "head", "installed.packages", "read.delim",
 importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
            "ncatt_get", "ncatt_put", "ncdim_def", "ncvar_def", "nc_create")
 
-importFrom("stringr", "str_remove", "regex", "str_match")
+importFrom("stringr", "str_remove", "regex", "str_match", "str_replace")
 
 exportClasses(
 	"tsLib",
@@ -85,7 +85,8 @@ exportMethods(
 	"fileFormat",
 	"fileFormat<-",
 	"show",
-	"tsUpdate"
+	"tsUpdate",
+	"ncdf4Convert"
 )
 
 S3method("as.list", "tsMSdata")
