@@ -126,6 +126,7 @@ export(
 	"writeMSP",
 	"baseline",
 	"baselineCorrection",
+	"baselineCorrectionQuant",
 	"fixRIcorrection",
 	"TargetSearchGUI",
 	"writeLibText",
