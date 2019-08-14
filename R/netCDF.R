@@ -104,8 +104,9 @@
 #' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
 #'   file extension (which should be \code{.cdf}) by \code{.nc4}. If the file
 #'   extension is not \code{.cdf}, then \code{.nc4} is just appended.
-#' @param massRange The \code{m/z} range. It is actually ignored but kept for compatibility
 #' @param force Logical. Set to \code{TRUE} to allow overwrites. Default to \code{FALSE}.
+#' @param baseline baseline correct the CDF file
+#' @param \dots extra options passed to baseline
 #'
 #' @note
 #' This function is intended for internal use (or advanced users); it is exported
@@ -130,28 +131,47 @@
 #' ret <- ncdf4_convert(cdf, nc4)
 #' stopifnot(ret == nc4)
 `ncdf4_convert` <-
-function(cdfFile, outFile=NULL, massRange=NULL, force=FALSE)
+function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 {
-	# first check that the file is not TS
-	if(.is_ts_ncdf4(cdfFile)) {
-		warning('File "', cdfFile, '" has already been converted')
-		return(invisible(outFile))
+	# extract information of CDF file
+	nfo <- .ncdf_info(cdfFile)
+	peaks <- NULL
+
+	if(nfo$creator == 'TargetSearch') {
+		if(baseline) {
+			if(nfo$baseline_corrected == 0) {
+				peaks <- peakCDFextraction(cdfFile)
+				peaks <- baseline(peaks, ...)
+			}
+			else {
+				warning('File "', cdfFile, '" has already been baseline corrected converted')
+				return(invisible(outFile))
+			}
+		}
+		else {
+			warning('File "', cdfFile, '" has already been converted')
+			return(invisible(outFile))
+		}
 	}
 
 	if(is.null(outFile)) {
-		outFile <- sprintf("%s.nc4", sub("\\.cdf$", "", cdfFile, ignore.case=TRUE))
+		outFile <- sprintf("%s.nc4", .trim_file_ext(cdfFile, 'cdf'))
 	}
 
-	if(cdfFile == outFile)
-		stop('Intput and output files are the same. aborting...')
+	if(cdfFile == outFile & !force)
+		stop('Input and output files are the same. Set `force` to overwrite.')
 
 	if(file.exists(outFile) & !force) {
 		warning('File `', outFile, "' exists. Set `force' to overwrite")
 		return(invisible(outFile))
     }
-	peaks <- peakCDFextraction(cdfFile, massRange)
-	ncdf4_write(outFile, peaks)
+	if(is.null(peaks)) {
+		peaks <- peakCDFextraction(cdfFile) # CDF3
+		if(baseline)
+			peaks <- baseline(peaks, ...)
+	}
 
+	ncdf4_write(outFile, peaks)
 	invisible(outFile)
 }
 
@@ -253,8 +273,9 @@ function(cdfFile, observed, standard)
 #'
 #' @param cdf_path the input path to scan for
 #' @param out_path the output path in which the files will be saved
+#' @param ... extra options passed to ncdf4_convert
 `ncdf4_convert_from_path` <-
-function(cdf_path, out_path=cdf_path)
+function(cdf_path, out_path=cdf_path, ...)
 {
 	# scans CDF file
 	in_files  <- dir(cdf_path, pattern="\\.cdf$", full.names=TRUE, ignore.case=TRUE)
@@ -263,7 +284,7 @@ function(cdf_path, out_path=cdf_path)
 	out_files <- sub("\\.cdf$", ".nc4", basename(in_files), ignore.case=TRUE)
 	out_files <- file.path(out_path, out_files)
 
-	mapply(ncdf4_convert, in_files, out_files)
+	mapply(ncdf4_convert, in_files, out_files, MoreArgs=list(...))
 	invisible(out_files)
 }
 
