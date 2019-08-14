@@ -11,6 +11,8 @@ BiocStyle::latex()
 @
 
 \usepackage{booktabs}
+\definecolor{NoteBlue}{RGB}{45, 28, 156}
+\newcommand{\Note}[2][Note]{\textsl{\textcolor{NoteBlue}{#1: #2}}}
 
 \title{The TargetSearch Package}
 \author{Alvaro Cuadros-Inostroza}
@@ -47,23 +49,40 @@ This section describes the files that have to be prepared before running
 file and a retention marker definition file. Throughout this manual, we will
 use the example files provided by the package \Biocpkg{TargetSearchData}.
 
-\subsection{NetCDF files and sample File}
+\subsection{NetCDF files}
 
 \Biocpkg{TargetSearch} can currently read only NetCDF files. Many GC-MS
-software packages are able to convert raw chromatograms to NetCDF. Although some
-baseline correction functionality is included in \Biocpkg{TargetSearch}, it is
-recommended to baseline correct your chromatograms before exporting
-to NetCDF to increase processing speed. Please refer to your vendor's software documentation
-for further details.
+software vendors are able to convert their propietary raw chromatograms to NetCDF.
+There are however two issues you have to keep in mind:
 
-Export the NetCDF files into a convenient location. Then prepare a tab-delimited
+\begin{itemize}
+    \item Make sure that you export the CDF files as nominal mass, not centroid
+    nor profile mode, as \Biocpkg{TargetSearch} cannot handle this type of data. Nevertheless,
+    if such an option is not available, there files can be converted to nominal
+    mass automatically.
+
+    \item It is recommended to baseline correct your chromatograms before exporting
+    to NetCDF to increase processing speed. If not, \Biocpkg{TargetSearch} implements
+    two methods for baseline correction that you can use at the cost of performance.
+\end{itemize}
+
+Though only NetCDF is supported, it is still possible to use other formats, such as
+mzXML, mzData or mzML using the package \Biocpkg{mzR}. This is not yet implemented
+but it will in the next release.
+
+\subsection{Sample Information}
+
+After exporting the CDF files into a convenient location, prepare a tab-delimited
 text file describing your samples. It must be contain (at least) the two columns
 entitled: ``CDF\_FILE'' and ``MEASUREMENT\_DAY'', or, column names that match ``cdf''
 and ``day'', respectively. If more than one column matches the pattern, then the
-first (leftmost) is taken. Other columns such as sample name,
-sample group, treatment, etc. may be additionally included to aid sample sub-setting
-and downstream analyses. An example is shown in table~\ref{sample:file}.
+first (leftmost) is taken. Addictionally, if a column named ``SAMPLE\_NAME'' is
+found, this column will be used as sample names instead of the CDF files (useful
+if your CDF files are not human readable friendly).
 
+Other columns such as sample group, treatment, etc. may be additionally included
+to aid sample sub-setting and downstream analyses. An example is shown in
+table~\ref{sample:file}.
 
 \begin{table}[ht]
 \begin{tabular}{lll}
@@ -164,6 +183,35 @@ checkRimLim(samples, rimLimits)
 
 \section{Pre-processing}
 
+\subsection{Convertion of CDF files to TargetSearch format}
+
+Starting from \Biocpkg{TargetSearch} 1.42, a CDF4 custom format was introduced. This format
+has many advantages over the typical CDF3 that is exported by commercial
+software, mainly compression and fast data access, which can speed up
+the internal \Biocpkg{TargetSearch} computations (specially in plotting functions). Another
+advantage is that you can store baseline corrected data in this file,
+which is not possible to do in CDF file. And finally, the conversion is
+required if the CDF files are not in nominal mass format. The main
+disadvantage is that this format is unique to \Biocpkg{TargetSearch} and it is unlikely to
+be used elsewhere, and the extra storage space required for these files.
+
+To transform the files, simply run the function \Rfunction{ncdf4Convert()}.
+In the example below, the files are converted to CDF4 format and saved
+to the working directory. If the parameter \Rcode{path} is missing,
+then the files will be placed in the same directory as the original
+CDF files.
+
+<<ncdf4>>=
+samples <- ncdf4Convert(samples, path=".")
+@
+
+If you need to perform baseline correction on the CDF files, please
+check the following section instead.
+
+\Note{Although this convertion is optional, it is highly recommended.
+It is still possible to use the classic workflow at the cost of
+computation speed.}
+
 \subsection{Baseline correction}
 
 \Biocpkg{TargetSearch} expects baseline corrected NetCDF files, which is
@@ -171,19 +219,37 @@ usually performed by your GC-MS vendor's software. If that is the case,
 you may continue reading the following subsection.
 
 However, if your chromatograms are not baseline corrected, \Biocpkg{TargetSearch}
-provides a method implemented in the function \Rfunction{baselineCorrection()}.
-This algorithm is based on the work of Chang et al. \cite{chang07} and a description
-is found in the \Rfunction{baselineCorrection()} documentation.
+provides two baseline correction methods. The first one is implemented in
+\Rfunction{baselineCorrection()}, the so-called ``classic'' method because it has been
+present since de beginning, and the algorithm is based on the work of
+Chang et al. \cite{chang07}. The second method, ``quantiles'', was introduced
+in \Biocpkg{TargetSearch} 1.42.0 and the baseline is estimated by computing a quantile in a sliding
+window. This is implemented in \Rfunction{baselineCorrectionQuant()}.
+A wrapper function called \Rfunction{baseline()} is also provided, which
+has the advantage that it can take a CDF file name as input (the other
+functions take matrices). \Note{These functions are meant to be run
+internally and only exposed for advanced users.}
 
-There is no need to call this function directly, as it is automatically
-called by \Rfunction{RIcorrect()}, which will be explained in the next subsection.
+To baseline correct the chromatograms, we would call the function
+\Rfunction{ncdf4Convert()}, similarly as the section above but with
+extra parameters as the example shown below.
+
+<<baseline, eval=FALSE>>=
+samples <- ncdf4Convert(samples, path=".", baseline=TRUE, bsline_method="quantiles", ...)
+@
+
+Here, the parameter \Robject{baseline} is set to \Robject{TRUE} (by default is \Robject{FALSE})
+and we choose the method ``quantiles''. The $\ldots$ contain the parameters passed
+to \Rfunction{baselineCorrectionQuant()}. Similarly, if the method is ``classic'',
+then the extra parameters will be passed to \Rfunction{baselineCorrectionQuant()}.
+Please refer to the manpages for details on these methods.
 
 \subsection{Peak detection}
 
 Initially, \Biocpkg{TargetSearch} identifies the local apex intensities
 in all chromatograms, finds the retention time (RT) of the RI markers and converts
 RT to RI using linear interpolation \cite{VandenDool1963}.
-This is done by the function \Rfunction{RIcorrect()}. Parameter to this function are
+This is done by the function \Rfunction{RIcorrect()}. Parameters to this function are
 sample and retention time limits objects, the intensity threshhold (\Rcode{IntThreshold = 100}),
 the peak picking method (\Robject{pp.method}) and a \Robject{Window} parameter
 that will be used by said method. The function will return a matrix
@@ -193,14 +259,12 @@ extracted peaks of the respective NetCDF file, which will we call
 format) or a custom binary file (default format). The difference between them
 is that the binary file allows much faster parsing compared to the other format.
 
-If you chromatograms are not baseline corrected, it is at this point
-where you can pass the parameters \Rcode{baseline=TRUE} to \Rfunction{RIcorrect()}.
-Additional baseline correction parameters can be passed via
-\Robject{baseline.opts}.
+\Note{Formely, we would use this function for baseline correction, but
+as of \Biocpkg{TargetSearch} 1.42.0, this has to be done as explained in the section above.}
 
 <<RIcorrection>>=
 RImatrix <- RIcorrect(samples, rimLimits, IntThreshold = 100,
-		      pp.method = "smoothing", Window = 15)
+		      pp.method = "ppc", Window = 15)
 @
 
 There are three peak picking methods available: \emph{smoothing} implements the
