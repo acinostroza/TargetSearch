@@ -10,6 +10,8 @@ BiocStyle::latex()
 @
 
 \usepackage{booktabs}
+\definecolor{NoteBlue}{RGB}{45, 28, 156}
+\newcommand{\Note}[2][Note]{\textsl{\textcolor{NoteBlue}{#1: #2}}}
 
 \title{RI Correction Extra}
 \author{\'Alvaro Cuadros-Inostroza}
@@ -115,8 +117,12 @@ an intensity threshold of 50,
 the peak detection method is "ppc", and the time window width
 is $2*15+1=31$ scan points (equal to 1.5 seconds in this example).
 
+\Note{We skip conversion to CDF-4 files for illustration purposes.
+In a normal workflow you would set \Rcode{writeCDF4path=TRUE} (the
+default)}.
+
 <<ricorrect>>=
-RImatrix <- RIcorrect(samples.all, rimLimits,
+RImatrix <- RIcorrect(samples.all, rimLimits, writeCDF4path=FALSE,
             Window=15, pp.method="ppc", IntThreshold=50)
 RImatrix
 @
