@@ -124,7 +124,7 @@ windowingStep <- function(x, n, wm) {
 #' @return a netCDF object list or a baseline corrected matrix
 baselineCorrectionQuant <- function(peaks, time, smooth=0, qntl=0.50, width=30, unit=c("seconds", "points"), steps=10)
 {
-    bslinefun <- function(x, ...) .Call(TargetSearch:::c_baseline, x, ...)
+    bslinefun <- function(x, ...) .Call(c_baseline, x, ...)
     stopifnot(all(!is.na(c(smooth, qntl, width, steps))))
     int <- NULL
     unit <- match.arg(unit)

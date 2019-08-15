@@ -9,7 +9,7 @@ importFrom("graphics", "abline", "axis", "box", "boxplot", "grid", "image",
 importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
 
 importFrom("stats", "approx", "as.dist", "coef", "cor", "cutree", "dist",
-           "hclust", "lm", "median", "predict", "sd", "smooth.spline")
+           "filter", "hclust", "lm", "median", "predict", "sd", "smooth.spline")
 
 importFrom("utils", "edit", "head", "installed.packages", "read.delim",
            "setTxtProgressBar", "txtProgressBar", "write.table")

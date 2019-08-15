@@ -316,7 +316,7 @@ function(cdf_path, out_path=cdf_path, ...)
 	}
 	else if(!all(pc == diff(c(si,ln)))) {
 		warning("Invalid `scanindex` data. Trying `point_count` instead")
-		ncdf$scanindex <- c(0, cumsum(p[-m]))
+		ncdf$scanindex <- c(0, cumsum(pc[-ns]))
 	}
 	ncdf
 }
