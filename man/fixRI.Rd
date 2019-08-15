@@ -66,8 +66,8 @@ rim <- rimLimits
 # mess up the limits of marker 3 (real value is 369 seconds app.)
 rimLimits(rim)[3,] <- c(375, 400)
 
-# run RIcorrect
-RImat <- RIcorrect(smp, rim, massRange = c(85,320),
+# run RIcorrect (skip CDF-4 conversion)
+RImat <- RIcorrect(smp, rim, massRange = c(85,320), writeCDF4path=FALSE,
            Window = 15, pp.method = "ppc", IntThreshold = 50)
 
 # fix the limits of marker 3

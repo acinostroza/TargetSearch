@@ -39,6 +39,7 @@
     \code{\link[TargetSearch]{ImportFameSettings}},
 }
 \examples{
+# this run an example pipeline
 require(TargetSearchData)
 
 ## The directory with the NetCDF GC-MS files
@@ -53,6 +54,10 @@ lib.file  <- file.path(cdfpath, "library.txt")
 sampleDescription <- ImportSamples(samp.file, CDFpath = cdfpath, RIpath = ".")
 refLibrary        <- ImportLibrary(lib.file)
 rimLimits         <- ImportFameSettings(rim.file, mass = 87)
+
+# update NCDF4
+sampleDescription <- ncdf4Convert(sampleDescription, path=".")
+
 # perform RI correction
 RImatrix          <- RIcorrect(sampleDescription, rimLimits, massRange = c(85,320),
                    IntThreshold = 25, pp.method = "ppc", Window = 15)

@@ -39,7 +39,7 @@ CDFpath(smp) <- cdfpath
 rim <- rimLimits
 
 # run RIcorrect
-RImat <- RIcorrect(smp, rim, massRange = c(85,320),
+RImat <- RIcorrect(smp, rim, massRange = c(85,320), writeCDF4path=FALSE,
            Window = 15, pp.method = "ppc", IntThreshold = 50)
 
 # extract the retention times of the markers
