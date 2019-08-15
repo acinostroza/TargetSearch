@@ -1,12 +1,12 @@
 # function to find peaks in chromatograms
 # arguments:
-#    - cdfFile : The file (version 3 or 4)
+#    - ncdf : The file (version 3 or 4) or a alist
 #    - Window: Window to be used by method
 #    - IntThreshold: Intensity threshold
 #    - method: peak picking method. PPC / smoothing
 #    - massRange: m/z range (deprecated, it has no effect)
 
-NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThreshold = 10,
+NetCDFPeakFinding <- function(ncdf, massRange = NULL, Window = 15, IntThreshold = 10,
 	pp.method = "ppc", baseline = FALSE, ...) {
 
 	method <- match.arg(pp.method,c("smoothing", "ppc", "gaussian"))
@@ -18,7 +18,7 @@ NetCDFPeakFinding <- function(cdfFile, massRange = NULL, Window = 15, IntThresho
 
 	refine <- min(c(round(Window / 3), 4))
 
-	ncData <- .peakExtractWrap(cdfFile)
+	ncData <- .peakExtractWrap(ncdf)
 
 	if(baseline)
 		ncData <- baseline(ncData, ...)
