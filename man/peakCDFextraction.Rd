@@ -2,35 +2,44 @@
 \alias{peakCDFextraction}
 \title{ NetCDF to R }
 \description{
-	This function reads a netcdf chromatogram file and returns a list containing
-	the retention time and the intensity matrices.
+    This function reads a netcdf chromatogram (format 3 or 4) file and returns
+    a list containing raw data (retention time, intensity matrix) for easy
+    manipulation.
 }
 \usage{
 peakCDFextraction(cdfFile, massRange)
 }
 \arguments{
-  \item{cdfFile}{ A character string naming a netcdf file. }
+  \item{cdfFile}{A character string naming a netcdf file.}
   \item{massRange}{Deprecated. The mass range is extracted automatically. }
 }
 \details{
-	The function expects the following NetCDF variables: \code{intensity_values},
-	\code{mass_values}, \code{scan_index}, \code{point_count} and \code{scan_acquisition_time}.
-	Otherwise, an error will be displayed.\cr
+    The \code{cdfFile} is a path to a CDF-3 or a CDF-4 format file. The CDF-4
+    format file is a custom file used on \code{\link{TargetSearch}}.
 
-	The \code{massRange} parameter used to be a numeric vector with two components: lower
-	and higher masses. Now, the mass rangeis determined by scanning the CDF file. All masses
-	in the CDF file will be extracted.
+    The \code{massRange} parameter is deprecated but kept for compatibility.
+    The actual m/z range is detected automatically and returned to the user.
 }
 \value{
-	A two component list.
+A list with the following components:
   \item{Time}{The retention time vector.}
+  \item{Index}{The retention time index vector or NULL if unavailable.}
   \item{Peaks}{The intensity matrix. Rows are the retention times and columns are masses. The first
-	column is the lower mass value and the last one is the higher mass. }
+    column is the lower mass value and the last one is the higher mass. }
   \item{massRange}{The mass range.}
+  \item{baselineCorrected}{Logical. It is \code{TRUE} if the file was baseline corrected by
+      the function \code{\link{baseline}}. See note below.}
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \note{
-	This function does not look for peaks, just extracts all the raw intensity values
-	of the chromatogram file. Use \code{\link{NetCDFPeakFinding}} instead.
+    This function does not look for peaks, just extracts all the raw intensity values
+    of the chromatogram file. Use \code{\link{NetCDFPeakFinding}} instead.
+
+    The function does not know whether a CDF file was baseline corrected (for
+    example by the GC-MS software vendor), unless it was performed by the
+    function \code{\link{baseline}}. It is perfectably possible to have a
+    baseline corrected file and the element \code{baselineCorrected} be \code{FALSE}.
 }
-\seealso{ \code{\link{NetCDFPeakFinding}} }
+\seealso{ \code{\link{NetCDFPeakFinding}}, \code{\link{baseline}}.}
+
+% vim: set ts=4 sw=4 et:
