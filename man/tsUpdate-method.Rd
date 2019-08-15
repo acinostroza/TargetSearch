@@ -1,8 +1,7 @@
-\name{tsUpdate-methods}
 \docType{methods}
-\alias{tsUpdate}
-\alias{tsUpdate-methods}
+\name{tsUpdate,tsSample-method}
 \alias{tsUpdate,tsSample-method}
+\alias{tsUpdate}
 \title{ Methods for Updating TargetSearch objects \code{tsUpdate} }
 \description{
     \code{tsUpdate} is a generic function which can be used to update
@@ -16,5 +15,11 @@
 	A change was introduced starting from \sQuote{TargetSearch} version 1.42.0.
 }
 }}
+\examples{
+\dontrun{
+newObject <- tsUpdate(oldObject)
+}
+}
 \keyword{methods}
 \keyword{tsSample}
+\author{Alvaro Cuadros-Inostroza}
