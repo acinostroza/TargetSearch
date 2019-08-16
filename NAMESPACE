@@ -135,3 +135,6 @@ export(
 	"riMatrix",
 	"fixRI"
 )
+
+export(ncdf4_convert)
+export(ncdf4_convert_from_path)

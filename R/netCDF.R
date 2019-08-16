@@ -95,41 +95,90 @@
 }
 
 #' Convert from a NetCDF file format 3 to format 4
-#
-#' Convert from NetCDF format 3 into a custom TargetSearch NetCDF format 4.
-#' The new NetCDF just contains an intensity matrix (time x m/z) in order
-#' to allow easier and faster data manipulation.
+#'
+#' Convert from NetCDF format 3 into a custom TargetSearch NetCDF format 4. The
+#' new NetCDF just contains the raw data in a matrix format in order to allow
+#' easier and faster data manipulation.
+#'
+#' Starting from version 1.42.0, TargetSearch introduces a custom NetCDF file which
+#' is used for faster and easier data manipulation. This means, ion traces within a
+#' retention time can be quickly extracted, which if often required before
+#' plotting. Formerly, this process required parsing the whole file before the data
+#' could be extracted.
+#'
+#' The function only takes one file at the time, to convert many files at the
+#' same time see the function [ncdf4_convert_from_path()] or the high level method
+#' [ncdf4Convert()]. Alternativelly, you can call this function in a loop or
+#' using the `lapply` family of functions.
+#'
+#' Keep in mind this function is intended for internal use (or advanced users); it is
+#' exported for convenience. Using the method [ncdf4Convert()] is recommended.
+#'
+#' @section File structure:
+#' The structure of the NetCDF format 4 is straightforward and the variables and
+#' attributes are self-evident. The following variables are defined.
+#'
+#' * `retention_time` is a vector representing the retention time in seconds (double).
+#' * `retention_index` is a vector representing the retention time indices (double).
+#'   If missing, then the variable contains zeros. Its length is equal to the length
+#'   of `retention_time`.
+#' * `mass_range` is vector of length two containing the minimum and maximum m/z
+#'   values (integer).
+#' * `intensity` is matrix of intensity values (integer) where columns represent
+#'   ion traces and rows are scans. The dimensions are length of "retention time"
+#'   times the number of ions, ie, mass max - mass min + 1.
+#'
+#' In addition, the following attributes are defined. Note that only `creator` and
+#' `version` are mandatory.
+#'
+#' * `creator` a string equal to "TargetSearch" (for indentification purposes).
+#' * `version` file format version (string). Currently "1.1".
+#' * `time_corrected` a flag (short integer) to indicate RI correction.
+#' * `baseline_corrected` a flag (short integer) to indicate that the file was
+#'   baseline corrected by TargetSearch.
 #'
 #' @param cdfFile The NetCDF file to be converted
 #' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
 #'   file extension (which should be \code{.cdf}) by \code{.nc4}. If the file
 #'   extension is not \code{.cdf}, then \code{.nc4} is just appended.
-#' @param force Logical. Set to \code{TRUE} to allow overwrites. Default to \code{FALSE}.
-#' @param baseline baseline correct the CDF file
-#' @param \dots extra options passed to baseline
+#' @param force Logical. Set to \code{TRUE} to allow file overwrites, for example
+#'   if the destination file still exists, in which case a warning is thrown. Default to \code{FALSE}.
+#' @param baseline Logical. Whether or not baseline correct the input file.
+#' @param \dots extra options passed to [baseline()].
 #'
 #' @note
-#' This function is intended for internal use (or advanced users); it is exported
-#' for convenience.
-#'
-#' The generated CDF file is non-standard and very likely cannot be
-#' used outside targetSearch. For instance cannot be used by AMDIS.
-#' Moreover, the mass values are converted to nominal mass (if they are not),
-#' meaning there is data loss.
-#'
-#' Currently, it is not possible to reconstruct the original NetCDF file
-#' from the converted file. On the other hand, if the NetCDF files are exported
-#' from the custom vendor files, then the NetCDF 3 files can be deleted safely
-#' (as long you keep your original chromatograms).
+#' Currently, it is not possible to reconstruct the original NetCDF file from the
+#' converted file, especially if nominal mass or baseline correction was applied.
+#' On the other hand, if the NetCDF files are exported from custom chromatogram
+#' files (such as thermo raw files or LECO peg files), then the NetCDF 3 files
+#' can be deleted safely as there is always a way to recover them.
 #'
 #' @return A string. The path to the converted file or invisible.
-#' @example
+#' @export
+#' @md
+#' @author Alvaro Cuadros-Inostroza
+#' @examples
 #' require(TargetSearchData)
+#'
+#' # get files from package TargetSearchData
 #' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+#'
+#' # choose any file
 #' cdf <- file.path(cdfpath, '7235eg04.cdf')
 #' nc4 <- '7235eg04.nc4' # save file in current path
+#'
+#' # run the function
 #' ret <- ncdf4_convert(cdf, nc4)
+#'
+#' # the output should match the output file
 #' stopifnot(ret == nc4)
+#'
+#' # Use mapply to convert many files at the same time.
+#' cdf <- paste0('7235eg0', 6:8, '.cdf')
+#' nc4 <- paste0('7235eg0', 6:8, '.nc4')
+#' ret <- mapply(ncdf4_convert, file.path(cdfpath, cdf), nc4)
+#' stopifnot(ret == nc4)
+#'
 `ncdf4_convert` <-
 function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 {
@@ -245,7 +294,7 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksiz
 #'
 #' Performs retention time index (RI) correction on a CDF file, using the
 #' using the retention markers found by [RIcorrect()]. It wraps around
-#' the function rt2ri()].
+#' the function [rt2ri()].
 #'
 #' @param cdfFile Path to the CDF file
 #' @param observed The observed RI markers retention times'.
@@ -269,13 +318,39 @@ function(cdfFile, observed, standard)
 	invisible()
 }
 
-#' scans for CDF files and converts them to CDF4
+#' Convert CDF files to CDF4 from a path automatically
+#'
+#' Convert from NetCDF format 3 into a custom TargetSearch NetCDF format 4
+#' automatically by scanning for CDF-3 files in given path and calling
+#' the function [ncdf4_convert()] on them.
+#'
+#' This function simply wraps around [ncdf4_convert()]. It searches for
+#' CDF-3 files and converts them to CDF-4. Note that the search is not
+#' recursive.
+#'
+#' By default, the function scans the current path and saves them in
+#' the same path if `out_path` is not specified.
 #'
 #' @param cdf_path the input path to scan for
 #' @param out_path the output path in which the files will be saved
-#' @param ... extra options passed to ncdf4_convert
+#' @param \dots extra options passed to [ncdf4_convert()], which in
+#'    can be passed to [baseline()]
+#'
+#' @return a character vector of generated files or invisible.
+#' @seealso [ncdf4_convert()], [baseline()]
+#' @export
+#' @author Alvaro Cuadros-Inostroza
+#' @md
+#' @examples
+#' \dontrun{
+#' # get files from package TargetSearchData
+#' require(TargetSearchData)
+#' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+#' ncdf4_convert_from_path(cdfpath, ".")
+#' }
+#'
 `ncdf4_convert_from_path` <-
-function(cdf_path, out_path=cdf_path, ...)
+function(cdf_path=".", out_path=cdf_path, ...)
 {
 	# scans CDF file
 	in_files  <- dir(cdf_path, pattern="\\.cdf$", full.names=TRUE, ignore.case=TRUE)
