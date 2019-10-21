@@ -101,6 +101,9 @@ ret <- mapply(ncdf4_convert, file.path(cdfpath, cdf), nc4)
 stopifnot(ret == nc4)
 
 }
+\seealso{
+\code{\link[=ncdf4Convert]{ncdf4Convert()}}, \code{\link[=ncdf4_convert_from_path]{ncdf4_convert_from_path()}}, \code{\link[=baseline]{baseline()}}
+}
 \author{
 Alvaro Cuadros-Inostroza
 }

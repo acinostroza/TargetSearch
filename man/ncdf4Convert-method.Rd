@@ -36,6 +36,7 @@
     A new \code{\linkS4class{tsSample}} object with updated CDF-4 file paths.
     The files are converted in the background.
 }
+\seealso{\code{\link{ncdf4_convert}}}
 \examples{
 require(TargetSearchData)
 data(TSExample)

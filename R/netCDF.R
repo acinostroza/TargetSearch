@@ -154,6 +154,7 @@
 #' can be deleted safely as there is always a way to recover them.
 #'
 #' @return A string. The path to the converted file or invisible.
+#' @seealso [ncdf4Convert()], [ncdf4_convert_from_path()], [baseline()]
 #' @export
 #' @md
 #' @author Alvaro Cuadros-Inostroza
