@@ -1,3 +1,34 @@
+		CHANGES IN VERSION 1.42.0:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	As announced in version 1.40.0, the graphical user interface is
+	gone for good (i.e., defunct). The source code is available in
+	my github repository.
+
+NEW FEATURES
+
+   o	The most interesting feature is the introduction of a custom CDF-4 format
+	which hold the same data as a normal CDF-3 (as exported by the software
+	vendors), but allows faster read-access (specially for plotting) and
+	compression (among other features). This is at the cost of compatibility
+	as the CDF-4 files are unlikely to be used outsied TargetSearch
+
+   o	A new baseline correction method based on quantiles around a retention
+	time window. In addition, the new CDF-4 file format allows storing
+	of baseline-corrected values so it is not needed to recompute the baseline
+	each time like in older TargetSearch versions.
+
+   o	New function to transform to nominal mass. Some GC instruments export
+	CDF not in nominal mass format (some even export high mass accuracy).
+	Formely, this type of files were not supported and TargetSearch would
+	refuse to process them. Now, all types of mass accuracy are allowed,
+	obviously at the cost of losing that accuracy.
+
+BUG FIXES
+
+   o	Mostly code refactoring and house-keeping.
+
 		CHANGES IN VERSION 1.40.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
