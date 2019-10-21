@@ -220,19 +220,22 @@ you may continue reading the following subsection.
 
 However, if your chromatograms are not baseline corrected, \Biocpkg{TargetSearch}
 provides two baseline correction methods. The first one is implemented in
-\Rfunction{baselineCorrection()}, the so-called ``classic'' method because it has been
-present since de beginning, and the algorithm is based on the work of
-Chang et al. \cite{chang07}. The second method, ``quantiles'', was introduced
-in \Biocpkg{TargetSearch} 1.42.0 and the baseline is estimated by computing a quantile in a sliding
-window. This is implemented in \Rfunction{baselineCorrectionQuant()}.
+\Rfunction{baselineCorrection()} and is based on the work of Chang et al. \cite{chang07}.
+This method is referred as ``classic'' in the man-pages as it has been
+present since the beginning. The second method called ``quantiles'', introduced
+in \Biocpkg{TargetSearch} 1.42.0, estimates the baseline by computing a given quantile
+in a sliding window (the quantile is $50\%$ bby default). This method
+is implemented in \Rfunction{baselineCorrectionQuant()}.
+
 A wrapper function called \Rfunction{baseline()} is also provided, which
 has the advantage that it can take a CDF file name as input (the other
 functions take matrices). \Note{These functions are meant to be run
 internally and only exposed for advanced users.}
 
-To baseline correct the chromatograms, we would call the function
-\Rfunction{ncdf4Convert()}, similarly as the section above but with
-extra parameters as the example shown below.
+To apply baseline correction to the chromatograms, we simply call the
+function \Rfunction{ncdf4Convert()}, similarly as the section above, but with
+extra parameters that are required so the baseline correction procedure
+takes place. An example of such as call is shown below.
 
 <<baseline, eval=FALSE>>=
 samples <- ncdf4Convert(samples, path=".", baseline=TRUE, bsline_method="quantiles", ...)
@@ -240,7 +243,7 @@ samples <- ncdf4Convert(samples, path=".", baseline=TRUE, bsline_method="quantil
 
 Here, the parameter \Robject{baseline} is set to \Robject{TRUE} (by default is \Robject{FALSE})
 and we choose the method ``quantiles''. The $\ldots$ contain the parameters passed
-to \Rfunction{baselineCorrectionQuant()}. Similarly, if the method is ``classic'',
+to \Rfunction{baselineCorrectionQuant()}. Similarly, if the chosen method is ``classic'',
 then the extra parameters will be passed to \Rfunction{baselineCorrectionQuant()}.
 Please refer to the manpages for details on these methods.
 
