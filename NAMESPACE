@@ -141,3 +141,4 @@ export(
 
 export(ncdf4_convert)
 export(ncdf4_convert_from_path)
+export(ncdf4_data_extract)
