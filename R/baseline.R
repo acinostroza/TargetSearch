@@ -125,7 +125,12 @@ windowingStep <- function(x, n, wm) {
 baselineCorrectionQuant <- function(peaks, time, smooth=0, qntl=0.50, width=30, unit=c("seconds", "points"), steps=10)
 {
     bslinefun <- function(x, ...) .Call(c_baseline, x, ...)
-    stopifnot(all(!is.na(c(smooth, qntl, width, steps))))
+
+    assert_that(is.scalar(smooth), noNA(smooth))
+    assert_that(is.scalar(qntl), noNA(qntl))
+    assert_that(is.scalar(width), noNA(width))
+    assert_that(is.count(steps))
+
     int <- NULL
     unit <- match.arg(unit)
 

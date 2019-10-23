@@ -19,6 +19,9 @@ importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
 
 importFrom("stringr", "str_remove", "regex", "str_match", "str_replace")
 
+importFrom("assertthat", "assert_that", "is.count", "is.flag", "is.scalar",
+           "is.string", "noNA")
+
 exportClasses(
 	"tsLib",
 	"tsRim",

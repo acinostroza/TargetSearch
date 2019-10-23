@@ -183,6 +183,11 @@
 `ncdf4_convert` <-
 function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 {
+	# parameter assertions
+	assert_that(is.string(cdfFile))
+	assert_that(is.flag(force))
+	assert_that(is.flag(baseline))
+
 	# extract information of CDF file
 	nfo <- .ncdf_info(cdfFile)
 	peaks <- NULL
