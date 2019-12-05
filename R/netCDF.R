@@ -503,19 +503,24 @@ function(cdfFile, massValues, timeRange, useRT=FALSE)
         return(NULL)
 
     if(missing(massValues)) {
-        z <- ncvar_get(nc, 'intensity')
+        z <- ncvar_get(nc, 'intensity')[index,,drop=FALSE]
         massValues <- seq(MR[1], MR[2])
     } else {
         assert_that(is.numeric(massValues))
         massValues <- as.integer(massValues)
+
         z <- sapply(massValues, function(x) {
-          if(x < MR[1] | x > MR[2])
-             numeric(length(index))
-          else
-             ncvar_get(nc, 'intensity', start=c(index[1], x - MR[1] + 1), count=c(length(index), 1))
-         })
+            if(x < MR[1] | x > MR[2])
+                numeric(length(index))
+            else
+                ncvar_get(nc, 'intensity', start=c(index[1], x - MR[1] + 1), count=c(length(index), 1))
+        })
+
+        if(!is.matrix(z))
+            z <- matrix(z, length(index),  length(massValues))
     }
     colnames(z) <- as.character(massValues)
     list(Time=RT[index], Index=RI[index], Intensity=z, massRange=MR)
 }
+
 # vim: set ts=4 sw=4:
