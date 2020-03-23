@@ -4,7 +4,7 @@ import("methods")
 
 importFrom("graphics", "abline", "axis", "box", "boxplot", "grid", "image",
            "layout", "lcm",  "legend", "matlines", "matplot", "mtext",
-           "par", "plot", "plot.new", "points", "rect", "text", "title")
+           "par", "plot.new", "points", "rect", "text", "title")
 
 importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
 
