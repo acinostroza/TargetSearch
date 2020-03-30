@@ -11,13 +11,13 @@ importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
 importFrom("stats", "approx", "as.dist", "coef", "cor", "cutree", "dist",
            "filter", "hclust", "lm", "median", "predict", "sd", "smooth.spline")
 
-importFrom("utils", "edit", "head", "installed.packages", "read.delim",
-           "setTxtProgressBar", "txtProgressBar", "write.table")
+importFrom("utils", "head", "read.delim", "setTxtProgressBar", "txtProgressBar",
+           "write.table")
 
 importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
            "ncatt_get", "ncatt_put", "ncdim_def", "ncvar_def", "nc_create")
 
-importFrom("stringr", "str_remove", "regex", "str_match", "str_replace")
+importFrom("stringr", "regex", "str_match", "str_replace")
 
 importFrom("assertthat", "assert_that", "is.count", "is.flag", "is.scalar",
            "is.string", "noNA")
