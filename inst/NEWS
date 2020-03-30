@@ -1,3 +1,13 @@
+		CHANGES IN VERSION 1.44.0:
+
+BUG FIXES
+
+   o	Make sure matrix dimensions are not dropped in NCDF extraction
+
+   o	Fix check warnings due to plot() being moved to `base`.
+
+   o	Clean-up NAMESPACE
+
 		CHANGES IN VERSION 1.42.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
