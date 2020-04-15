@@ -299,14 +299,24 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksiz
 #' Update retention time index on a NCDF4 file
 #'
 #' Performs retention time index (RI) correction on a CDF file, using the
-#' using the retention markers found by [RIcorrect()]. It wraps around
-#' the function [rt2ri()].
+#' retention markers found by [RIcorrect()], or to force the markers time
+#' if, for example, the RI markers were not co-injected with the biological
+#' samples. It wraps around [rt2ri()]
 #'
+#' This function is similar to [fixRI()], with the difference that is acts
+#' upon a single file, whereas [fixRI()] requires a [tsSample-class]
+#' object.
+#'
+#' @md
 #' @param cdfFile Path to the CDF file
 #' @param observed The observed RI markers retention times'.
 #' @param standard The RI of said markers.
+#' @return Returns `invisible`
 #' @note
 #' This function is meant to be used internally. It is exposed for convenience.
+#' @seealso [fixRI()], [RIcorrect()]
+#' @author Alvaro Cuadros-Inostroza
+#'
 `ncdf4_update_ri` <-
 function(cdfFile, observed, standard)
 {
