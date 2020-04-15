@@ -7,7 +7,7 @@
     for example, the RI markers were not co-injected with the biological samples.
 }
 \usage{
-fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL)
+fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRUE)
 }
 \arguments{
   \item{samples}{ A \code{tsSample} object created by \code{\link{ImportSamples}} function. }
@@ -15,6 +15,7 @@ fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL)
   \item{RImatrix}{Optional. A retention time matrix of the found retention time markers that
   was obtained after running \code{\link{RIcorrect}}.}
   \item{sampleNames}{Optional. A character vector naming the samples that are to be RI corrected.}
+  \item{quiet}{Logical. Do not print a list of converted files.}
 }
 \details{
     Sometimes the retention index limits (see \code{\link{ImportFameSettings}})
@@ -45,7 +46,8 @@ fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL)
     names) or a numeric vector representing the sample indexes.
 }
 \value{
-    Invisible \code{NULL}. It prints the corrected samples.
+    Invisible \code{NULL}. It prints the corrected samples if \code{quiet} is
+    \code{FALSE}.
 }
 \examples{
 require(TargetSearchData)

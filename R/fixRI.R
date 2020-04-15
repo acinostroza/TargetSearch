@@ -6,11 +6,12 @@ fixRIcorrection <- function(...) {
 }
 
 # function to fix the RI of the files indexed by 'idx'
-.fixRIfile <- function(ri.files, RImatrix, standard, idx)
+.fixRIfile <- function(ri.files, RImatrix, standard, idx, quiet)
 {
    for(i in idx) {
        fameTimes <- RImatrix[,i]
-       message(sprintf("Correcting File %s", ri.files[i]))
+       if(!quiet)
+           message(sprintf("Correcting File %s", ri.files[i]))
        cols   <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
        opt    <- get.file.format.opt(ri.files[i], cols)
        if(opt[1] == 0) {
@@ -83,8 +84,9 @@ riMatrix <- function(samples, rim)
 	RImat
 }
 
-fixRI <- function(samples, rimLimits, RImatrix=NULL, sampleNames=NULL)
+fixRI <- function(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRUE)
 {
+	assert_that(is.flag(quiet))
 	if(!is.null(RImatrix))
 		.validateRImatrix(samples, rimLimits, RImatrix)
 	else
@@ -96,7 +98,7 @@ fixRI <- function(samples, rimLimits, RImatrix=NULL, sampleNames=NULL)
 
 	ri.files <- RIfiles(samples)
 	standard  <- rimStandard(rimLimits)
-	.fixRIfile(ri.files, RImatrix, standard, idx)
+	.fixRIfile(ri.files, RImatrix, standard, idx, quiet)
 	invisible()
 }
 
