@@ -28,16 +28,16 @@ fixRIcorrection <- function(...) {
    }
 }
 
-# validate an RI matrix.
+# validate an RI matrix. returns the same matrix
 .validateRImatrix <- function(smp, rim, RImat)
 {
 	if(length(rimStandard(rim)) != nrow(RImat))
 		stop("Invalid RI matrix: number of rows don't match rimLimit object.")
-	if(length(smp) != ncol(RImat))
-		stop("Invalid RI matrix: number of columns don't match tsSample object.")
-	if( any(colnames(RImat) != sampleNames(smp) ))
+	if(is.null(colnames(RImat)))
+		stop("Invalid RI matrix: missing column names")
+	if(!all(sampleNames(smp) %in% colnames(RImat)))
 		stop("Sample names and columns of the RI matrix do not match")
-	return(TRUE)
+	RImat[, sampleNames(smp), drop=FALSE]
 }
 
 # returns the index of the sampl
@@ -88,7 +88,7 @@ fixRI <- function(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRU
 {
 	assert_that(is.flag(quiet))
 	if(!is.null(RImatrix))
-		.validateRImatrix(samples, rimLimits, RImatrix)
+		RImatrix <- .validateRImatrix(samples, rimLimits, RImatrix)
 	else
 		RImatrix <- riMatrix(samples, rimLimits)
 

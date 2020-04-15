@@ -69,8 +69,8 @@ rim <- rimLimits
 rimLimits(rim)[3,] <- c(375, 400)
 
 # run RIcorrect (skip CDF-4 conversion)
-RImat <- RIcorrect(smp, rim, massRange = c(85,320), writeCDF4path=FALSE,
-           Window = 15, pp.method = "ppc", IntThreshold = 50)
+RImat <- RIcorrect(smp, rim, writeCDF4path=FALSE,
+           Window = 15, IntThreshold = 50)
 
 # fix the limits of marker 3
 rimLimits(rim)[3,] <- c(360, 400)
@@ -84,7 +84,7 @@ RImat <- riMatrix(smp, rim)
 # compare the values with the real ones (previously stored in RImatrix)
 stopifnot( all.equal(RImat, RImatrix[,1:4], tolerance=1e-8) )
 
-# manual adjusment or RI markers for sample 3.
+# manual adjustment or RI markers for sample 3.
 # Warning: this is just an example to illustrate how to use this function.
 #          don't do this unless you know what you're doing.
 RImat[,3] <- c(252, 311, 369)
