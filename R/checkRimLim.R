@@ -55,6 +55,9 @@
 #' # time window
 #' ret <- checkRimLim(samples, rim)
 #'
+#' # to choose a specific samples and marker, use subsetting
+#' ret <- checkRimLim(samples[3], rim[2])
+#'
 `checkRimLim` <-
 function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
     mar=c(2,2,2,2), oma=c(3,3,2,0.5), cex.main=1, type='l', ...)
@@ -80,6 +83,7 @@ function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
     cdf <- CDFfiles(samples)[k]
     get_data <- if(.is_ts_ncdf4(cdf)) .get_data4 else .get_data3
     dat <- get_data(cdf, rim, extend)
+    names(dat) <- rownames(rim@limits)
 
     if(!show)
 	    return(invisible(dat))

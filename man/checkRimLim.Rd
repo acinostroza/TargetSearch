@@ -4,9 +4,19 @@
 \alias{checkRimLim}
 \title{Visually check retention index marker limits}
 \usage{
-checkRimLim(samples, rim, layout, show = TRUE, extend = 0.5,
-  rect.col = "#e7e7e7", mar = c(2, 2, 2, 2), oma = c(3, 3, 2, 0.5),
-  cex.main = 1, type = "l", ...)
+checkRimLim(
+  samples,
+  rim,
+  layout,
+  show = TRUE,
+  extend = 0.5,
+  rect.col = "#e7e7e7",
+  mar = c(2, 2, 2, 2),
+  oma = c(3, 3, 2, 0.5),
+  cex.main = 1,
+  type = "l",
+  ...
+)
 }
 \arguments{
 \item{samples}{A  \code{\linkS4class{tsSample}} object created by
@@ -36,9 +46,9 @@ the current retention time limits.}
 \code{\link[graphics]{par}()}.}
 
 \item{type}{A character vector indicating the type of plots. Default \code{"l"} for
-lines. Passed to \code{\link[base]{plot}()}.}
+lines. Passed to \code{\link[graphics]{plot}()}.}
 
-\item{...}{extra plotting arguments passed to \code{\link[base]{plot}()}
+\item{...}{extra plotting arguments passed to \code{\link[graphics]{plot}()}
 such as \code{col}, \code{lty}, \code{pch}, \code{lwd}.}
 }
 \value{
@@ -72,6 +82,9 @@ rim <- ImportFameSettings(file.path(cdfpath, "rimLimits.txt"))
 # choose a sample at random and plot the m/z traces around the retention
 # time window
 ret <- checkRimLim(samples, rim)
+
+# to choose a specific samples and marker, use subsetting
+ret <- checkRimLim(samples[3], rim[2])
 
 }
 \seealso{
