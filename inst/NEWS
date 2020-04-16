@@ -1,8 +1,17 @@
 		CHANGES IN VERSION 1.44.0:
 
+NEW FEATURES
+
+   o	The class tsRim allows subsetting by the `[` operator. This makes
+	possible to choose specific marker for plotting, eg, in `checkRimLim`.
+
+   o	New function `updateRI` to update/correct/force the time of the RI
+	markers. Just like the old function `fixRI`, but it also corrects
+	CDF files.
+
 BUG FIXES
 
-   o	Make sure matrix dimensions are not dropped in NCDF extraction
+   o	Make sure matrix dimensions are not dropped in NCDF extraction.
 
    o	Fix check warnings due to plot() being moved to `base`.
 
