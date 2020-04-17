@@ -27,8 +27,8 @@
 #' @param cex.main The magnification to be used for main titles, passed to
 #'    \code{\link[graphics]{par}()}.
 #' @param type A character vector indicating the type of plots. Default \code{"l"} for
-#'    lines. Passed to \code{\link[graphics]{plot}()}.
-#' @param ... extra plotting arguments passed to \code{\link[graphics]{plot}()}
+#'    lines. Passed to \code{\link[base]{plot}()}.
+#' @param ... extra plotting arguments passed to \code{\link[base]{plot}()}
 #'    such as \code{col}, \code{lty}, \code{pch}, \code{lwd}.
 #'
 #' @return

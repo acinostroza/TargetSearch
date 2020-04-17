@@ -46,9 +46,9 @@ the current retention time limits.}
 \code{\link[graphics]{par}()}.}
 
 \item{type}{A character vector indicating the type of plots. Default \code{"l"} for
-lines. Passed to \code{\link[graphics]{plot}()}.}
+lines. Passed to \code{\link[base]{plot}()}.}
 
-\item{...}{extra plotting arguments passed to \code{\link[graphics]{plot}()}
+\item{...}{extra plotting arguments passed to \code{\link[base]{plot}()}
 such as \code{col}, \code{lty}, \code{pch}, \code{lwd}.}
 }
 \value{
