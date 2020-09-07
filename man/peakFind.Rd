@@ -5,19 +5,18 @@
   This function returns a list of the intensities and RI matrices that were searched.
 }
 \usage{
-peakFind(samples, Lib, cor_RI,
-    columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
-    showProgressBar = FALSE)
+peakFind(samples, Lib, cor_RI, columns = NULL, showProgressBar = FALSE)
 }
 \arguments{
   \item{samples}{ A \code{tsSample} object created by \code{ImportSamples} function. }
   \item{Lib}{ A \code{tsLib} object created by \code{ImportLibrary} function with
-	 corrected RI values.	See \code{medianRILib}. }
+	 corrected RI values. See \code{medianRILib}. }
   \item{cor_RI}{ A matrix of correlating selective masses RI for every sample.
 	 See \code{sampleRI}. }
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
-    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
-    with the header names of those columns.}
+  \item{columns}{Either \code{NULL}, a \code{character} vector, or an \code{integer} vector. In
+    most cases, leave it as \code{NULL}. This parameter is used to configure the column names or
+    positions of RI text files. See the documentation on the \code{\link{text2bin}} function for
+    further details.}
 	\item{showProgressBar}{Logical. Should the progress bar be displayed?}
 }
 \value{

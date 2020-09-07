@@ -1,7 +1,6 @@
 # low level search of peaks in a RI file.
 `getAllPeaks` <-
-function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
-         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
+function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"), columns = NULL)
 {
     if(!all(c('mz', 'minRI', 'maxRI') %in% colnames(ref)))
         stop("Error: missing columns in 'ref'")
@@ -19,7 +18,7 @@ function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"),
 `FindAllPeaks` <-
 function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          mz_type = c('selMass', 'quantMass', 'topMass'),
-         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
+         columns = NULL)
 {
     if(is_nullOrNA(RI)) #
         RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]

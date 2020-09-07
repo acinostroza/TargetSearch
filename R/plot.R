@@ -85,8 +85,8 @@ plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI =
 }
 
 # a new version
-plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, massRange=NULL, corMass=FALSE) {
-
+plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, massRange=NULL, corMass=FALSE)
+{
 	grep2 <- function(pattern, x) {
 		out <- grep(tolower(pattern), tolower(x), fixed=TRUE)
 		if(length(out) == 0) # trying regular expression
@@ -131,11 +131,14 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 	}
 
 	# code to transform from RI to RT
-	cols      <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
-	opt       <- get.file.format.opt(riFile, cols)
+	opt       <- get.file.format.opt(riFile)
+
 	if(opt[1] == 0) {
+        # retention index and retention time columns (only for text RI files)
+        ri_col <- opt[4] + 1
+        rt_col <- opt[5] + 1
 		tmp  <- read.delim(riFile, as.is = TRUE)
-		ri   <- rt2ri(rawpeaks$Time, tmp$RETENTION_TIME, tmp$RETENTION_TIME_INDEX)
+		ri   <- rt2ri(rawpeaks$Time, tmp[, rt_col], tmp[, ri_col])
 	} else if(opt[1] == 1) {
 		tmp <- readRIBin(riFile)
 		ri  <- rt2ri(rawpeaks$Time, tmp$retTime, tmp$retIndex)

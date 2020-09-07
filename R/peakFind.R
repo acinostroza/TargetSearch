@@ -1,11 +1,10 @@
 
 peakFind <-
-function(samples, Lib, cor_RI, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
-	showProgressBar = FALSE) {
-
+function(samples, Lib, cor_RI, columns = NULL, showProgressBar = FALSE)
+{
 	my.files <- RIfiles(samples)
 	my.names <- sampleNames(samples)
-	
+
 	refLib <- lapply(seq(ncol(cor_RI)), function(x) refLib(Lib, cor_RI[,x], w=3, sel=FALSE))
 	RES    <- FindPeaks(my.files, refLib, columns, showProgressBar)
 	resInt <- Intensity(RES)

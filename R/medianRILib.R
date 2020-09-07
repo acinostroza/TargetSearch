@@ -2,8 +2,8 @@
 # 07.10.2008: the function was change to support the new Library format.
 
 medianRILib <- function(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRep.pdf",
-	columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"), showProgressBar = FALSE) {
-	
+	columns = NULL, showProgressBar = FALSE) {
+
 	my.files   <- RIfiles(samples)
 	refLib     <- refLib(Lib, w = 1, sel = TRUE)
 	libId      <- libId(Lib, sel = TRUE)

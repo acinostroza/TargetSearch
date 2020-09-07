@@ -45,6 +45,12 @@ fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRUE)
     then all samples will be corrected. It could be character vector (sample
     names) or a numeric vector representing the sample indexes.
 }
+\note{
+    In case the RI files are in text format and their column names are not standard (for
+    example, when the files were generated with another software), use the global option
+    \code{'TS_RI_columns'} or transform the RI files to \code{\link{TargetSearch}} binary
+    format. See the documentation in function \code{\link{text2bin}}.
+}
 \value{
     Invisible \code{NULL}. It prints the corrected samples if \code{quiet} is
     \code{FALSE}.

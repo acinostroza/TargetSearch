@@ -2,7 +2,7 @@
 # 07.10.2008: the function was change to support the new Library format.
 
 sampleRI <-
-function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
+function(samples, Lib, r_thres=0.95, columns = NULL,
  method = "dayNorm", minPairObs = 5, showProgressBar = FALSE,
  makeReport = FALSE, pdfFile = "medianLibRep.pdf"){
 
@@ -10,7 +10,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 	Names     <- sampleNames(samples)
 	refLib    <- refLib(Lib, w = 2, sel = TRUE)
 	libId     <- libId(Lib, sel = TRUE)
-	
+
 	RES       <- FindPeaks(my.files, refLib, columns, showProgressBar)
 
 	if(makeReport == TRUE)
@@ -32,7 +32,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 
 	met_cor <- list()
 	options(warn = -1)
-	
+
 	if(showProgressBar)
 		pb <- ProgressBar(title="Correlating Masses...", label="File in processing...")
 
@@ -75,7 +75,7 @@ function(samples, Lib, r_thres=0.95, columns = c("SPECTRUM", "RETENTION_TIME_IND
 			return(X)
 		apply(X, MARGIN, FUN, ...)
 	}
-	
+
 	if(showProgressBar)
 		pb <- ProgressBar(title="Getting RIs...", label="File in processing...")
   for(i in 1:length(Lib)){

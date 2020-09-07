@@ -6,24 +6,24 @@ Return a \code{tsLib} object with the median RI of the selective masses across s
 }
 \usage{
 medianRILib(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRep.pdf",
-	columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
-    showProgressBar = FALSE)
+            columns = NULL, showProgressBar = FALSE)
 }
 
 \arguments{
   \item{samples}{ A \code{tsSample} object created by \code{\link{ImportSamples}} function. }
   \item{Lib}{ A \code{tsLib} object created by \code{\link{ImportLibrary}} function. }
   \item{makeReport}{ Logical. If \code{TRUE} will report the RI deviations for every metabolite
-	in the library. }
+    in the library. }
   \item{pdfFile}{ The file name where the report will be saved. }
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
-    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
-    with the header names of those columns.}
-	\item{showProgressBar}{Logical. Should the progress bar be displayed?}
+  \item{columns}{Either \code{NULL}, a \code{character} vector, or an \code{integer} vector. In
+    most cases, leave it as \code{NULL}. This parameter is used to configure the column names or
+    positions of RI text files. See the documentation on the \code{\link{text2bin}} function for
+    further details.}
+  \item{showProgressBar}{Logical. Should the progress bar be displayed?}
 }
 \value{
-	A \code{tsLib} object. It will update the slot \code{med_RI} which contains
- the median RI of every	searched metabolite.
+    A \code{tsLib} object. It will update the slot \code{med_RI} which contains
+    the median RI of every searched metabolite.
 }
 \examples{
 require(TargetSearchData)

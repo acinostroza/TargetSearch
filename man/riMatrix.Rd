@@ -18,6 +18,12 @@ riMatrix(samples, rim)
 
     Note that it does not perform any RI adjusment. See \code{\link{fixRI}}.
 }
+\note{
+    In case the RI files are in text format and their column names are not standard (for
+    example, when the files were generated with another software), use the global option
+    \code{'TS_RI_columns'} or transform the RI files to \code{\link{TargetSearch}} binary
+    format. See the documentation in function \code{\link{text2bin}}.
+}
 \value{
     A retention time matrix of the found retention time markers. Every column represents a
     sample and rows RT markers.

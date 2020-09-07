@@ -8,7 +8,7 @@
 \usage{
 FindAllPeaks(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          mz_type = c('selMass', 'quantMass', 'topMass'),
-         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"))
+         columns = NULL)
 }
 \arguments{
   \item{samples}{ A \code{tsSample} object created by \code{\link{ImportSamples}} function. }
@@ -20,9 +20,10 @@ FindAllPeaks(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
   \item{RI}{ The expected retention index  or \code{NULL}. }
   \item{mz_type}{ whether to search for the selective, quant or top masses of the respective
     metabolite.}
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
-    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
-    with the header names of those columns.}
+  \item{columns}{Either \code{NULL}, a \code{character} vector, or an \code{integer} vector. In
+    most cases, leave it as \code{NULL}. This parameter is used to configure the column names or
+    positions of RI text files. See the documentation on the \code{\link{text2bin}} function for
+    further details.}
 }
 \details{
    The function searches for all peaks of a metabolite in all samples within a RI

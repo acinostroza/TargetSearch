@@ -7,8 +7,7 @@
 	in text (binary) format to binary (text) format.
 }
 \usage{
-text2bin(in.files, out.files=NULL,
-	columns=c("SPECTRUM","RETENTION_TIME_INDEX","RETENTION_TIME"))
+text2bin(in.files, out.files=NULL, columns=NULL)
 
 bin2text(in.files, out.files=NULL)
 }

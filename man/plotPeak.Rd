@@ -21,7 +21,14 @@ plotPeak(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1,
   \item{corMass}{ Logical. If TRUE, show only correlating masses for the selected
 	metabolite. Show all masses otherwise.}
 }
-\note{This function was completely rewritten. For the old function, see \code{\link{plotPeakSimple}}}
+\note{
+    This function was completely rewritten. For the old function, see \code{\link{plotPeakSimple}}.
+
+    In case the RI files are in text format and their column names are not standard (for
+    example, when the files were generated with another software), use the global option
+    \code{'TS_RI_columns'} or transform the RI files to \code{\link{TargetSearch}} binary
+    format. See the documentation in function \code{\link{text2bin}}.
+}
 \value{
   A two component list containing the retention time and the intensity matrices. This
   list can be recycled as the 'rawpeaks' parameter for further plots (for example in a loop),

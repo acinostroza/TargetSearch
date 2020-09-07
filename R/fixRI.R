@@ -12,11 +12,15 @@ fixRIcorrection <- function(...) {
        fameTimes <- RImatrix[,i]
        if(!quiet)
            message(sprintf("Correcting File %s", ri.files[i]))
-       cols   <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
-       opt    <- get.file.format.opt(ri.files[i], cols)
+       opt    <- get.file.format.opt(ri.files[i])
+
+       # retention index and retention time columns (only for text RI files)
+       ri_col <- opt[4] + 1
+       rt_col <- opt[5] + 1
+
        if(opt[1] == 0) {
            tmp    <- read.delim(ri.files[i], as.is = TRUE)
-           tmp$RETENTION_TIME_INDEX <- rt2ri(tmp$RETENTION_TIME, fameTimes, standard)
+           tmp[, ri_col] <- rt2ri(tmp[, rt_col], fameTimes, standard)
            write.table(tmp, file = ri.files[i], row.names = FALSE, sep="\t", quote=FALSE)
        } else if(opt[1] == 1) {
            z <- readRIBin(ri.files[i])
@@ -63,12 +67,11 @@ riMatrix <- function(samples, rim)
 	if(length(mass) == 1)
 		mass <- rep(mass, dim(rLimits)[1])
 
-	cols <- c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME")
 	searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
 
 	useRT <- TRUE
 	for (i in 1:length(ri.files)) {
-		opts <- get.file.format.opt(ri.files[i], cols)
+		opts <- get.file.format.opt(ri.files[i])
 		out  <- .Call(c_find_peaks,
 						as.character(ri.files[i]), # MyFile
 						as.integer(mass),          # Mass

@@ -1,6 +1,6 @@
 
 `FindPeaks` <-
-function(my.files, refLib, columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"), showProgressBar = FALSE)
+function(my.files, refLib, columns = NULL, showProgressBar = FALSE)
 {
     my.names <- basename(my.files)
     if(is.list(refLib)) {

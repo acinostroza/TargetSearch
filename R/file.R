@@ -1,7 +1,28 @@
 # miscellaneous file functions
 
-# Convert RI files from text to binary format and viceversa.
+`get.columns.name.default` <- function()
+{
+	c(spectrum="SPECTRUM",retIndex="RETENTION_TIME_INDEX",retTime="RETENTION_TIME")
+}
 
+# function to get the default RI text columns
+`get.columns.name` <- function(cols)
+{
+	if(!is.null(cols) && !is.na(cols))
+		return(cols)
+	cols <- getOption('TS_RI_columns')
+	if(is.null(cols))
+		return(get.columns.name.default())
+	return(cols)
+}
+
+# return file header as string to write TXT files
+`get.file.header` <- function() {
+	cols <- get.columns.name.default()
+	paste(cols['retTime'], cols['spectrum'], cols['retIndex'], sep="\t")
+}
+
+# Convert RI files from text to binary format and viceversa.
 `bin2text` <-
 function(in.files, out.files=NULL)
 {
@@ -9,7 +30,7 @@ function(in.files, out.files=NULL)
 		out.files <- paste(sub("\\.\\w+$", "", in.files), ".txt", sep="")
 
 	swap <- pmatch(.Platform$endian, c("little", "big")) - 1
-	header <- "RETENTION_TIME\tSPECTRUM\tRETENTION_TIME_INDEX"
+	header <- get.file.header()
 
 	stopifnot(length(in.files) == length(out.files))
 	for(i in 1:length(in.files)) {
@@ -22,14 +43,12 @@ function(in.files, out.files=NULL)
 }
 
 `text2bin` <-
-function(in.files, out.files=NULL,
-	columns=c("SPECTRUM","RETENTION_TIME_INDEX","RETENTION_TIME"))
+function(in.files, out.files=NULL, columns=NULL)
 {
 	if(is.null(out.files))
 		out.files <- paste(sub("\\.\\w+$", "", in.files), ".dat", sep="")
 
 	swap <- pmatch(.Platform$endian, c("little", "big")) - 1
-	header <- "RETENTION_TIME\tSPECTRUM\tRETENTION_TIME_INDEX"
 
 	stopifnot(length(in.files) == length(out.files))
 	for(i in 1:length(in.files)) {
@@ -46,6 +65,7 @@ function(in.files, out.files=NULL,
 `get.columns` <-
 function(my.file, columns)
 {
+	columns <- get.columns.name(columns)
 	if(length(columns) != 3)
 		stop("Incorrect length of 'columns' argument. Should be exactly 3.")
 
@@ -67,7 +87,7 @@ function(my.file, columns)
 #  - RETENTION_TIME column number (*)
 #    (*) numbering starts from 0
 `get.file.format.opt` <-
-function(my.file, columns)
+function(my.file, columns=NULL)
 {
 	x <- readBin(my.file, what="int", n=2, endian="little")
 	if(all(x == c(169603882,84919))) { # bin file signature

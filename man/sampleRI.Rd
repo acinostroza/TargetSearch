@@ -5,8 +5,7 @@
 	Return a matrix of the sample specific RIs based on the correlating selective masses.
 }
 \usage{
-sampleRI(samples, Lib, r_thres = 0.95,
-         columns = c("SPECTRUM", "RETENTION_TIME_INDEX", "RETENTION_TIME"),
+sampleRI(samples, Lib, r_thres = 0.95, columns = NULL,
          method = "dayNorm", minPairObs = 5, showProgressBar = FALSE,
          makeReport = FALSE, pdfFile = "medianLibRep.pdf")
 }
@@ -15,10 +14,11 @@ sampleRI(samples, Lib, r_thres = 0.95,
   \item{samples}{A \code{tsSample} object created by \code{ImportSamples} function. }
   \item{Lib}{  A \code{tsLib} object created by \code{\link{ImportLibrary}} function with corrected RI values.
 	See \code{medianRILib}. }
-  \item{r_thres}{ A correlation threshold.}
-  \item{columns}{ A numeric vector with the positions of the columns \code{SPECTRUM},
-    \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME} or a character vector
-    with the header names of those columns.}
+  \item{r_thres}{ A correlation threshold. }
+  \item{columns}{Either \code{NULL}, a \code{character} vector, or an \code{integer} vector. In
+    most cases, leave it as \code{NULL}. This parameter is used to configure the column names or
+    positions of RI text files. See the documentation on the \code{\link{text2bin}} function for
+    further details.}
   \item{method}{ Normalisation method. Options are \code{"dayNorm"}, a day based median
 	normalisation, \code{"medianNorm"}, normalisation using the median of all the intensities
 	of a given mass, and \code{"none"}, no normalisation at all. }
