@@ -10,7 +10,7 @@ Author: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>,
 Maintainer: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>
 Depends: ncdf4
 Imports: graphics, grDevices, methods, stats, utils, stringr, assertthat
-Suggests: TargetSearchData, BiocStyle, knitr
+Suggests: TargetSearchData, BiocStyle, knitr, tinytest
 VignetteBuilder: knitr
 Description: This packages provides a targeted pre-processing method for GC-MS data. 
 biocViews: MassSpectrometry, Preprocessing, DecisionTree, ImmunoOncology
