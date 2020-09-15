@@ -27,9 +27,8 @@ function(files, quiet=FALSE)
 `.detect.files` <-
 function(files)
 {
-    fun <- function(x) {
-        k <- str_match(x, regex("\\.(cdf|nc4)$", ignore_case=TRUE))
-        if(all(!is.na(k)))
+    fun <- function(x, m) {
+        if(m != -1)
             return(x)
         for(e in c('.nc4', '.cdf', '.CDF')) {
             f <- paste0(x, e)
@@ -38,7 +37,8 @@ function(files)
        }
        return(x)
     }
-    sapply(files, fun, USE.NAMES=FALSE)
+    m <- regexpr("\\.(cdf|nc4)$", files, perl=TRUE, ignore.case=TRUE)
+    mapply(fun, files, m, USE.NAMES=FALSE)
 }
 
 `ImportSamples` <-
@@ -157,9 +157,8 @@ function(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"), verbose=FALSE, .
         if(length(rifiles) == 0)
             stop('Error: No RI files were found in the directory')
 
-        pattern <- regex(pattern, ignore_case=TRUE)
         path    <- dirname(rifiles)
-        cdffiles <- str_replace(basename(rifiles), pattern, "\\1.nc4")
+        cdffiles <- sub(pattern, "\\1.nc4", basename(rifiles), perl=TRUE, ignore.case=TRUE)
         cdffiles <- file.path(path, cdffiles)
         ret <- new('tsSample', CDFfiles=cdffiles, RIfiles=rifiles, ftype=ftype)
     } else {

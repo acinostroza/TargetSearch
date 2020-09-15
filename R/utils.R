@@ -51,10 +51,12 @@ is_nullOrNA <- function(x)
 .parse_file_names <- function(files, exts)
 {
     e <- paste(exts, collapse="|")
-    e <- sprintf("^(.+)\\.(%s)$", e)
-    z <- str_match(files, regex(e, ignore_case=TRUE))
-    name <- z[,2]
-    extension  <- z[,3]
+    m <- regexpr(sprintf("^(.+)\\.(%s)$", e), files, perl=TRUE, ignore.case=TRUE)
+    f <- function(x, m, len) if(m == -1) NA_character_ else substring(x, m, m + len - 1)
+    cstart <- attr(m, 'capture.start')
+    clen <- attr(m, 'capture.length')
+    name <- mapply(f, files, cstart[, 1], clen[, 1], USE.NAMES=FALSE)
+    extension <- mapply(f, files, cstart[, 2], clen[, 2], USE.NAMES=FALSE)
     name[ is.na(name) ] <- files[ is.na(name) ]
     cbind(name, extension)
 }
