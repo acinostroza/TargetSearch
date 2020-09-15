@@ -8,7 +8,7 @@
 # function to get the default RI text columns
 `get.columns.name` <- function(cols)
 {
-	if(!is.null(cols) && !is.na(cols))
+	if(!is.null(cols) && all(!is.na(cols)))
 		return(cols)
 	cols <- getOption('TS_RI_columns')
 	if(is.null(cols))
