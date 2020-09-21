@@ -533,4 +533,78 @@ function(cdfFile, massValues, timeRange, useRT=FALSE)
     list(Time=RT[index], Index=RI[index], Intensity=z, massRange=MR)
 }
 
+#' plot peak from NetCDF-4 files
+#'
+#' @param obj list of files of tsSample object
+#' @param massValues the m/z values (two-element vector)
+#' @param timeRange the time range (two-element vector)
+#' @param useRT use RT as time units (RI if FALSE)
+#' @param showRT use RT as y-axis (RI if FALSE)
+#' @param plot should a plot be drawn?
+#' @param ... extra plotting parameters
+#' @return a matrix with the data used for plotting
+`ncdf4_plot_peak` <-
+function(obj, massValues, timeRange, useRT=TRUE, showRT=useRT, plot=TRUE, ...)
+{
+    if(inherits(obj, 'tsSample')) {
+        cdf <- CDFfiles(obj)
+        names(cdf) <- sampleNames(obj)
+    } else if(is.character(obj)) {
+        cdf <- obj
+    } else {
+        stop('Object must inherit `tsSample` or be a character vector')
+    }
+    assert_that(is.flag(useRT))
+    assert_that(is.flag(showRT))
+    assert_that(is.flag(plot))
+
+    optfun <- function(j, ...) {
+        J <- function(x, j) x[ ((j - 1) %% length(x)) + 1]
+        optnames <- c('scol', 'stype', 'slty', 'slwd', 'spch', 'sbg', 'scex')
+        opts <- list(...)
+        if(j == 0) {
+            opts <- opts[ ! names(opts) %in% optnames ]
+            return( opts[!duplicated(names(opts))] )
+        }
+        for(name in optnames) {
+            if(!is.null(opts[[ name ]])) {
+                opts[[ substring(name, 2)]] <- J(opts[[ name ]], j)
+                opts[[name]] <- NULL
+            }
+        }
+        opts[!duplicated(names(opts))]
+    }
+
+    dat <- lapply(cdf, ncdf4_data_extract, massValues, timeRange, useRT)
+    if(is.null(names(dat)))
+        names(dat) <- basename(cdf)
+
+    null <- sapply(dat, is.null)
+    if(all(null)) {
+        warning("Nothing to plot")
+        return(invisible())
+    }
+
+    if(!plot)
+        return(invisible(dat))
+
+    unit <- if(showRT) 'Time' else 'Index'
+    xlim <- range(sapply(dat[!null], function(x) range(x[[ unit ]])))
+    ylim <- range(sapply(dat[!null], function(x) range(x[[ 'Intensity' ]])))
+    M <- length(massValues)
+
+    opt <- optfun(0, x=1, type='n', ..., xlim=xlim, ylim=ylim, xlab=unit, ylab='Intensity')
+    do.call('plot', opt)
+
+    for(j in seq_along(dat)) {
+        x <- dat[[j]]
+        if(is.null(x))
+            next
+        opt <- optfun(j, x=x[[ unit ]], y=x[[ 'Intensity' ]], ...)
+        do.call('matlines', opt)
+    }
+
+    return(invisible(dat))
+}
+
 # vim: set ts=4 sw=4:
