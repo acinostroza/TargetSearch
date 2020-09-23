@@ -3,7 +3,7 @@
 \title{Extract peaks from chromatogram files - low level function}
 \description{
   This function extracts all peaks of a given metabolite in a given
-  RI window. It is intented to fine-tune metabolite search parameters.
+  RI window. This function is intended for fine-tuning metabolite search parameters.
 }
 \usage{
 FindAllPeaks(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
@@ -40,6 +40,9 @@ FindAllPeaks(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
     it is exposed for convenience and advanced used.
 
     In the future it will replace \code{\link{FindPeaks}}.
+
+    See also the function \code{\link{ri_data_extract}} which offers a similar functionality
+    but with different input parameters.
 }
 \value{
    It returns a matrix in which each row represent a hit. Note that there can be zero
@@ -74,6 +77,9 @@ head(peaks)
 
 }
 \author{Alvaro Cuadros-Inostroza }
-\seealso{\code{\link{FindPeaks}}}
+\seealso{
+    \code{\link{FindPeaks}},
+    \code{\link{ri_data_extract}},
+}
 
 % vim: set ts=4 sw=4 et:

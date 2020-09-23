@@ -1,7 +1,7 @@
 \name{text2bin}
 \alias{text2bin}
 \alias{bin2text}
-\title{Convert RI files from text to binary format and viceversa}
+\title{Convert RI files from text to binary format and vice versa}
 \description{
     This function converts a list of RI files (also known as peak list files) in text or binary
     format to binary or text format.
@@ -15,12 +15,12 @@
     \item{in.files}{A character vector of file paths to the input RI files. }
 
     \item{out.files}{A character vector of file paths. If \code{NULL}, the input file extensions
-        will be changed accordingly ("txt" to "dat" and viceversa).}
+        will be changed accordingly ("txt" to "dat" and vice versa).}
 
     \item{columns}{Either a numeric vector with the positions of the columns for \code{SPECTRUM},
         \code{RETENTION_TIME_INDEX}, and \code{RETENTION_TIME}; or a character vector with the
-        respective names of those columns. If \code{NULL}, then default (hardcoded) values will be
-        used. If an integer vector, the colum position must start at zero. In addition, the column
+        respective names of those columns. If \code{NULL}, then default (hard-coded) values will be
+        used. If an integer vector, the column position must start at zero. In addition, the column
         names can be set by a global option (see details below).}
 }
 \details{
@@ -107,10 +107,10 @@
     write.table(tmp, file="RI_test.txt", sep="\t", quote=FALSE, row.names=FALSE)
 
     # convert this text file to binary format
-    ## wrong! fails because of invalid columns
+    ## wrong! It fails because of invalid columns
     # text2bin("RI_test.txt")
 
-    # correct! columns are correct
+    # correct! The columns are correct
     text2bin("RI_test.txt", columns=c('SPEC', 'RI', 'RT'))
 
     # same example but using integers (not recommended)

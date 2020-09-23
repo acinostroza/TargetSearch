@@ -1,8 +1,8 @@
 \name{sampleRI}
 \alias{sampleRI}
-\title{ Sample especific RI detection }
+\title{ Sample specific RI detection }
 \description{
-	Return a matrix of the sample specific RIs based on the correlating selective masses.
+	Return a matrix of the sample specific retention indices (RI) based on the correlating selective masses.
 }
 \usage{
 sampleRI(samples, Lib, r_thres = 0.95, columns = NULL,
@@ -19,9 +19,9 @@ sampleRI(samples, Lib, r_thres = 0.95, columns = NULL,
     most cases, leave it as \code{NULL}. This parameter is used to configure the column names or
     positions of RI text files. See the documentation on the \code{\link{text2bin}} function for
     further details.}
-  \item{method}{ Normalisation method. Options are \code{"dayNorm"}, a day based median
-	normalisation, \code{"medianNorm"}, normalisation using the median of all the intensities
-	of a given mass, and \code{"none"}, no normalisation at all. }
+  \item{method}{ Normalization method. Options are \code{"dayNorm"}, a day based median
+	normalization, \code{"medianNorm"}, normalization using the median of all the intensities
+	of a given mass, and \code{"none"}, no normalization at all. }
   \item{minPairObs}{ Minimum number of pair observations. Correlations between two variables are
 	computed using all complete pairs of observations in those variables. If the number
 	of observations is too small, you may get high correlations values just by chance,

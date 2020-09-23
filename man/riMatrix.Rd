@@ -16,7 +16,7 @@ riMatrix(samples, rim)
     for RI markers in RI files (not in CDF files). Can be used to retrieve
     the retention times of RI markers in already processed files.
 
-    Note that it does not perform any RI adjusment. See \code{\link{fixRI}}.
+    Note that it does not perform any RI adjustment. See \code{\link{fixRI}}.
 }
 \note{
     In case the RI files are in text format and their column names are not standard (for

@@ -38,7 +38,7 @@ fixRI(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRUE)
     (using the settings of \code{rimLimits} parameters, which you should have already
     fixed) and the resulting values will be used to correct the RI files.
     If it is a numeric matrix, then these values will be used to correct the
-    RI files. Note that this matrix dimmensions are exactly \emph{m} samples (rows)
+    RI files. Note that this matrix dimensions are exactly \emph{m} samples (rows)
     times \emph{n} (columns) RI markers.
 
     \code{sampleNames} controls which samples will be corrected. If \code{NULL}
