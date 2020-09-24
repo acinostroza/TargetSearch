@@ -1,3 +1,33 @@
+		CHANGES IN VERSION 1.46.0:
+
+NEW FEATURES
+
+   o	New function `ri_data_extract` to extract peaks from RI files. It works
+	similar to `FindAllPeaks` but uses different (simpler) input parameters,
+	comparable to ncdf4_data_extract.
+
+   o	New function `ri_plot_peak` to plot peaks from RI files, built upon
+	`ri_data_extract`. It can be used as an alternative to `plotPeakRI` as it
+	has a simple interface.
+
+   o	New function `ncdf4_plot_peak`. An alternative to function `plotPeakSimple`
+	with a simple interface to plot peaks from NetCDF format 4. This function
+	supersedes `plotPeakSimple`.
+
+BUG FIXES
+
+   o	Remove unneeded ICO file.
+
+   o	Man pages improvements. Mostly grammar and spelling changes.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	The function `peakPlotSimple` is considered deprecated, and its
+	use should be avoided. Use the function `ncdf4_plot_peak` instead.
+
+   o	The parameter `column` in many columns is now `NULL` by default. To
+	change the column names use the global option `TS_RI_columns` instead
+
 		CHANGES IN VERSION 1.44.0:
 
 NEW FEATURES
