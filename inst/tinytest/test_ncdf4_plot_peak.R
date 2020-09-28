@@ -30,7 +30,6 @@ for(i in seq(repeats)) {
     expect_identical(fake, real)
 }
 
-real <- ncdf4_plot_peak(files, massValues=mz, timeRange=tm + 200, plot=FALSE)
 expect_warning(real <- ncdf4_plot_peak(files, massValues=mz, timeRange=tm + 200, plot=FALSE))
 expect_null(real)
 unlink(files)
