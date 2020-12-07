@@ -6,6 +6,10 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 	n <- length(libId)
 	j <- ceiling(sqrt(n))
 	i <- ceiling(n/j)
+
+	op <- par(no.readonly=TRUE)
+	on.exit(par(op))
+
 	par(mfrow = c(i,j), mar = c(3,3,3,2), mgp = c(1.5,0.75,0))
 	for(id in libId) {
 		if(is.null(retIndex(peaks)[[id]]))
@@ -73,6 +77,9 @@ plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI =
 	    tm <- rawpeaks$Time
 		xlab <- "RT"
 	}
+
+	op <- par(no.readonly=TRUE)
+	on.exit(par(op))
 
 	ms  <- masses - massRange[1] + 1
 	idx <- which(tm > time.range[1] & tm < time.range[2] )
