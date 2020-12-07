@@ -83,6 +83,8 @@ baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
     .pch <- sapply(best, function(x) if(x) 21 else 19)
     .col[best] <- 'black'
 
+    def_par <- par(no.readonly=TRUE)
+    on.exit(par(def_par))
     layout(matrix(c(1,1,2,0), 2, 2), widths=c(1, lcm(key_width)))
     par(mar=c(5,4,4, 3)+.1)
     plot(x, y, cex=.cex, pch=.pch, bg=.bg, col=.col, ylab='RI', xlab='samples', main=main,
