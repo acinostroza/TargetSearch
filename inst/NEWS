@@ -1,3 +1,10 @@
+		CHANGES IN VERSION 1.46.1:
+
+BUG FIXES
+
+   o	Functions `plotPeakSimple`, `plotPeakRI`, and `plotRIdev` now correctly
+	reset the graphics parameters by `on.exit()` calls.
+
 		CHANGES IN VERSION 1.46.0:
 
 NEW FEATURES
