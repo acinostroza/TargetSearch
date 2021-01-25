@@ -36,7 +36,7 @@ SEXP baseline(SEXP X, SEXP T, SEXP Quantile, SEXP Window, SEXP Step)
 {
 	double *x   = REAL(AS_NUMERIC(X));
 	double *t   = REAL(AS_NUMERIC(T));
-	int win     = INTEGER_VALUE(Window);
+	double win  = NUMERIC_VALUE(Window);
 	int step    = INTEGER_VALUE(Step);
 	double qntl = NUMERIC_VALUE(Quantile);
 	int n = GET_LENGTH(X);
