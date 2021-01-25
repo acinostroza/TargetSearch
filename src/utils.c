@@ -266,7 +266,7 @@ int qntl_win(double *x, double *t, double qntl, double win, int step, int n, dou
 
 	for(int i = 0; i < n; i+= step) {
 		find(t, t[i] - win / 2.0, t[i] + win / 2.0, n, eq, &a, &b);
-		len = b - a + 1;
+		len = b - a;
 		if(len <= 0) {
 			ans[k++] = NAN;
 			continue;
