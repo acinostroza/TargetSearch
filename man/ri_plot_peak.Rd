@@ -12,7 +12,7 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
     This function is useful for quick peak data visualization.
 }
 \arguments{
-    \item{obj}{Either a \code{\linkS4class{tsSample}} object or a path to NetCDF format 4 files.}
+    \item{obj}{Either a \code{\linkS4class{tsSample}} object or a character vector of paths to RI files.}
     \item{massValues}{A numeric vector representing \emph{m/z} values.}
     \item{timeRange}{A numeric vector of length 2 representing the lower and upper time limits.}
     \item{useRT}{Logical. If \code{TRUE} (default), the time range is expressed in seconds,
@@ -20,7 +20,7 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
     \item{showRT}{Logical. Whether the \emph{x}-axis of the resulting plot should represent seconds
         (\code{TRUE}) or retention index units (\code{FALSE}). This allows, for example, to search
         for a time range in seconds and display a graph in index units.}
-    \item{sizefun}{A function that could be use to scale the point size of the plot via the
+    \item{sizefun}{A function that could be used to scale the point size of the plot via the
         parameter `cex`, for example, to scale the peak intensity. This function should take a numeric
         vector as input and return a positive value. If \code{NULL}, then a default function
         will be used. This function is called using the peak intensity as input.}
@@ -51,7 +51,7 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
     returns a positive value which correspond to the point size (parameter \code{cex}).
     This function will be applied on the peak intensities and the result will be used as \code{cex}.
     If \code{NULL}, the scaling function is implemented as  \code{(log10(x/100) * (9/8) + (1/2)},
-    where \code{x} is the peak intensity.Note that if either \code{cex} or \code{scex} is
+    where \code{x} is the peak intensity. Note that if either \code{cex} or \code{scex} is
     passed to the function, then \code{sizefun} will have no effect.
 
     The logical parameter \code{plot} controls whether a plot is drawn. This might be useful
