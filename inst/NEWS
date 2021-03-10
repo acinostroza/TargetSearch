@@ -1,3 +1,22 @@
+		CHANGES IN VERSION 1.46.3:
+
+BUG FIXES
+
+   o	Function `ri_plot_peak`: Correct description of arguments on man-page and
+	fix typos.
+
+   o	Update NEWS for version 1.46.2
+
+		CHANGES IN VERSION 1.46.2:
+
+BUG FIXES
+
+   o	Baseline correction: Cast window parameter as double rather than integer.
+
+   o	Fix off-by-line error in quantile-based baseline calculation. This bug
+	caused an out-of-bound memory access on edge cases, which it was why it
+	took long to be found.
+
 		CHANGES IN VERSION 1.46.1:
 
 BUG FIXES
