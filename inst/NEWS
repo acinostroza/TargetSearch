@@ -1,3 +1,45 @@
+		CHANGES IN VERSION 1.48.0:
+
+NEW FEATURES
+
+   o	Function `ri_data_extract` allows for a time range for each searched m/z,
+	instead of a single range for all masses.
+
+   o	Man-pages typos and clarifications. No more user-significant changes.
+
+BUG FIXES
+
+   o	Add extra assertions on `ncdf4_convert`.
+
+   o	The dependency package `ncdf4` should be on `Imports` rather than `Depends`
+	on the DESCRIPTION file.
+
+		CHANGES IN VERSION 1.46.3:
+
+BUG FIXES
+
+   o	Function `ri_plot_peak`: Correct description of arguments on man-page and
+	fix typos.
+
+   o	Update NEWS for version 1.46.2
+
+		CHANGES IN VERSION 1.46.2:
+
+BUG FIXES
+
+   o	Baseline correction: Cast window parameter as double rather than integer.
+
+   o	Fix off-by-line error in quantile-based baseline calculation. This bug
+	caused an out-of-bound memory access on edge cases, which it was why it
+	took long to be found.
+
+		CHANGES IN VERSION 1.46.1:
+
+BUG FIXES
+
+   o	Functions `plotPeakSimple`, `plotPeakRI`, and `plotRIdev` now correctly
+	reset the graphics parameters by `on.exit()` calls.
+
 		CHANGES IN VERSION 1.46.0:
 
 NEW FEATURES
