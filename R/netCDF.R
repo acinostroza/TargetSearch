@@ -185,6 +185,7 @@ function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 {
 	# parameter assertions
 	assert_that(is.string(cdfFile))
+	assert_that(is.null(outFile) || is.string(outFile))
 	assert_that(is.flag(force))
 	assert_that(is.flag(baseline))
 
@@ -219,7 +220,7 @@ function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 	if(file.exists(outFile) & !force) {
 		warning('File `', outFile, "' exists. Set `force' to overwrite")
 		return(invisible(outFile))
-    }
+	}
 	if(is.null(peaks)) {
 		peaks <- peakCDFextraction(cdfFile) # CDF3
 		if(baseline)
