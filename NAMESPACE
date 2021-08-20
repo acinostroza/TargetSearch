@@ -18,7 +18,7 @@ importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
            "ncatt_get", "ncatt_put", "ncdim_def", "ncvar_def", "nc_create")
 
 importFrom("assertthat", "assert_that", "is.count", "is.flag", "is.scalar",
-           "is.string", "noNA")
+           "is.string", "noNA", "on_failure<-")
 
 exportClasses(
 	"tsLib",
