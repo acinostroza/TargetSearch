@@ -1,12 +1,5 @@
 # common functions
 
-is_nullOrNA <- function(x)
-{
-    if(is.null(x)) return(TRUE)
-    if(any(is.na(x))) return(TRUE)
-    FALSE
-}
-
 #' like `dirname`, but checks if all dirs are the same
 #'
 #' @param x a vector of file paths
@@ -33,8 +26,10 @@ is_nullOrNA <- function(x)
 #' @return the updated file paths
 .setpath <- function(old, new)
 {
-    if(is_nullOrNA(new))
+    if(is.null_or_na(new))
         return(old)
+    if(has_na(new))
+        stop("path must not contain NAs")
     if(length(old) %% length(new) != 0)
         stop("lengths must be multiples of each other")
     if(length(new) > length(old)) {

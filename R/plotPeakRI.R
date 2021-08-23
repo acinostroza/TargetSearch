@@ -32,7 +32,7 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          # graphical parameters:
          col=NULL, int_range=c(2,6), cex_range=c(.7,6), key_width=2)
 {
-    if(is_nullOrNA(RI))
+    if(is.null_or_na(RI))
         RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
 
     pk <- FindAllPeaks(samples, Lib, libID, dev, mz, RI, mz_type='quantMass')
@@ -64,10 +64,11 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
 baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
                      col=NULL, int_range=c(2,6), cex_range=c(.7,6), key_width=2)
 {
-    if(is_nullOrNA(nSamp))
+    if(is.null_or_na(nSamp))
         nSamp <- max(x)
-    if(is_nullOrNA(col))
+    if(is.null_or_na(col))
         col <- c("#E0ECF4","#BFD3E6","#8C96C6","#88419D","#4D004B")
+    assert_that(noNA(nSamp), noNA(col))
     rimed <- median(y[best])
 
     .scale <- function(x, a1, a2, b1, b2) (x - b1) / (b2 - b1) * (a2 - a1) + a1

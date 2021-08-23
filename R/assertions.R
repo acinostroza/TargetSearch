@@ -27,6 +27,14 @@ on_failure(is.tsProfile) <- function(call, env) {
 }
 
 # useful assertions
+# check if a variable is NULL or is a scalar set to NA
+is.null_or_na <- function(x) is.null(x) || (is.scalar(x) && is.na(x))
+on_failure(is.null_or_na) <- function(call, env) {
+    paste0(deparse(call$x), " is neither NULL nor a scalar equal to NA")
+}
+
+# return TRUE if x has a NA value. if x is TRUE them it returns FALSE
+has_na <- function(x) any(is.na(x))
 
 is.sod <- function(x) length(x) == 1 || length(x) == 2
 on_failure(is.sod) <- function(call, env) {

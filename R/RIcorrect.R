@@ -98,7 +98,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 #' Generates a list of NCDF4 files from a list of CDF files (formats 3 or 4).
 #' The output is controlled by the parameter path, for which there are several
 #' options:
-#'  - If path is FALSE or NULL or NA, then return NULL
+#'  - If path is FALSE or NULL or NA (or contains NA), then return NULL
 #'  - If path is TRUE, return a list of NCDF4 files. If the files are already
 #'    NCDF4 files, then output them.
 #-  - If path is a string, then update the files' path to this value. Recycle
@@ -109,7 +109,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 #' get a list nc4 files. If the files are already nc4 files,
 .mk_cdf_files <- function(files, path, exts=c('nc4','cdf'))
 {
-	if(is_nullOrNA(path))
+	if(is.null_or_na(path) || has_na(path))
 		return(NULL)
 	if(is.logical(path)) {
 		if(all(path))

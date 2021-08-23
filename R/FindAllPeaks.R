@@ -20,13 +20,13 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          mz_type = c('selMass', 'quantMass', 'topMass'),
          columns = NULL)
 {
-    if(is_nullOrNA(RI)) #
+    if(is.null_or_na(RI)) #
         RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
 
-    if(is_nullOrNA(dev))
+    if(is.null_or_na(dev))
         dev <- RIdev(Lib)[libID, 1]
 
-    if(is_nullOrNA(mz)) {
+    if(is.null_or_na(mz)) {
         method <- switch(match.arg(mz_type),
                          selMass=selMass, quantMass=quantMass, topMass=topMass)
         mz <- method(Lib)[[libID]]
