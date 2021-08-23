@@ -20,19 +20,29 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
          mz_type = c('selMass', 'quantMass', 'topMass'),
          columns = NULL)
 {
+    assert_that(is.tsSample(samples))
+    if(!is.null_or_na(Lib))
+        assert_that(is.tsLib(Lib))
+    if(!is.null_or_na(libID))
+        assert_that(is.scalar(libID))
+
     if(is.null_or_na(RI)) #
         RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
+    assert_that(is.scalar(RI))
 
     if(is.null_or_na(dev))
         dev <- RIdev(Lib)[libID, 1]
+    assert_that(is.numeric(dev), is.sod(dev))
 
     if(is.null_or_na(mz)) {
         method <- switch(match.arg(mz_type),
                          selMass=selMass, quantMass=quantMass, topMass=topMass)
         mz <- method(Lib)[[libID]]
     }
+    assert_that(is.numeric(mz))
 
-    ref   <- cbind(minRI=RI-dev, mz=mz, maxRI=RI + dev)
+    ref   <- switch(length(dev), cbind(minRI=RI - dev, mz=mz, maxRI=RI + dev),
+                    cbind(minRI=RI + dev[1], mz=mz, maxRI=RI + dev[2]))
     peaks <- lapply(RIfiles(samples), getAllPeaks, ref, columns=columns)
 
     n  <- rep.int(1:length(peaks), sapply(peaks, nrow))
