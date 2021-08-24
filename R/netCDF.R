@@ -214,6 +214,10 @@ function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
 		outFile <- sprintf("%s.nc4", .trim_file_ext(cdfFile, 'cdf'))
 	}
 
+	# attempt to create output directory for outFile if it does not exist
+	if(!dir.exists(dirname(outFile)))
+		dir.create(dirname(outFile), recursive=TRUE)
+
 	if(cdfFile == outFile & !force)
 		stop('Input and output files are the same. Set `force` to overwrite.')
 
@@ -341,43 +345,38 @@ function(cdfFile, observed, standard)
 #' automatically by scanning for CDF-3 files in given path and calling
 #' the function [ncdf4_convert()] on them.
 #'
-#' This function simply wraps around [ncdf4_convert()]. It searches for
-#' CDF-3 files and converts them to CDF-4. Note that the search is not
-#' recursive.
-#'
-#' By default, the function scans the current path and saves them in
-#' the same path if `out_path` is not specified.
-#'
 #' @param cdf_path the input path to scan for
 #' @param out_path the output path in which the files will be saved
-#' @param \dots extra options passed to [ncdf4_convert()], which in
+#' @param recursive logical. Should the search recurse into directories?
+#' @param ignore.case logical. Should the file extension matching be case insensitive?
+#' @param \dots extra options passed to [ncdf4_convert()], which in turn
 #'    can be passed to [baseline()]
 #'
 #' @return a character vector of generated files or invisible.
+#' @importFrom assertthat assert_that is.flag
 #' @seealso [ncdf4_convert()], [baseline()]
 #' @export
-#' @author Alvaro Cuadros-Inostroza
-#' @md
-#' @examples
-#' \dontrun{
-#' # get files from package TargetSearchData
-#' require(TargetSearchData)
-#' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-#' ncdf4_convert_from_path(cdfpath, ".")
-#' }
-#'
 `ncdf4_convert_from_path` <-
-function(cdf_path=".", out_path=cdf_path, ...)
+function(cdf_path=".", out_path=cdf_path, recursive = FALSE, ignore.case = TRUE, ...)
 {
-	# scans CDF file
-	in_files  <- dir(cdf_path, pattern="\\.cdf$", full.names=TRUE, ignore.case=TRUE)
-	if(length(in_files) == 0)
-		stop(sprintf("No CDF files detected in dir `%s`", cdf_path))
-	out_files <- sub("\\.cdf$", ".nc4", basename(in_files), ignore.case=TRUE)
-	out_files <- file.path(out_path, out_files)
+	assert_that(length(cdf_path) == length(out_path) || length(out_path) == 1)
+	assert_that(is.character(out_path))
+	assert_that(is.character(cdf_path))
+	assert_that(is.flag(recursive))
+	assert_that(is.flag(ignore.case))
 
-	mapply(ncdf4_convert, in_files, out_files, MoreArgs=list(...))
-	invisible(out_files)
+	# process each path and scan for CDF files
+	files <- mapply(function(in.path, out.path) {
+	in_files <- dir(in.path, pattern = "\\.cdf$", recursive = recursive, ignore.case = ignore.case)
+	out_files <- sub("\\.cdf$", ".nc4", in_files, ignore.case = ignore.case)
+	cbind('in'=file.path(in.path, in_files), 'out'=file.path(out.path, out_files))
+	}, cdf_path, out_path, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+	files <- do.call('rbind', files)
+	if(nrow(files) == 0)
+		stop("No CDF files detected in specified directories")
+
+	mapply(ncdf4_convert, files[, 'in'], files[, 'out'], MoreArgs=list(...))
+	invisible(files[, 'out'])
 }
 
 # CDF sanity check
