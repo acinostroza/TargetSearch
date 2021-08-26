@@ -100,85 +100,17 @@
 #' new NetCDF just contains the raw data in a matrix format in order to allow
 #' easier and faster data manipulation.
 #'
-#' Starting from version 1.42.0, TargetSearch introduces a custom NetCDF file which
-#' is used for faster and easier data manipulation. This means, ion traces within a
-#' retention time can be quickly extracted, which if often required before
-#' plotting. Formerly, this process required parsing the whole file before the data
-#' could be extracted.
-#'
-#' The function only takes one file at the time, to convert many files at the
-#' same time see the function [ncdf4_convert_from_path()] or the high level method
-#' [ncdf4Convert()]. Alternativelly, you can call this function in a loop or
-#' using the `lapply` family of functions.
-#'
-#' Keep in mind this function is intended for internal use (or advanced users); it is
-#' exported for convenience. Using the method [ncdf4Convert()] is recommended.
-#'
-#' @section File structure:
-#' The structure of the NetCDF format 4 is straightforward and the variables and
-#' attributes are self-evident. The following variables are defined.
-#'
-#' * `retention_time` is a vector representing the retention time in seconds (double).
-#' * `retention_index` is a vector representing the retention time indices (double).
-#'   If missing, then the variable contains zeros. Its length is equal to the length
-#'   of `retention_time`.
-#' * `mass_range` is vector of length two containing the minimum and maximum m/z
-#'   values (integer).
-#' * `intensity` is matrix of intensity values (integer) where columns represent
-#'   ion traces and rows are scans. The dimensions are length of "retention time"
-#'   times the number of ions, ie, mass max - mass min + 1.
-#'
-#' In addition, the following attributes are defined. Note that only `creator` and
-#' `version` are mandatory.
-#'
-#' * `creator` a string equal to "TargetSearch" (for indentification purposes).
-#' * `version` file format version (string). Currently "1.1".
-#' * `time_corrected` a flag (short integer) to indicate RI correction.
-#' * `baseline_corrected` a flag (short integer) to indicate that the file was
-#'   baseline corrected by TargetSearch.
-#'
 #' @param cdfFile The NetCDF file to be converted
 #' @param outFile The new output file. If \code{NULL}, it replaces the \code{cdfFile}'s
 #'   file extension (which should be \code{.cdf}) by \code{.nc4}. If the file
-#'   extension is not \code{.cdf}, then \code{.nc4} is just appended.
+#'   extension is not \code{.cdf}, then \code{.nc4} is just appended. If the path to
+#'   the file does not exist, it will be created automatically.
 #' @param force Logical. Set to \code{TRUE} to allow file overwrites, for example
 #'   if the destination file still exists, in which case a warning is thrown. Default to \code{FALSE}.
 #' @param baseline Logical. Whether or not baseline correct the input file.
 #' @param \dots extra options passed to [baseline()].
 #'
-#' @note
-#' Currently, it is not possible to reconstruct the original NetCDF file from the
-#' converted file, especially if nominal mass or baseline correction was applied.
-#' On the other hand, if the NetCDF files are exported from custom chromatogram
-#' files (such as thermo raw files or LECO peg files), then the NetCDF 3 files
-#' can be deleted safely as there is always a way to recover them.
-#'
 #' @return A string. The path to the converted file or invisible.
-#' @seealso [ncdf4Convert()], [ncdf4_convert_from_path()], [baseline()]
-#' @export
-#' @md
-#' @author Alvaro Cuadros-Inostroza
-#' @examples
-#' require(TargetSearchData)
-#'
-#' # get files from package TargetSearchData
-#' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-#'
-#' # choose any file
-#' cdf <- file.path(cdfpath, '7235eg04.cdf')
-#' nc4 <- '7235eg04.nc4' # save file in current path
-#'
-#' # run the function
-#' ret <- ncdf4_convert(cdf, nc4)
-#'
-#' # the output should match the output file
-#' stopifnot(ret == nc4)
-#'
-#' # Use mapply to convert many files at the same time.
-#' cdf <- paste0('7235eg0', 6:8, '.cdf')
-#' nc4 <- paste0('7235eg0', 6:8, '.nc4')
-#' ret <- mapply(ncdf4_convert, file.path(cdfpath, cdf), nc4)
-#' stopifnot(ret == nc4)
 #'
 `ncdf4_convert` <-
 function(cdfFile, outFile=NULL, force=FALSE, baseline=FALSE, ...)
