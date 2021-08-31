@@ -59,15 +59,23 @@
 #' ret <- checkRimLim(samples[3], rim[2])
 #'
 `checkRimLim` <-
-function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
-    mar=c(2,2,2,2), oma=c(3,3,2,0.5), cex.main=1, type='l', ...)
+function(samples, rim, layout, show=TRUE, single=TRUE, extend=0.5,
+    rect.col="#e7e7e7", mar=c(2,2,2,2), oma=c(3,3,2,0.5), cex.main=1, type='l', ...)
 {
     panel <- function(z, r) {
-        ylim <- range(z[, 2])
+        ylim <- range(z)
         ylim <- ylim + c(-1, 1)*0.04*diff(ylim)
         rect(r[1], ylim[1], r[2], ylim[2], col=rect.col, border=FALSE)
     }
-    k <- sample(length(samples), 1)
+    # single element
+    se <- function(x) if(length(x) == 1) x[[1]] else x
+    assert_that(is.tsSample(samples))
+    assert_that(is.tsRim(rim))
+    assert_that(is.flag(show))
+    assert_that(is.flag(single))
+
+    if(single)
+        samples <- samples[ sample(length(samples), 1) ]
     nr <- nrow(rim@limits)
     rim@mass <- if(length(rim@mass) == 1) rep(rim@mass, nr) else rim@mass
 
@@ -75,36 +83,41 @@ function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
         n  <- ceiling(sqrt(nr))
         layout <- if(n * (n - 1) >= nr) c(n-1, n) else c(n, n)
     } else {
-        layout <- layout[1:2]
+        assert_that(is.numeric(layout), length(layout) == 2)
         if(prod(layout) < nr)
-            stop("invalid layout")
+            stop(sprintf("Invalid layout. The supplied value cannot hold %d panels", nr))
     }
 
-    cdf <- CDFfiles(samples)[k]
-    get_data <- if(.is_ts_ncdf4(cdf)) .get_data4 else .get_data3
-    dat <- get_data(cdf, rim, extend)
-    names(dat) <- rownames(rim@limits)
+    dat <- lapply(CDFfiles(samples), .chkrl_get_data, rim, extend)
+    names(dat) <- sampleNames(samples)
 
     if(!show)
-	    return(invisible(dat))
+	    return(invisible(se(dat)))
 
-    mass <- rim@mass
-    if(length(mass) == 1)
-        mass <- rep(mass, nrow(rim@limits))
-
+    pdata <- .chkrl_prep_data(dat, nr)
     op <- par(mfrow = layout, mar=mar, oma=oma, cex.main=cex.main)
+    on.exit(par(op))
     for(i in 1:nr) {
-        plot(dat[[i]], type=type, panel.first=panel(dat[[i]],rim@limits[i, ]),
+        Time <- pdata[[i]][, 1] ; Intensity <- pdata[[i]][, -1]
+        matplot(Time, Intensity, type=type, panel.first=panel(Intensity, rim@limits[i, ]),
             main=rownames(rim@limits)[i], ...)
-        legend('topright', legend=sprintf("m/z: %d", mass[i]), box.lty=0)
+        legend('topright', legend=sprintf("m/z: %d", rim@mass[i]), box.lty=0)
     }
-    title(main = basename(cdf), outer=TRUE)
-    par(op)
-    invisible(dat)
+    title(main = .chkrl_main(names(dat)), outer=TRUE)
+
+    invisible(se(dat))
+}
+
+# checkRimLim Helper functions
+# all functions are prefixed with .chkrl as they are used only here
+
+.chkrl_get_data <- function(cdf, ...)
+{
+    if(.is_ts_ncdf4(cdf)) .chkrl_get_data4(cdf, ...) else .chkrl_get_data3(cdf, ...)
 }
 
 # get data from netcdf4 files
-.get_data4 <- function(cdf, rim, extend=0.5)
+.chkrl_get_data4 <- function(cdf, rim, extend=0.5)
 {
     nc <- nc_open(cdf)
     on.exit(nc_close(nc))
@@ -119,7 +132,7 @@ function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
 }
 
 # get data from netcdf3 files
-.get_data3 <- function(cdf, rim, extend=0.5)
+.chkrl_get_data3 <- function(cdf, rim, extend=0.5)
 {
     dat <- peakCDFextraction(cdf)
     mzRange <- dat$massRange
@@ -130,4 +143,26 @@ function(samples, rim, layout, show=TRUE, extend=0.5, rect.col="#e7e7e7",
         w <- dat$Peaks[ z, mz - mzRange[1] + 1 ]
         cbind(Time=Time[z], Intensity=w)
         }, rim@limits[,1], rim@limits[,2], rim@mass, extend, SIMPLIFY=FALSE)
+}
+
+# prepare data for multiple plotting
+.chkrl_prep_data <- function(dat, nr) {
+    res <- lapply(seq(nr), function(j) {
+        z <- lapply(dat, getElement, j)
+        t <- range(sapply(z, function(x) range(x[,1])))
+        n <- max(sapply(z, nrow))
+        t <- seq(t[1], t[2], length=n)
+        y <- sapply(z, function(x) approx(x[,1], x[,2], t)$y)
+        cbind(time=t, y)
+    })
+    res
+}
+
+# make title for plot
+.chkrl_main <- function(x, len=6) {
+    s <- if(length(x) == 1) "" else "s"
+    if(length(x) > len)
+        paste0("Samples: ", paste(x[1:len], collapse=", "), ", ...")
+    else
+        paste0("Sample", s, ": ", paste(x, collapse=", "))
 }

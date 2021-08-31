@@ -9,6 +9,7 @@ checkRimLim(
   rim,
   layout,
   show = TRUE,
+  single = TRUE,
   extend = 0.5,
   rect.col = "#e7e7e7",
   mar = c(2, 2, 2, 2),
@@ -31,6 +32,10 @@ automatically.}
 
 \item{show}{Logical. If \code{FALSE} the plot is not shown, but the data points
 can be used for further inspection or for custom plots.}
+
+\item{single}{Logical. If \code{TRUE} a single sample will be selected randomly
+for plotting. This was the old default behavior. If \code{FALSE} all samples
+will be used for plotting (see note below).}
 
 \item{extend}{a numeric coefficient to extend the time window search of the
 respective time marker. Defaults to \code{0.5}.}
