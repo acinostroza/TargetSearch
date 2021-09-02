@@ -1,13 +1,7 @@
 #' Visually check retention index marker limits
 #'
-#' A function to visually check if the retention time limites of the retention
-#' index markers (aka FAMEs) is correct.
-#'
-#' The function takes a random CDF file from your \code{\linkS4class{tsSample}}
-#' object and creates a panel plot of the m/z traces around the area in which a
-#' marker is expected to be. Repeated calls to this function can be used to check
-#' other samples. It is also possible to check a specific sample by indexing
-#' the \code{\linkS4class{tsSample}} object.
+#' A function to visually check if the retention time limits of the retention
+#' index markers (aka FAMEs) are correct.
 #'
 #' @param samples A  \code{\linkS4class{tsSample}} object created by
 #'    \code{\link{ImportSamples}}.
@@ -16,6 +10,9 @@
 #' @param layout A vector of the form \code{c(nr, nc)} to arrange the panel by
 #'    \code{nr} rows and \code{nc} columns. If missing then the layout is created
 #'    automatically.
+#' @param single Logical. If TRUE, a single sample will be selected randomly
+#'    for plotting. This was the old default behavior. If FALSE, all samples
+#'    will be used for plotting (see note below).
 #' @param show Logical. If \code{FALSE} the plot is not shown, but the data points
 #'    can be used for further inspection or for custom plots.
 #' @param extend a numeric coefficient to extend the time window search of the
@@ -38,26 +35,6 @@
 #'
 #' @seealso
 #'    \code{\linkS4class{tsSample}}, \code{\linkS4class{tsRim}}, \code{\link{ImportFameSettings}}
-#'
-#' @examples
-#' require(TargetSearchData)
-#'
-#' # get the cdf path TargetSearchData
-#' cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-#'
-#' # import samples (see ImportSamples() for details)
-#' samples <- ImportSamples(file.path(cdfpath, "samples.txt"), CDFpath = cdfpath)
-#'
-#' # Import RI markers (see ImportFameSettings())
-#' rim <- ImportFameSettings(file.path(cdfpath, "rimLimits.txt"))
-#'
-#' # choose a sample at random and plot the m/z traces around the retention
-#' # time window
-#' ret <- checkRimLim(samples, rim)
-#'
-#' # to choose a specific samples and marker, use subsetting
-#' ret <- checkRimLim(samples[3], rim[2])
-#'
 `checkRimLim` <-
 function(samples, rim, layout, show=TRUE, single=TRUE, extend=0.5,
     rect.col="#e7e7e7", mar=c(2,2,2,2), oma=c(3,3,2,0.5), cex.main=1, type='l', ...)
