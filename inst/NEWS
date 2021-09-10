@@ -1,3 +1,22 @@
+		CHANGES IN VERSION 1.50.0:
+NEW FEATURES
+
+   o	FindAllPeaks: Allow for asymmetric RT deviations. Formerly, the window
+	search parameter was plus o minus a tolerance; now it can be different on either
+	side of the expected RT.
+
+   o	ncdf4_convert_from_path: New flag to convert CDF files recursively.
+
+   o	checkRimLim: show multiple samples at the same time, as opposed to a
+	single sample in previous versions.
+
+BUG FIXES
+
+   o	Make sure that the assertion that checks for NULL or NA is operating in a
+	scalar. For vectors use another assertion.
+
+   o	Code clean-up. Remove unneeded files.
+
 		CHANGES IN VERSION 1.48.0:
 
 NEW FEATURES
