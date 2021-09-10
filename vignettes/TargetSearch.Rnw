@@ -172,13 +172,22 @@ Please note that in this case, no retention time correction will be performed.
 
 To make sure that you have correctly set the time ranges for the RI markers,
 the function \Rfunction{checkRimLim()} can be used. This function plots
-the $m/z$ of all the markers in one, randomly chosen, sample. Repeat
-the function to see other samples. In the figure~\ref{fig:checkRimLim}
-a example is shown. The gray area indicates the search window of each
-marker.
+the $m/z$ of all the markers in (a subset of) the samples. By default, the
+option \Rcode{single} is \Rcode{TRUE}, which means only a (randomly chosen)
+sample will be used for the figure (the reason is we usually do not need to
+see all the samples, and it is computationally expensive to display too
+many samples at the same time). To display multiple samples, set the said
+option to \Rcode{FALSE}. In this case, it is recommended to use \emph{subsetting}
+to select specific sample to review (in particular in large datasets).
 
-<<checkRimLim, fig.cap="Example of the RI markers $m/z$ traces in one sample">>=
-checkRimLim(samples, rimLimits)
+The example below demonstrates the multiple display option restricted to the
+first three samples. Some basic plot styling is also possible by passing
+arguments to \Rfunction{matplot()}, such as, \Rcode{col} and \Rcode{lty}.
+The generated plot is shown in figure~\ref{fig:checkRimLim}. Note that the
+gray area indicates the search window of each marker.
+
+<<checkRimLim, fig.cap="Example of the RI markers $m/z$ traces in samples">>=
+checkRimLim(samples[1:3], rimLimits, single=FALSE, col=2:4, lty=1)
 @
 
 \section{Pre-processing}
