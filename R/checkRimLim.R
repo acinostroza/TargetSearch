@@ -40,7 +40,7 @@ function(samples, rim, layout, show=TRUE, single=TRUE, extend=0.5,
     rect.col="#e7e7e7", mar=c(2,2,2,2), oma=c(3,3,2,0.5), cex.main=1, type='l', ...)
 {
     panel <- function(z, r) {
-        ylim <- range(z)
+        ylim <- range(z, na.rm=TRUE)
         ylim <- ylim + c(-1, 1)*0.04*diff(ylim)
         rect(r[1], ylim[1], r[2], ylim[2], col=rect.col, border=FALSE)
     }
