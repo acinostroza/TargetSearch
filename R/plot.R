@@ -2,7 +2,7 @@
 # function to make a boxplot of the RI deviations of a given metabolite.
 
 plotRIdev <- function(Lib, peaks, libId = 1) {
-
+	equal <- function(x, y) isTRUE(all.equal(x, y))
 	n <- length(libId)
 	j <- ceiling(sqrt(n))
 	i <- ceiling(n/j)
@@ -16,12 +16,13 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 		    stop(sprintf("Error: libId=%d not found", id))
 
 		x <- t(retIndex(peaks)[[id]])
+		mz <- as.numeric(colnames(x))
 		lib.name <- libName(Lib)[id]
-	    mz <- selMass(Lib)[[id]]
-    	if(any(mz != colnames(x)))
-        	mz <- topMass(Lib)[[id]]
-	    if(any(mz != colnames(x)))
-    	    stop("LibraryID Error: Library object and tsMSdata object don't match.")
+		sel_mz <- selMass(Lib)[[id]]
+		top_mz <- topMass(Lib)[[id]]
+
+		if(!equal(mz, top_mz) && !equal(mz, top_mz))
+			stop("LibraryID Error: Library object and tsMSdata object don't match.")
 
 		if(all(is.na(x))) {
 		    warning(sprintf("All values are NAs for libId=%d", id))
