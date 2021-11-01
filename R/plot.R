@@ -21,7 +21,7 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 		sel_mz <- selMass(Lib)[[id]]
 		top_mz <- topMass(Lib)[[id]]
 
-		if(!equal(mz, top_mz) && !equal(mz, top_mz))
+		if(!equal(mz, sel_mz) && !equal(mz, top_mz))
 			stop("LibraryID Error: Library object and tsMSdata object don't match.")
 
 		if(all(is.na(x))) {
