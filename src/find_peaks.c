@@ -5,6 +5,7 @@
 
 #include "find_peaks.h"
 #include "getLine.h"
+#include "utils.h"
 
 #define BUFFER 4096
 
@@ -44,25 +45,6 @@ free_point_list(struct point_list_s *x)
 	Free(x);
 }
 
-/* Returns the index of the input array at which its value is between
- * min and max. The algorith uses a binary search. -1 if nothing is found
- * The array must be sorted. */
-
-int binsearch(double *x, int n, double min, double max)
-{
-	int imin=0, imax=n-1;
-	while(imax >= imin) {
-		int i = imin + (imax - imin) / 2;
-		if(x[i] >= min && x[i] <= max)
-			return i;
-		else if(x[i] < min)
-			imin = i + 1;
-		else
-			imax = i - 1;
-	}
-	return -1;
-}
-
 void
 find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 		SPECTRA *sp, struct point_list_s *plist, int use_rt, int idx)
@@ -76,10 +58,7 @@ find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 	ri = (use_rt == 0) ? sp->ri : sp->rt;
 
 	/* This returns approximately the scan index of ri_min */
-	i = binsearch(ri, n_scans, ri_min, ri_max);
-
-	while (i > 0 && ri_min < ri[i])
-		i--;
+	i = binsearch(ri, ri_min, n_scans);
 
 	for (; i < n_scans; i++) {
 		if (ri_max < ri[i])

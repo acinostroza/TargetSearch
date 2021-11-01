@@ -278,3 +278,32 @@ int qntl_win(double *x, double *t, double qntl, double win, int step, int n, dou
 	Free(tmp);
 	return k;
 }
+
+/**
+ * Binary search on a sorted vector
+ *
+ * @param x pointer to a sorted array (double).
+ * @param y the value to search for (double)
+ * @param n the length of the array (int).
+ * @return (int) the position `i` at which the value `y` can be inserted so that
+ *    the order of `x` is preserved. If there is an index `j` such that x[j] == y,
+ *    then `j` will be returned.
+*/
+
+int binsearch(double *x, double y, int n)
+{
+	int imin = 0, imax = n, i = n / 2;
+	if(n <= 0 || y <= x[0])
+		return 0;
+
+	while(imax - imin > 1) {
+		if(x[i] == y)
+			return i;
+		else if(x[i] < y)
+			imin = i;
+		else
+			imax = i;
+		i = imin + (imax - imin) / 2;
+	}
+	return imax;
+}

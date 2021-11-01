@@ -20,5 +20,6 @@ void refine_peak(const int *, int, int, int *, int);
 double * gaussian_coef(int);
 int peak_detection_ppc(int *, int, int, int *);
 int qntl_win(double *, double *, double, double, int, int, double *);
+int binsearch(double *, double, int);
 
 #endif
