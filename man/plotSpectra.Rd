@@ -8,14 +8,14 @@ given metabolite in the library. \code{plotAllRIdev} saves the plots of the medi
 spectra comparisons of all the metabolites in the reference library into a PDF file.
 }
 \usage{
-plotSpectra(Lib, peaks, libId = 1, type = "ht")
+plotSpectra(Lib, peaks, libID = 1, type = "ht")
 
 plotAllSpectra(Lib, peaks, type = "ht", pdfFile, width = 8, height = 8, ...)
 }
 \arguments{
   \item{Lib}{ A \code{tsLib} object created by \code{\link{ImportLibrary}} function. }
   \item{peaks}{ A \code{tsMSdata} object. See \code{\link{peakFind}}.}
-  \item{libId}{ A numeric vector providing the indices of the metabolites
+  \item{libID}{ A numeric vector providing the indices of the metabolites
 	to plot. }
   \item{type}{ The type of the plot. Options are \code{"ht"}, head-tail plot, \code{"ss"},
 	side by side plot, and \code{"diff"}, spectrum difference plot. }
@@ -41,13 +41,13 @@ peakData <- peakFind(sampleDescription, refLibrary, corRI)
 
 # Plot a comparison RI deviation of metabolite "Valine"
 grep("Valine", libName(refLibrary)) # answer: 3
-plotSpectra(refLibrary, peakData, libId = 3, type = "ht")
+plotSpectra(refLibrary, peakData, libID = 3, type = "ht")
 
 # Plot the spectra "side by side"
-plotSpectra(refLibrary, peakData, libId = 3, type = "ss")
+plotSpectra(refLibrary, peakData, libID = 3, type = "ss")
 
 # Plot the spectra difference
-plotSpectra(refLibrary, peakData, libId = 3, type = "diff")
+plotSpectra(refLibrary, peakData, libID = 3, type = "diff")
 }
 
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }

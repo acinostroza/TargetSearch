@@ -411,7 +411,7 @@ the expected RI deviation.
 
 <<medianLib, fig.cap="RI deviation of first 9 metabolites in the library", fig.dim=c(8,8), fig.wide=TRUE, out.width='95%', echo=FALSE>>=
 resPeaks <- FindPeaks(RIfiles(samples), refLib(lib, w = 1, sel = TRUE))
-plotRIdev(lib, resPeaks, libId = 1:9)
+plotRIdev(lib, resPeaks, libID = 1:9)
 @
 
 In the second step, the function \Rfunction{sampleRI()} searches the selective
@@ -542,7 +542,7 @@ spectra comparison in a ``head-tail'' plot (figure~\ref{fig:plotSpectra}).
 
 <<plotSpectra, fig.cap="Spectra comparison of ``Valine''">>=
 grep("Valine", libName(lib))
-plotSpectra(lib, peakData, libId = 3, type = "ht")
+plotSpectra(lib, peakData, libID = 3, type = "ht")
 @
 
 To look at the chromatographic peak of ``Valine'' in a given sample,

@@ -8,14 +8,14 @@
 into a PDF file.
 }
 \usage{
-plotRIdev(Lib, peaks, libId = 1)
+plotRIdev(Lib, peaks, libID = 1, ...)
 
 plotAllRIdev(Lib, peaks, pdfFile, width = 8, height = 8, ...)
 }
 \arguments{
   \item{Lib}{ A \code{tsLib} object created by \code{\link{ImportLibrary}} function. }
   \item{peaks}{ A \code{tsMSdata} object. See \code{\link{peakFind}}.}
-  \item{libId}{A numeric vector providing the indices of the metabolites to plot.}
+  \item{libID}{A numeric vector providing the indices of the metabolites to plot.}
   \item{pdfFile}{A file name where the plot will be saved. Only \code{plotAllRIdev}. }
   \item{width, height}{The width and height of the plots in inches. Only \code{plotAllRIdev}. }
   \item{\dots}{Further options passed to \code{\link{pdf}}. }
@@ -33,10 +33,10 @@ peakData <- peakFind(sampleDescription, refLibrary, corRI)
 
 # Plot RI deviation of metabolite "Valine"
 grep("Valine", libName(refLibrary)) # answer: 3
-plotRIdev(refLibrary, peakData, libId = 3)
+plotRIdev(refLibrary, peakData, libID = 3)
 
 # Plot an RI deviation overview of the first nine metabolites
-plotRIdev(refLibrary, peakData, libId = 1:9)
+plotRIdev(refLibrary, peakData, libID = 1:9)
 
 # Save all RI deviation into a pdf file
 plotAllRIdev(refLibrary, peakData, pdfFile = "RIdeviations.pdf")

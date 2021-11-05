@@ -1,9 +1,14 @@
 
 # function to make a boxplot of the RI deviations of a given metabolite.
 
-plotRIdev <- function(Lib, peaks, libId = 1) {
+plotRIdev <- function(Lib, peaks, libID = 1, ...) {
 	equal <- function(x, y) isTRUE(all.equal(x, y))
-	n <- length(libId)
+    # check if `libId` was given
+    if('libId' %in% names(list(...))) {
+        warning('The parameter "libId" is deprectated, use "libID" instead.')
+        libID <- list(...)$libId
+    }
+	n <- length(libID)
 	j <- ceiling(sqrt(n))
 	i <- ceiling(n/j)
 
@@ -11,9 +16,9 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 	on.exit(par(op))
 
 	par(mfrow = c(i,j), mar = c(3,3,3,2), mgp = c(1.5,0.75,0))
-	for(id in libId) {
+	for(id in libID) {
 		if(is.null(retIndex(peaks)[[id]]))
-		    stop(sprintf("Error: libId=%d not found", id))
+		    stop(sprintf("Error: libID=%d not found", id))
 
 		x <- t(retIndex(peaks)[[id]])
 		mz <- as.numeric(colnames(x))
@@ -25,10 +30,10 @@ plotRIdev <- function(Lib, peaks, libId = 1) {
 			stop("LibraryID Error: Library object and tsMSdata object don't match.")
 
 		if(all(is.na(x))) {
-		    warning(sprintf("All values are NAs for libId=%d", id))
+		    warning(sprintf("All values are NAs for libID=%d", id))
 	    	plot.NA(main = lib.name, xlab = "mz", ylab = "RI")
 		} else {
-			boxplot(data.frame(x), names = mz, main = lib.name, xlab = "mz", ylab = "RI")
+			boxplot(data.frame(x), names = mz, main = lib.name, xlab = "mz", ylab = "RI", ...)
 			abline( h = medRI(Lib)[id], col = "red")
 		}
 	}
@@ -196,13 +201,13 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 # function to plot the median intensities across all the samples with the reference spectrum
 # for a given metabolite.
 
-plotSpectra <- function(Lib, peaks, libId = 1, type = "ht") {
+plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
 
 	ptype <- pmatch(type, c("ht", "ss", "diff"))
 	if(is.na(ptype))
 		stop("Unknown type parameter ", type)
 
-    id <- libId
+    id <- libID
 	x <- t(Intensity(peaks)[[id]])
 
 	if(all(is.na(x))) {
