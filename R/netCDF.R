@@ -27,9 +27,10 @@
 	ncData$rt          <- ncvar_get(nc, "scan_acquisition_time")
 	nc_close(nc)
 
-	if(any(ncData$scanindex < 0) | any(diff(ncData$scanindex) < 0)) {
-		message('Error:')
-		message(sprintf('The NetCDF file %s seems to be corrupted.', cdfFile))
+	len <- sapply(ncData, length)
+
+	if(any(ncData$scanindex < 0) || any(len == 0) || any(diff(ncData$scanindex) < 0)) {
+		message(sprintf('Error: The NetCDF file "%s" seems to be corrupted.', cdfFile))
 		stop('Unable to processs file. Aborting.')
 	}
 
