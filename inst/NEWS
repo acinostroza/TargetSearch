@@ -1,3 +1,10 @@
+		CHANGES IN VERSION 1.50.1:
+BUG FIXES
+
+   o	Fixes the gcc warning produced by passing a pointer and with an incorrect
+	size to the function `swapb`. This went undiscovered for years because
+	the code is only executed in big-endian machines.
+
 		CHANGES IN VERSION 1.50.0:
 NEW FEATURES
 
