@@ -126,13 +126,13 @@ void write_dat(FILE *fp, SPECTRA *sp, int swap)
         /* write len*/
 	n = sp->n_scans;
 	if(swap == 1)
-		swapb(&n, sizeof(int));
+		swapb(&n, sizeof(n));
         fwrite(&n, sizeof(int), 1, fp);
 
 	/* write point count */
 	n = sp->p_count;
 	if(swap == 1)
-		swapb(&n, sizeof(int));
+		swapb(&n, sizeof(n));
         fwrite(&n, sizeof(int), 1, fp);
 
         /* write RI */
@@ -155,7 +155,7 @@ void write_dat(FILE *fp, SPECTRA *sp, int swap)
         for(i = 0; i < splen; i++) {
 		n = sp->n[i];
 		if(swap == 1)
-			swapb(&n, sizeof(rt));
+			swapb(&n, sizeof(n));
                 fwrite(&n, sizeof(n), 1, fp);
 	}
 
@@ -245,7 +245,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		ri_str[ri_i] = '\0';
 		rt_str[rt_i] = '\0';
 		sp_str[sp_i] = '\0';
-		
+
 		if(n == 0 || ri_i == 0 || rt_i == 0 || sp_i == 0) {
 			REprintf("Error reading spectra. Invalid spectrum format:\n");
 			REprintf("--> Line %d: '%s'\n", j+1, line);
