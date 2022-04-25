@@ -1,3 +1,32 @@
+		CHANGES IN VERSION 1.52.0:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	Deprecate parameter 'libId' and replace it with 'libID'
+
+	The parameter `libId` conflicts with the method libId, and in other
+	functions we already use a variable `libID` that correspond with the
+	library identifier. Therefore, we replace it for consistency.
+
+	This change affects the functions `plotRIdev`, `plotSpectra` and
+
+BUG FIXES
+
+   o	plotRIdev: use near equality for comparison.
+
+	The function compares the selective or top masses against the columns
+	of the intensity matrix. However, their lengths are variable, so the
+	for `if` condition threw a warning if the lengths didn't match.
+
+   o	Refactor functions binsearch and find_peaks.
+
+	Minor optimization to the function binsearch in which the starting
+	RT scan is found directly. This will reduce a couple of CPU cycles.
+
+   o	Extra CDF integrity checks. Check that the length of the variables
+	are all greater than zero and replace logical OR operator for its
+	longer form.
+
 		CHANGES IN VERSION 1.50.1:
 BUG FIXES
 
