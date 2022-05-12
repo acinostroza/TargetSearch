@@ -179,7 +179,7 @@ void write_dat(FILE *fp, SPECTRA *sp, int swap)
 SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 {
 	SPECTRA *spectra;
-	int total = 0, i, j;
+	int total = 0, j;
 	int header = 1;
 	char *line = NULL;
 	int  len = 0;
@@ -208,16 +208,12 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 	j = 0;
 
 	while (getLine(&line, &len, fp) != -1) {
+		size_t i = 0;
 		if (header) {
 			header = 0;
 			continue;
 		}
-		tabs = 0;
-		i    = 0;
-		ri_i = 0;
-		rt_i = 0;
-		sp_i = 0;
-		n    = 0;
+		tabs = ri_i = rt_i = sp_i = n = 0;
 
 		/* allocates memory for RI string and spectra if 'line'
 		 * length is updated. string lengths will be the same as 'line' */
