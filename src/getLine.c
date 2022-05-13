@@ -8,7 +8,7 @@ int getLine(char **line, int *n, FILE *fp) {
 
 	if(*line == NULL) {
 		*n = BUFSIZE;
-		*line = (char *) R_chk_calloc(*n, sizeof(char));
+		*line = R_Calloc(*n, char);
 	}
 
 	while(1) {
@@ -16,7 +16,7 @@ int getLine(char **line, int *n, FILE *fp) {
 		linepos++;
 		if(linepos == *n) {
 			*n += BUFSIZE;
-			*line = (char *) R_chk_realloc(*line, *n * sizeof(char));
+			*line = R_Realloc(*line, *n, char);
 		}
 
 		if(c == EOF) {

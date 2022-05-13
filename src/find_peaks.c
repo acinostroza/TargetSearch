@@ -4,7 +4,6 @@
 #include <ctype.h>
 
 #include "find_peaks.h"
-#include "getLine.h"
 #include "utils.h"
 
 #define BUFFER 4096
