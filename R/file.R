@@ -10,9 +10,7 @@
 {
 	if(!is.null(cols) && all(!is.na(cols)))
 		return(cols)
-	cols <- getOption('TS_RI_columns')
-	if(is.null(cols))
-		return(get.columns.name.default())
+	cols <- getOption('TS_RI_columns', get.columns.name.default())
 	return(cols)
 }
 
