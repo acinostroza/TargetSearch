@@ -137,10 +137,10 @@ function(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
     d[]  <- FALSE
     searchData2 <- cbind(searchData2, Groups[, 1:2])
   }
-  MET_info <- cbind(searchData2[d == F,],corData[d == F,])
-  MET <- medInt2[d == F,]
-  MET_RI <- medRI2[d == F,]
-  MET_RT <- medRT2[d == F,]
+  MET_info <- cbind(searchData2[d == FALSE,],corData[d == FALSE,])
+  MET <- medInt2[d == FALSE,]
+  MET_RI <- medRI2[d == FALSE,]
+  MET_RT <- medRT2[d == FALSE,]
   MET_info$final_sample_count <- apply(MET, 1, function(x) sum(is.finite(x)))
   rownames(MET) <- rownames(MET_RI) <- rownames(MET_RT) <- MET_info$Name
   RI <- RI[d == FALSE]

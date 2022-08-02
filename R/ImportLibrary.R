@@ -141,7 +141,7 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 }
 
 Top.Masses <- function(sp, TopMasses, ExcludeMasses = NULL) {
-	m <- sp[order(sp[,2], decreasing = T),1]
+	m <- sp[order(sp[,2], decreasing = TRUE),1]
 	if(!missing(ExcludeMasses) & !is.null(ExcludeMasses)) {
 			if(!is.numeric(ExcludeMasses))
 				stop("'ExcludeMasses' must be a numeric vector")
@@ -266,7 +266,7 @@ ImportLibrary.msp <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
         stringsAsFactors = FALSE)
 
     new("tsLib", Name = libData$Name, RI = ri, medRI = ri,
-        RIdev = matrix(rep(RI_dev, length(msp)), ncol = 3, byrow = T),
+        RIdev = matrix(rep(RI_dev, length(msp)), ncol = 3, byrow = TRUE),
         selMass = selMass, topMass = topMass,
         spectra = lapply(msp, function(x) x$spectrum), libData = libData)
 }

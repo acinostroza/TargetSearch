@@ -8,7 +8,7 @@ medianRILib <- function(samples, Lib, makeReport = FALSE, pdfFile = "medianLibRe
 	refLib     <- refLib(Lib, w = 1, sel = TRUE)
 	libId      <- libId(Lib, sel = TRUE)
 	resPeaks   <- FindPeaks(my.files, refLib, columns, showProgressBar)
-	med_RI     <- sapply(retIndex(resPeaks), median, na.rm = T)
+	med_RI     <- sapply(retIndex(resPeaks), median, na.rm = TRUE)
 	medRI(Lib) <- med_RI
 
 	if(makeReport == TRUE)

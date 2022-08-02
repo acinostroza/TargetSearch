@@ -171,11 +171,11 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 
 	libOriRI <- libRI(Lib)[which.met]
 	libMedRI <- medRI(Lib)[which.met]
-	smpMedRI <- median(retIndex(metProf)[[which.met]][, which.smp], na.rm=T)
+	smpMedRI <- median(retIndex(metProf)[[which.met]][, which.smp], na.rm=TRUE)
 	rdev <- RIdev(Lib)[which.met,]
 
 	riRange <- range(c(c(libOriRI,libMedRI,smpMedRI)-rdev,
-		c(libOriRI,libMedRI,smpMedRI)+rdev), na.rm=T)
+		c(libOriRI,libMedRI,smpMedRI)+rdev), na.rm=TRUE)
 
 	idx <- which( ri >= riRange[1] & ri <= riRange[2])
 	mz  <- topMz - massRange[1] + 1
@@ -219,9 +219,8 @@ plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
 		# remove masses with no data
 		bar      <- apply(x, 2, function(x) all(is.na(x))) == FALSE
 		x        <- x[,bar,drop=FALSE]
-		# x        <- apply(x, 1,median,na.rm = T), FUN = "/")
 
-		x.median <- apply(x, 2, median, na.rm = T)
+		x.median <- apply(x, 2, median, na.rm = TRUE)
 		x.median <- 999 * x.median / max(x.median)
 
 		mz <- topMass(Lib)[[id]][bar]

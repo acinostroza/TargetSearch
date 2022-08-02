@@ -54,7 +54,7 @@ function(samples, Lib, r_thres=0.95, columns = NULL,
       # assume that the correlation of a metabolite with itself is always 1
       diag(tmp) <- 1
 
-      tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
+      tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=TRUE)}))
       tmp.sel <- tmp[tmp.max,]
       met_cor[[i]] <- which(tmp.sel > r_thres)
 
@@ -79,7 +79,7 @@ function(samples, Lib, r_thres=0.95, columns = NULL,
 	if(showProgressBar)
 		pb <- ProgressBar(title="Getting RIs...", label="File in processing...")
   for(i in 1:length(Lib)){
-		cor_RI[i,] <- apply2(resRI[[i]][met_cor[[i]],], 2, median, na.rm=T)
+		cor_RI[i,] <- apply2(resRI[[i]][met_cor[[i]],], 2, median, na.rm=TRUE)
 		if(showProgressBar)
 			setProgressBar(pb, value=i/length(Lib),
 				title=sprintf("Getting RIs (%d %%)",round(100*i/length(Lib))),

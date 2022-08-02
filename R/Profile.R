@@ -54,7 +54,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
             diag(tmp) <- 1
             tmp[ is.na(tmp) | is.nan(tmp) ] <- 0
 
-            tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=T)}))
+            tmp.max <- which.max(apply(tmp,1,function(x){ sum(x > r_thres, na.rm=TRUE)}))
 
             M <- res_log[[i]]
             tmp <- cor(t(M), use="pair")
@@ -70,7 +70,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
         # calculates scores if there are at least 3 top masses
         if(!is.null(spectra(Lib)[[i]]) & length(topMass(Lib)[[i]]) >= 3) {
-            M <- apply(resInt[[i]], 1, median, na.rm = T)
+            M <- apply(resInt[[i]], 1, median, na.rm = TRUE)
             M[is.na(M)] <- 0
             score_all   <- Score(cbind(topMass(Lib)[[i]], M), spectra(Lib)[[i]])
             if(length(y) >= 3) {
@@ -89,7 +89,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
         searchData$Sample_Count_per_Mass[i] <- sampCountPerMass(res[[i]][y,,drop=FALSE])
         searchData$Masses[i] <- paste(topMass(Lib)[[i]][y], collapse=";")
-        searchData$RI[i]     <- median(resRI[[i]][y,], na.rm=T)
+        searchData$RI[i]     <- median(resRI[[i]][y,], na.rm=TRUE)
         searchData$Score_all_masses[i] <- score_all
         searchData$Score_cor_masses[i] <- score_cor
 
@@ -98,9 +98,9 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
             medRI[i,] <- resRI[[i]][y,]
             medRT[i,] <- resRT[[i]][y,]
         } else {
-            medInt[i,] <- apply(res[[i]][y,,drop=FALSE],2,median, na.rm=T)
-            medRI[i,] <- apply(resRI[[i]][y,,drop=FALSE],2,median, na.rm=T)
-            medRT[i,] <- apply(resRT[[i]][y,,drop=FALSE],2,median, na.rm=T)
+            medInt[i,] <- apply(res[[i]][y,,drop=FALSE],2,median, na.rm=TRUE)
+            medRI[i,] <- apply(resRI[[i]][y,,drop=FALSE],2,median, na.rm=TRUE)
+            medRT[i,] <- apply(resRT[[i]][y,,drop=FALSE],2,median, na.rm=TRUE)
         }
     }
 
@@ -126,7 +126,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 # columns are m/z and intensity, respectively. if "match" is TRUE, the score
 # is obtain using the common masses. Otherwise, all the masses are used.
 
-Score <- function(x, y, match = T)
+Score <- function(x, y, match = TRUE)
 {
     matchFun <- Vectorize(function(a, b, c) {
         j <- which(a == b)

@@ -17,18 +17,18 @@ function(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'), prefix = NA
         M <- quantMatrix(Lib, metabProfile, value=qm)
         M <- data.frame(Name=rownames(M), quantMass=attr(M, "quantMass"),
             isSelectiveMass=attr(M, "isSelMass"), M, row.names=1:nrow(M))
-        write.table(M, file=file.quantmat, sep="\t", quote=F, row.names=FALSE)
+        write.table(M, file=file.quantmat, sep="\t", quote=FALSE, row.names=FALSE)
     }
 
-    write.table(profileInfo(metabProfile), file = file.pro.info, sep = "\t", quote = F)
-    write.table(profileInt(metabProfile), file = file.pro.int, sep = "\t", quote = F)
-    write.table(profileRI(metabProfile), file = file.pro.ri, sep = "\t", quote = F)
+    write.table(profileInfo(metabProfile), file = file.pro.info, sep = "\t", quote = FALSE)
+    write.table(profileInt(metabProfile), file = file.pro.int, sep = "\t", quote = FALSE)
+    write.table(profileRI(metabProfile), file = file.pro.ri, sep = "\t", quote = FALSE)
 
     metInfo   <- profileInfo(metabProfile)
     metPrf    <- as.list(metabProfile)
     libIndex  <- attr(metPrf$RI, "index")
     libId     <- rownames(metInfo)
-    med_RI    <- format(apply(metPrf$RI, 1, median, na.rm = T), digits = 3)
+    med_RI    <- format(apply(metPrf$RI, 1, median, na.rm = TRUE), digits = 3)
 
     Name      <- as.character(metInfo[libIndex, "Name"])
     libRI     <- metInfo[libIndex, "Lib_RI"]
@@ -41,9 +41,9 @@ function(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'), prefix = NA
          med_RI, IS_SEL = is_sel, IS_COR=is_cor)
 
     write.table( data.frame(Out, metPrf$Intensity, row.names = NULL,
-            check.names = FALSE), file = file.peak.int, sep = "\t", quote = F, row.names = F)
+            check.names = FALSE), file = file.peak.int, sep = "\t", quote = FALSE, row.names = FALSE)
     write.table( data.frame(Out, metPrf$RI, row.names = NULL,
-            check.names = FALSE), file = file.peak.ri, sep = "\t", quote = F, row.names = F)
+            check.names = FALSE), file = file.peak.ri, sep = "\t", quote = FALSE, row.names = FALSE)
     options(opt)
     invisible()
 }
@@ -71,7 +71,7 @@ writeMSP <- function (metlib, metprof, file, append = FALSE)
         if (all(is.na(x))) {
             next
         }
-        x.median <- apply(x, 1, median, na.rm = T)
+        x.median <- apply(x, 1, median, na.rm = TRUE)
         x.median[is.na(x.median)] <- 0
         x.median <- round(999 * x.median/max(x.median))
         mz <- topMass(metlib)[[id]][x.median > 0]

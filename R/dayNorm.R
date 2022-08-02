@@ -8,7 +8,7 @@ function(samples, resInt) {
     	res  <- z
         for(i in 1:length(Days)) {
             tmp <- z[,run_days == Days[i],drop=FALSE]
-            day.med <- apply(tmp,1, median, na.rm=T)
+            day.med <- apply(tmp,1, median, na.rm=TRUE)
             tmp <- sweep(tmp,1,day.med, FUN="/")
             res[,run_days == Days[i]] <- tmp
         }
@@ -19,7 +19,7 @@ function(samples, resInt) {
 `medianNorm` <-
 function(my.files, resInt) {
     lapply(resInt, function(z) {
-    	res.med <- apply(z,1, median, na.rm=T)
+        res.med <- apply(z,1, median, na.rm=TRUE)
     	sweep(z,1,res.med, FUN="/")
     })
 }
