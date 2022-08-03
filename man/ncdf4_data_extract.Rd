@@ -55,9 +55,22 @@ to be used internally, but it is exposed for convinience, for example, to
 create custom plots.
 }
 \examples{
-\dontrun{
-# set a NCDF-4 file
-nc4file <- "/path/to/netcdf4.nc4"
+# If you already have a NCDF4 file set the variable accordingly
+# and skip the following section
+# nc4file <- "/path/to/netcdf4.nc4"
+
+### create NCDF4 from NCDF3 from the package TargetSearchData
+require(TargetSearchData)
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+
+# pick first file
+cdffile <- dir(cdfpath, pattern="cdf", full=TRUE)[1]
+nc4file <- tempfile(fileext=".nc4")
+ncdf4_convert(cdffile, nc4file)
+
+# update RI data using pre-computed values
+ncdf4_update_ri(nc4file, c(252, 311, 269), c(262320, 323120, 381020))
+### end
 
 # extract all data (behaves like peakCDFextraction)
 data <- ncdf4_data_extract(nc4file)
@@ -75,7 +88,6 @@ data <- ncdf4_data_extract(nc4file, massValues=c(116, 192),
 # same, but using retention time in seconds.
 data <- ncdf4_data_extract(nc4file, massValues=c(116, 192),
                            timeRange=c(200, 300), useRT=TRUE)
-}
 }
 \seealso{
 \code{\link[=ncdf4_convert]{ncdf4_convert()}}, \code{\link[=peakCDFextraction]{peakCDFextraction()}}

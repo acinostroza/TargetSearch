@@ -46,17 +46,23 @@ ncdf4_convert_from_path(cdf_path = ".", out_path = cdf_path, recursive = FALSE, 
     internally).
 }
 \examples{
-\dontrun{
+# in this example we'll use a temporary directory destination as storage
+outdir <- tempfile()
+
 # get files from package TargetSearchData
 require(TargetSearchData)
 cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-ncdf4_convert_from_path(cdfpath, ".")
+
+# convert to output directory set above
+ncdf4_convert_from_path(cdfpath, outdir)
 
 # recursive search. note that output files will be saved under "gc-ms-data"
+# in the output directory
 cdfpath <- find.package("TargetSearchData")
-ncdf4_convert_from_path(cdfpath, ".", recursive=TRUE)
-}
+ncdf4_convert_from_path(cdfpath, outdir, recursive=TRUE)
 
+# clean-up the mess
+unlink(outdir, recursive=TRUE)
 }
 \seealso{
 \code{\link[=ncdf4_convert]{ncdf4_convert()}}, \code{\link[=baseline]{baseline()}}
