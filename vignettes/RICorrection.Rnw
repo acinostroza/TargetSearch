@@ -193,9 +193,7 @@ RImatrix <- RImatrix2[, !isRIMarker]
 @
 
 After that, we can continue we the normal \Biocpkg{TargetSearch}
-workflow. If you prefer to use the GUI, run \Rfunction{TargetSearchGUI()}
-from this point and import the RI files by selecting the option \emph{Apex Data}
-(do not import the standard files).
+workflow.
 
 A script with all the commands used in this document is located
 in the \file{doc} directory of the \Biocpkg{TargetSearch} package.
