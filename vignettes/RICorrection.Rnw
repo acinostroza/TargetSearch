@@ -143,11 +143,13 @@ RIMs and which biological. For example, you could create a
 vector like this.
 
 <<isRIMarker>>=
-isRIMarker <- c(T, F, F, F, F, T, F, F, F, F, T, F, F, F, F)
+isRIMarker <- rep(FALSE, length(samples.all))
+isRIMarker[c(1, 6, 11)] <- TRUE
 @
 
-where \Robject{isRIMarker} is \Rcode{TRUE} if the respective
-sample is a RIM and \Rcode{FALSE} otherwise. Note that here
+where \Robject{isRIMarker} is a logical vector of length equal
+to the number of samples in which \Rcode{TRUE} signals that the
+respective sample is a RIM and \Rcode{FALSE} otherwise. Note that here
 we have set components 1, 6, 11 to \Rcode{TRUE} just like
 the example in Table~\ref{tab:01}.
 
