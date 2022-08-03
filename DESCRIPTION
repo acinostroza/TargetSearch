@@ -3,15 +3,20 @@ Type: Package
 Title: A package for the analysis of GC-MS metabolite profiling data
 Version: 1.53.1
 Date: 2022-08-03
-Author: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>,
-        Jan Lisec,
-        Henning Redestig,
-        Matt Hannah
+Authors@R: c(person("Alvaro", "Cuadros-Inostroza", role=c("aut", "cre"),
+                     email="acuadros+bioc@gmail.com"),
+             person("Jan", "Lisec", role="aut"),
+             person("Henning", "Redestig", role="aut"),
+             person("Matt", "Hannah", role="aut"))
 Maintainer: Alvaro Cuadros-Inostroza <acuadros+bioc@gmail.com>
 Imports: graphics, grDevices, methods, ncdf4, stats, utils, assertthat
 Suggests: TargetSearchData, BiocStyle, knitr, tinytest
 VignetteBuilder: knitr
-Description: This packages provides a targeted pre-processing method for GC-MS data. 
+Description: This packages provides a flexible, fast and accurate method
+    for targeted pre-processing of GC-MS data. The user provides a (often
+    very large) set of GC chromatograms and a metabolite library of targets.
+    The package will automatically search those targets in the chromatograms
+    resulting in a data matrix that can be used for further data analysis.
 biocViews: MassSpectrometry, Preprocessing, DecisionTree, ImmunoOncology
 License: GPL (>= 2)
 URL: https://github.com/acinostroza/TargetSearch
