@@ -40,6 +40,22 @@ A list with the following components:
     function \code{\link{baseline}}. It is perfectably possible to have a
     baseline corrected file and the element \code{baselineCorrected} be \code{FALSE}.
 }
-\seealso{ \code{\link{NetCDFPeakFinding}}, \code{\link{baseline}}.}
+\seealso{\code{\link{ncdf4_data_extract}} for an updated and more flexible version
+   of this function, \code{\link{NetCDFPeakFinding}}, \code{\link{baseline}}.}
+\examples{
+### take a NCDF3 file from the package TargetSearchData
+require(TargetSearchData)
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 
+# pick first file and extract its data
+cdffile <- dir(cdfpath, pattern="cdf", full=TRUE)[1]
+peakData <- peakCDFextraction(cdffile)
+
+# it also works for NCDF4 files (we need to convert the file first)
+nc4file <- ncdf4_convert(cdffile, tempfile(fileext='.nc4'))
+peakData2 <- peakCDFextraction(nc4file)
+
+# clean-up
+unlink(nc4file)
+}
 % vim: set ts=4 sw=4 et:
