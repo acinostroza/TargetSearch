@@ -31,8 +31,26 @@ object.
 This function is meant to be used internally. It is exposed for convenience.
 }
 \seealso{
-\code{\link[=fixRI]{fixRI()}}, \code{\link[=RIcorrect]{RIcorrect()}}
+\code{\link{fixRI}}, \code{\link{RIcorrect}}, \code{\link{ImportFameSettings}}
 }
 \author{
 Alvaro Cuadros-Inostroza
+}
+\examples{
+# pull a CDF file from package TargetSearchData as example
+require(TargetSearchData)
+cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdffile <- dir(cdfpath, pattern=".cdf", full=TRUE)[1]
+
+# we need to convert from NCDF3 to NCDF4 in this example
+# (NCDF3 files do not work)
+nc4file <- ncdf4_convert(cdffile, 'example.nc4')
+
+# to update the RI we need to pass two equal-length vectors of
+# observed RT and standard RI values.
+obsRT <- c(252, 311, 369) # approx time of RI markers
+stdRI <- c(262320, 323120, 381020) # the exact RI of the markers
+
+# finally update the RI for these file
+ncdf4_update_ri(nc4file, obsRT, stdRI)
 }
