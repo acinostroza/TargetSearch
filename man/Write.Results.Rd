@@ -28,3 +28,14 @@ Write.Results(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'),
 \seealso{ \code{\link{peakFind}}, \code{\link{Profile}}, \code{\link{ProfileCleanUp}},
 \code{\linkS4class{tsLib}}, \code{\linkS4class{tsMSdata}}, \code{\linkS4class{tsProfile}},
 \code{\link{quantMatrix}} }
+\examples{
+# load precomputed results from `TSExample`
+data(TSExample)
+
+# we need the objects metabProgile and refLibrary. This will create files
+# with prefix 'TargetSearch-YYYY-MM-DD' corresponding to today's date
+Write.Results(refLibrary, metabProfile)
+
+# change the prefix with the parameter `prefix` to 'my_experiment'
+Write.Results(refLibrary, metabProfile, prefix='my_experiment')
+}
