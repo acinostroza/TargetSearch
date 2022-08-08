@@ -180,30 +180,51 @@ int peak_detection_ppc(int *x, int ispan, int n, int *ans)
  */
 
 /**
- * quantile on sorted data. Implementes R's quantiles type 7.
+ * returns the k value for quantile computation
  *
- * @param xs pointer to a sorted vector
+ * the relationship between k and p is given by p = (k - 1)/(n - 1)
+ * where n is the number of elements. See type 7 in `quantile` man
+ * page in R.
+ *
+ * @param n the number of points of the vector.
+ * @param p the probability value in [0, 1] used in the computation of the
+ *        quantile.
+ * @return the k value such that the formula holds.
+ */
+static inline int get_k(double n, double p)
+{
+        return (int) (p * (n - 1) + 1);
+}
+
+/**
+ * Implementes R's quantiles type 7.
+ *
+ * Computes quantiles in a numberic vector. The vector does not need to be
+ * sorted (as previous versions). The sorting is taken care by rPsort.
+ *
+ * @param xs pointer to a numeriv vector
  * @param p the probabily 0 <= p <= 1
  * @param n length of the vector
  * @return the computed sample quantile or NAN if error
- * @note The function does not check whether the vector is actuatlly sorted.
- *       In addition, NAN's are not handled.
+ * @note NAN's are neither checked for nor handled. It is expected that
+ *       there are no NAN's.
  */
 double quantile(double *xs, double p, int n)
 {
-#define _assert(x) do{ if(!(x)) return NAN; } while(0)
-	int k = 0;
-	_assert(p >= 0 && p <= 1);
-	/* trivial cases */
-	if(p == 0) return xs[0];
-	if(p == 1) return xs[n - 1];
+	if(!(p >= 0 && p <= 1))
+		return NAN;
 
-	while(((double) k) / ((double) n - 1) < p)
-		k++;
-	_assert(k < n && k > 0);
+	int k = get_k((double) n, p);
+	rPsort(xs, n, k - 1);
+
+	/* trivial cases */
+	if(p == 0 || p == 1);
+		return xs[k - 1];
+
+	rPsort(xs + k, n - k, 0);
+
 	double pk1 = ((double) (k-1)) / ((double) n - 1);
 	return xs[k - 1] + (n-1) * (xs[k] - xs[k-1]) * (p - pk1);
-#undef _assert
 }
 
 /**
@@ -272,7 +293,6 @@ int qntl_win(double *x, double *t, double qntl, double win, int step, int n, dou
 			continue;
 		}
 		Memcpy(tmp, x + a, len);
-		R_rsort(tmp, len);
 		ans[k++] = quantile(tmp, qntl, len);
 	}
 	Free(tmp);
