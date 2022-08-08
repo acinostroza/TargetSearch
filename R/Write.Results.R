@@ -93,6 +93,7 @@ writeMSP <- function (metlib, metprof, file, append = FALSE)
         cat("", file = file, sep = "\n")
     }
     close(file)
+    invisible()
 }
 
 # vim: set ts=4 sw=4 expandtab:

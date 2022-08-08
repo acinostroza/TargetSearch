@@ -37,6 +37,7 @@ plotRIdev <- function(Lib, peaks, libID = 1, ...) {
 			abline( h = medRI(Lib)[id], col = "red")
 		}
 	}
+    invisible()
 }
 
 # a wrapper function to make a PDF of all the RIdev of all metabolites
@@ -49,6 +50,7 @@ plotAllRIdev <- function(Lib, peaks, pdfFile, width = 8, height = 8,...) {
 		y <- min(9*i, n)
 		plotRIdev(Lib, peaks, x:y)
 	}
+    invisible()
 }
 
 # function to plot a empty box with "NA" text.
@@ -95,6 +97,7 @@ plotPeakSimple <- function(rawpeaks, time.range, masses, cdfFile = NULL, useRI =
         axis(3, at = tm[idx[1:(length(idx/10)/10)*10]], labels = rawpeaks$Time[idx[1:(length(idx/10)/10)*10]])
 	}
 	legend("topright", legend = masses, col = 1:6, lty = 1:5)
+    invisible()
 }
 
 # a new version
@@ -272,6 +275,7 @@ plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
 			legend("topright", "median spectrum", box.lty = 0, cex = 0.8)
 		}
 	}
+    invisible()
 }
 
 # a wrapper function to plotSpectrum to plot all spectra
@@ -281,4 +285,5 @@ plotAllSpectra <- function(Lib, peaks, type = "ht", pdfFile, width = 8, height =
 	for(i in 1:length(Lib)) {
 		plotSpectra(Lib, peaks, i, type)
 	}
+    invisible()
 }
