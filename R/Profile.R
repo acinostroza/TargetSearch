@@ -1,4 +1,4 @@
-Profile <- 
+Profile <-
 function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
     opt <- options(stringsAsFactors=FALSE)
@@ -18,13 +18,11 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
 
     searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
-    rownames(searchData) <- 1:length(Lib)
     colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_Count_per_Mass", "Masses",
         "RI", "Score_all_masses", "Score_cor_masses")
 
     medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
     colnames(medInt) <- my.names
-    rownames(medInt) <- 1:length(Lib)
     medRT <- medRI <- medInt
 
     res <- switch(method,
@@ -34,7 +32,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     res_log <- lapply(res,log2)
 
     opt_warn <- options(warn=-1) # suppress correlation warnings
-    for(i in 1:length(Lib)){
+    for(i in seq_along(Lib)){
 
         x <- as.character(selMass(Lib)[[i]])
 
@@ -117,6 +115,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     }
 
     info <- cbind(Name = libName(Lib), Lib_RI = libRI(Lib), searchData)
+    rownames(medInt) <- rownames(medRI) <- rownames(medRT) <- rownames(info)
     options(opt)
     return(new("tsProfile", peakData, info=info,
     profInt=medInt, profRI=medRI, profRT=medRT))
