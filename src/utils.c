@@ -218,7 +218,7 @@ double quantile(double *xs, double p, int n)
 	rPsort(xs, n, k - 1);
 
 	/* trivial cases */
-	if(p == 0 || p == 1);
+	if(p == 0 || p == 1)
 		return xs[k - 1];
 
 	rPsort(xs + k, n - k, 0);
