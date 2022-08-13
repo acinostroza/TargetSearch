@@ -46,23 +46,29 @@ ncdf4_convert_from_path(cdf_path = ".", out_path = cdf_path, recursive = FALSE, 
     internally).
 }
 \examples{
-# in this example we'll use a temporary directory destination as storage
-outdir <- tempfile()
+# in this example we'll use a temporary directory as source
+# and storage of CDF (because we need to reduce testing time in Bioc)
 
-# get files from package TargetSearchData
+# get some files from package TargetSearchData and copy them
+# to `srcdir`
 require(TargetSearchData)
 cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdffiles <- dir(cdfpath, pattern="cdf$", full=TRUE)[1:4]
+srcdir <- file.path(tempdir(), 'gc-ms-data')
+dir.create(srcdir)
+file.copy(cdffiles, srcdir)
 
 # convert to output directory set above
-ncdf4_convert_from_path(cdfpath, outdir)
+outdir <- tempfile()
+ncdf4_convert_from_path(srcdir, outdir)
 
 # recursive search. note that output files will be saved under "gc-ms-data"
 # in the output directory
-cdfpath <- find.package("TargetSearchData")
+cdfpath <- tempdir() # (base path where we copy the CDF files)
 ncdf4_convert_from_path(cdfpath, outdir, recursive=TRUE)
 
 # clean-up the mess
-unlink(outdir, recursive=TRUE)
+unlink(c(srcdir, outdir), recursive=TRUE)
 }
 \seealso{
 \code{\link[=ncdf4_convert]{ncdf4_convert()}}, \code{\link[=baseline]{baseline()}}
