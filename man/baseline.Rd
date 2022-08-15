@@ -30,3 +30,40 @@ man pages for details.}
 }
 \author{Alvaro Cuadros-Inostroza}
 \seealso{ \code{\link{RIcorrect}}, \code{\link{baselineCorrection}}, \code{\link{baselineCorrectionQuant}} }
+\examples{
+  # get sample CDF from TargetSearchData
+  require(TargetSearchData)
+  cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+  cdffile <- dir(cdfpath, pattern="cdf$", full=TRUE)[7]
+  pdata <- peakCDFextraction(cdffile)
+
+  # restrict mass range to reduce computing time (not needed for
+  # actual data)
+  pdata$Peaks <- pdata$Peaks[, 1:10] ; pdata$massRange <- c(85, 94)
+
+  # make a fake baseline as constant + noise (the CDF files have been
+  # already baseline corrected by the vendor software).
+  nscans <- length(pdata$Time)
+  noise <- as.integer(1000 + rnorm(nscans, sd=5))
+  pdata$Peaks <- pdata$Peaks + noise
+
+  # use Classic and Quantile methods for baseline correction (def parameters)
+  pdata_c <- baseline(pdata, 'classic')
+  # use Quantile method
+  pdata_q <- baseline(pdata, 'quantiles')
+
+  # plot function to compare traces
+  plfun <- function(p, q, k, n, titl) {
+    plot(p$Time, p$Peaks[, k], col='blue', type='l', xlab='time', ylab='intensity')
+    lines(q$Time, q$Peaks[, k] - n, col='red')
+    legend('topleft', c('corrected', 'original'), col=c('blue', 'red'), lty=1, lwd=2)
+    title(paste('method:', titl))
+  }
+
+  op <- par(mfrow=c(2,2))
+    plfun(pdata_c, pdata, 1, noise, 'classic')
+    plfun(pdata_q, pdata, 1, noise, 'quantile')
+    plfun(pdata_c, pdata, 7, noise, 'classic')
+    plfun(pdata_q, pdata, 7, noise, 'quantile')
+  par(op)
+}
