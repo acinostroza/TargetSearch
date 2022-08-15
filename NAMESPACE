@@ -1,15 +1,13 @@
 useDynLib(TargetSearch, .registration = TRUE, .fixes = "c_")
 
 import("methods")
+import("stats")
 
 importFrom("graphics", "abline", "axis", "box", "boxplot", "grid", "image",
            "layout", "lcm",  "legend", "matlines", "matplot", "mtext",
            "par", "plot.new", "points", "rect", "text", "title")
 
 importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
-
-importFrom("stats", "approx", "as.dist", "coef", "cor", "cutree", "dist",
-           "filter", "hclust", "lm", "median", "predict", "sd", "smooth.spline")
 
 importFrom("utils", "head", "read.delim", "setTxtProgressBar", "txtProgressBar",
            "write.table")
