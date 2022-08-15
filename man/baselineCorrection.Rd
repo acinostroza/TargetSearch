@@ -27,25 +27,27 @@
 \details{
 The baseline correction algorithm is based on the work of Chang et al, and it works as
 follows. For every mass trace, i.e., columns of matrix \code{peaks}, the signal intensity is filtered
-by a first high pass filter: \emph{y[i] = alpha * (y[i-1] + x[i] - x[i-1])}. The
+by a first high pass filter: \deqn{y_i = \alpha (y_{i-1} + x_i - x_{i-1})} The
 filtered signal is divided into evenly spaced segments (\code{segments})
 and the standard deviation of each segment is calculated. A percentage (\code{bfraction})
 of the segments with the lowest values are assumed to be baseline signal and the
-standard deviation (\emph{stdn}) of the points within those segments is calculated.
+standard deviation (\eqn{\sigma}{stdn}) of the points within those segments is calculated.
 
-Once \emph{stdn} has been determined, the points with absolute filtered values larger than
-\emph{2 * stdn} are considered signal. After that, the signal windowing step takes
-every one of the points found to be signal as the center of a signal window (\code{signalWindow)}
+Once \eqn{\sigma}{stdn} has been determined, the points with absolute filtered values larger than
+\eqn{2\sigma}{2 * stdn} are considered signal. After that, the signal windowing step takes
+every one of the points found to be signal as the center of a signal window (\code{signalWindow})
 and marks the points within that window as signal. The remaining points are now considered
 to be noise.
 
-The baseline signal is obtained by either using linear interpolation (default) or fitting a cubic
-smoothing spline taking only
-the noise. The baseline can be shifted up or down by using the parameter (threshold),
-which is done by the formula: \emph{B' = B + 2*(threshold - 0.5)*2*stdn}, where
-\emph{B} is the fitted spline, \emph{stdn} the standard deviation of the noise,
-and \code{threshold} a value between 0 and 1. Finally, the corrected signal
-is calculated by subtracting \emph{B'} to the original signal.
+The baseline signal is obtained by either using linear interpolation (default)
+or fitting a cubic smoothing spline taking only
+the noise. The baseline can be shifted up or down by using the parameter
+\code{threshold}, which is done by the formula:
+\deqn{B' = B + 4\sigma(t - 0.5)}{B' = B + 4 * stdn (t - 0.5)}
+where
+\eqn{B} is the fitted spline, \eqn{\sigma}{stdn} the standard deviation of the noise,
+and \eqn{t} is the \code{threshold} between 0 and 1. Finally, the corrected signal
+is calculated by subtracting \eqn{B'} to the original signal.
 
 }
 \value{
