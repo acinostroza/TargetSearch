@@ -65,4 +65,33 @@ David Chang, Cory D. Banack and Sirish L. Shah, Robust baseline correction algor
 for signal dense NMR spectra. \emph{Journal of Magnetic Resonance 187 (2007) 288-292}
 }
 \author{Alvaro Cuadros-Inostroza}
-\seealso{ \code{\link{RIcorrect}} }
+\seealso{ \code{\link{RIcorrect}}, \code{\link{baseline} }}
+\examples{
+  # get sample CDF from TargetSearchData
+  require(TargetSearchData)
+  cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+  cdffile <- dir(cdfpath, pattern="cdf$", full=TRUE)[7]
+  pdata <- peakCDFextraction(cdffile)
+
+  # restrict mass range to reduce computing time (not needed for
+  # actual data)
+  pdata$Peaks <- pdata$Peaks[, 1:10] ; pdata$massRange <- c(85, 94)
+
+  # make a fake baseline as constant + noise (the CDF files have been
+  # already baseline corrected by the vendor software).
+  nscans <- length(pdata$Time)
+  noise <- as.integer(1000 + rnorm(nscans, sd=5))
+  pdata$Peaks <- pdata$Peaks + noise
+
+  # change parameters and see how the results change
+  pdata1 <- baselineCorrection(pdata)
+  pdata2 <- baselineCorrection(pdata, threshold = 1, alpha = 0.97)
+
+  # pick random trace k
+  k <- 6
+  m <- cbind(pdata$Peaks[, k] - noise, pdata1$Peaks[, k], pdata2$Peaks[, k])
+  matplot(pdata$Time, m, type='l', lty=1, xlab='time', ylab='intensity')
+  legend('topleft', c('original', 'base correct 1', 'base correct 2'),
+         col=1:3, lty=1, lwd=1)
+}
+% vim: ts=2 sw=2 et
