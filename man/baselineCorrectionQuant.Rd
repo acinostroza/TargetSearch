@@ -3,7 +3,7 @@
 \title{Baseline correction - quantiles method}
 \description{
     This function perform baseline correction using a quantiles around a
-    moving window algorthim.
+    moving window algorithm.
 }
 \usage{
     baselineCorrectionQuant(peaks, time, smooth=0, qntl=0.50, width=30,
@@ -20,8 +20,9 @@
   \item{smooth}{An integer. Smooth each signal by this number of points using a moving average.
     Smoothing is disabled if this value is less or equal than 1. Note that the smoothing is applied
     after the baseline correction.}
-  \item{qntl}{Numeric scalar. The quantile for baseline estimation. The value must be in [0, 1].}
-  \item{width}{numeric scalar. The size of the window centered around a scan for baseline estimation.
+  \item{qntl}{Numeric scalar. The quantile for baseline estimation. The value must be in
+    \code{[0, 1]}.}
+  \item{width}{Numeric scalar. The size of the window centered around a scan for baseline estimation.
     The size depends on the parameter \code{unit} below.}
   \item{unit}{A string which chooses if the \code{width} are points (scans) or seconds.}
   \item{steps}{Integer scalar greater than zero. To speed up computation, the baseline
@@ -31,20 +32,50 @@
 \details{
   Applies a quantile based baseline estimation method. The method is applied for each ion
   mass trace (column of peaks) individually. It simple computes for each data point of the
-  trace the \code{qntl} quantile, for example the 50\% quantile, ie, the median, of all
+  trace the \code{qntl} quantile, for example the 50\% quantile, i.e., the median, of all
   the points which are within a \code{width} distance or it.
 
   In order for the method to work, select a \code{width} much larger than the widest peak.
 
   For speed efficiency, and assuming that the baseline is a smooth curve, the quantiles
-  are computed every \code{step} points instead. By setting this value to 1, it means
-  compute the baseline for each point. The baseline of the points in between are approximated
-  by linear interpolation.
+  are computed every \code{step} points. For example, if \code{step=3}, then the quantiles
+  will be computed every third scan instead of every point. If instead \code{step=1}, then
+  it will computed in every scan. The baseline of the points in between (if \code{step > 1})
+  are approximated by linear interpolation.
 }
 \value{
-  Returns a list with the same elements as the the input, but the element \code{"Peaks"}
+  Returns a list with the same elements as the input, but the element \code{"Peaks"}
   containing baseline corrected values. In case peaks is a matrix, it returns a matrix
   of the same dimension instead.
 }
 \author{Alvaro Cuadros-Inostroza}
 \seealso{ \code{\link{RIcorrect}}, \code{\link{baseline}}, \code{\link{baselineCorrection}} }
+\examples{
+  # get sample CDF from TargetSearchData
+  require(TargetSearchData)
+  cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+  cdffile <- dir(cdfpath, pattern="cdf$", full=TRUE)[7]
+  pdata <- peakCDFextraction(cdffile)
+
+  # restrict mass range to reduce computing time (not needed for
+  # actual data)
+  pdata$Peaks <- pdata$Peaks[, 1:10] ; pdata$massRange <- c(85, 94)
+
+  # make a fake baseline as constant + noise (the CDF files have been
+  # already baseline corrected by the vendor software).
+  nscans <- length(pdata$Time)
+  noise <- as.integer(1000 + rnorm(nscans, sd=5))
+  pdata$Peaks <- pdata$Peaks + noise
+
+  # change parameters and see how the results change. Note that the default
+  # width of 30 seconds might be too small
+  pdata1 <- baselineCorrectionQuant(pdata, steps=5)
+  pdata2 <- baselineCorrectionQuant(pdata, width=50, steps=5)
+
+  # pick random trace k and compare correction values
+  k <- 6
+  m <- cbind(pdata$Peaks[, k] - noise, pdata1$Peaks[, k], pdata2$Peaks[, k])
+  matplot(pdata$Time, m, type='l', lty=1, xlab='time', ylab='intensity')
+  legend('topleft', c('original', 'base correct 1', 'base correct 2'),
+         col=1:3, lty=1, lwd=1)
+}
