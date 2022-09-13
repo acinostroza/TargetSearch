@@ -87,10 +87,11 @@ library(TargetSearchData)
 @
 
 Specify the directory where the CDF files are. In this example we will
-use the CDF files of \Biocpkg{TargetSearchData} package.
+use the CDF files of \Biocpkg{TargetSearchData} package, which
+can be retrieved by the function \Rfunction{tsd\_data\_path()}.
 
 <<cdffiles>>=
-cdfPath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfPath <- tsd_data_path()
 dir(cdfPath, pattern="cdf$")
 @
 
@@ -105,10 +106,11 @@ RIpath(samples.all) <- "."
 @
 
 Import retention index marker times limits. We will use the
-ones defined in \Biocpkg{TargetSearchData}.
+ones defined in \Biocpkg{TargetSearchData} (the function
+\Rfunction{tsd\_file\_path()} gets the full path of the file).
 
 <<rim>>=
-rimLimits <- ImportFameSettings(file.path(cdfPath,"rimLimits.txt"))
+rimLimits <- ImportFameSettings(tsd_file_path("rimLimits.txt"))
 rimLimits
 @
 

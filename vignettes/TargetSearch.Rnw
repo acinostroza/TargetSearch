@@ -112,10 +112,14 @@ This function will warn you if CDF samples are not found in the chosen path.
 <<ImportSample>>=
 library(TargetSearchData)
 library(TargetSearch)
-cdf.path <- system.file("gc-ms-data", package = "TargetSearchData")
-sample.file <- file.path(cdf.path, "samples.txt")
+cdf.path <- tsd_data_path()
+sample.file <- tsd_file_path("samples.txt")
 samples <- ImportSamples(sample.file, CDFpath = cdf.path, RIpath = ".")
 @
+
+\bioccomment{The functions \Rfunction{tsd\_data\_path()} and \Rfunction{tsd\_file\_path()}
+are convenience functions that retrieve file path to \Rpackage{TargetSearchData}
+data files.}
 
 Alternatively, you could create a \Robject{tsSample} object by using the sample class
 methods.
@@ -144,7 +148,7 @@ has to be provided either in an additional column or as an argument \Robject{mas
 to function \Rfunction{ImportFameSettings()}.
 
 <<ImportFameSettings>>=
-rim.file  <- file.path(cdf.path, "rimLimits.txt")
+rim.file  <- tsd_file_path("rimLimits.txt")
 rimLimits <- ImportFameSettings(rim.file, mass = 87)
 @
 
@@ -379,7 +383,7 @@ colon (:) and different pairs are separated by spaces.
 The function \Rfunction{ImportLibrary()} imports the reference file.
 
 <<ImportLibrary>>=
-lib.file <- file.path(cdf.path, "library.txt")
+lib.file <- tsd_file_path("library.txt")
 lib      <- ImportLibrary(lib.file, RI_dev = c(2000,1000,200),
             TopMasses = 15, ExcludeMasses = c(147, 148, 149))
 @
@@ -552,7 +556,7 @@ the raw chromatogram and \Rfunction{plotPeak} to plot the peak (figure~\ref{fig:
 <<plotPeak, fig.cap="Chromatographic peak of Valine.">>=
 # we select the first sample
 sample.id <- 1
-cdf.file  <- file.path(cdf.path, cdffiles[sample.id])
+cdf.file  <- tsd_file_path(cdffiles[sample.id])
 rawpeaks  <- peakCDFextraction(cdf.file)
 # which.met=3 (id of Valine)
 plotPeak(samples, lib, MetabProfile, rawpeaks, which.smp=sample.id,
