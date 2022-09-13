@@ -33,8 +33,7 @@ man pages for details.}
 \examples{
   # get sample CDF from TargetSearchData
   require(TargetSearchData)
-  cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-  cdffile <- dir(cdfpath, pattern="cdf$", full=TRUE)[7]
+  cdffile <- tsd_cdffiles()[7]
   pdata <- peakCDFextraction(cdffile)
 
   # restrict mass range to reduce computing time (not needed for

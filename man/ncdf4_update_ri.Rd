@@ -39,8 +39,7 @@ Alvaro Cuadros-Inostroza
 \examples{
 # pull a CDF file from package TargetSearchData as example
 require(TargetSearchData)
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-cdffile <- dir(cdfpath, pattern=".cdf", full=TRUE)[1]
+cdffile <- tsd_cdffiles()[9]
 
 # we need to convert from NCDF3 to NCDF4 in this example
 # (NCDF3 files do not work)

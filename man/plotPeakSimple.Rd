@@ -39,7 +39,7 @@ require(TargetSearchData)
 data(TSExample)
 
 # update CDF path
-CDFpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+CDFpath(sampleDescription) <- tsd_data_path()
 
 # Plot the peak "Valine" for sample number 1
 grep("Valine", libName(refLibrary)) # answer: 3

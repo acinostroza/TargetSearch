@@ -14,7 +14,6 @@ plotFAME(samples, RImatrix, whichFAME)
 	and the number of markers.}
 }
 \examples{
-require(TargetSearchData)
 data(TSExample)
 # plot Retention index standards 1 to 3
 plotFAME(sampleDescription, RImatrix, 1)

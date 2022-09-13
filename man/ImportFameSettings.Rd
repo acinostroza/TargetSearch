@@ -29,9 +29,9 @@ ImportFameSettings(tmp.file = NA, mass = NA, ...)
     A \code{tsRim} object.
 }
 \examples{
+require(TargetSearchData)
 # get the RI marker definition file
-cdfpath  <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-rim.file <- file.path(cdfpath, "rimLimits.txt")
+rim.file <- tsd_file_path("rimLimits.txt")
 
 # set the mass marker to 87
 mass <- 87

@@ -85,8 +85,9 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"),
 }
 \examples{
 # get the sample definition definition file
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-sample.file  <- file.path(cdfpath, "samples.txt")
+require(TargetSearchData)
+cdfpath <- tsd_data_path()
+sample.file  <- tsd_file_path("samples.txt")
 
 # set a path where the RI files will be created
 RIpath <- "."

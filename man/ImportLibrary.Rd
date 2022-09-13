@@ -137,8 +137,8 @@ Name: another metabolite
 }
 \examples{
 # get the reference library file
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-lib.file  <- file.path(cdfpath, "library.txt")
+require(TargetSearchData)
+lib.file  <- tsd_file_path("library.txt")
 
 # Import the reference library
 refLibrary <- ImportLibrary(lib.file)

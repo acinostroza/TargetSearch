@@ -88,7 +88,7 @@
 \examples{
     require(TargetSearchData)
     # take three example files from package TargetSearchData
-    in.files <- dir(file.path(find.package("TargetSearchData"), "gc-ms-data"), pattern="RI_", full=TRUE)[1:3]
+    in.files <- tsd_rifiles()[1:3]
     # out files to current directory
     out.files <- sub(".txt", ".dat", basename(in.files))
     # convert to binary format

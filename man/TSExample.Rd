@@ -43,12 +43,13 @@
 require(TargetSearchData)
 
 ## The directory with the NetCDF GC-MS files
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- tsd_data_path()
 cdfpath
 list.files(cdfpath)
-samp.file <- file.path(cdfpath, "samples.txt")
-rim.file  <- file.path(cdfpath, "rimLimits.txt")
-lib.file  <- file.path(cdfpath, "library.txt")
+# get files from TargetSearchData
+samp.file <- tsd_file_path("samples.txt")
+rim.file  <- tsd_file_path("rimLimits.txt")
+lib.file  <- tsd_file_path("library.txt")
 
 # import files from package
 sampleDescription <- ImportSamples(samp.file, CDFpath = cdfpath, RIpath = ".")

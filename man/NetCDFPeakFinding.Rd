@@ -56,12 +56,11 @@ NetCDFPeakFinding(ncdf, massRange = NULL, Window = 15, IntThreshold = 10,
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \examples{
 require(TargetSearchData)
-CDFpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-CDFfiles <- dir(CDFpath, pattern = ".cdf$", full.names = TRUE)
-CDFfiles
+# pick first CDF file
+CDFfile <- tsd_cdffiles()[1]
 
 # extrac peaks of first chromatogram
-peaks.1 <- NetCDFPeakFinding(CDFfiles[1], Window = 15, IntThreshold = 10, pp.method = "ppc")
+peaks.1 <- NetCDFPeakFinding(CDFfile, Window = 15, IntThreshold = 10, pp.method = "ppc")
 # scan acquisition times
 head(peaks.1$Time)
 # peaks in matrix form. first column is mass 85, last one is mass 320.

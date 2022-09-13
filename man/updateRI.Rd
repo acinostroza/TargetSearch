@@ -58,8 +58,7 @@ in \code{RImatrix} will be ignored and not returned.
 require(TargetSearchData)
 # import refLibrary, rimLimits and sampleDescription.
 data(TSExample)
-CDFpath(sampleDescription) <-
-    file.path(find.package("TargetSearchData"), "gc-ms-data")
+CDFpath(sampleDescription) <- tsd_data_path()
 
 # convert a subset of files to netCDF4
 smp <- ncdf4Convert(sampleDescription[1:6], path=".")

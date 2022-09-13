@@ -41,7 +41,7 @@
 require(TargetSearchData)
 data(TSExample)
 # get the CDF files
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- tsd_data_path()
 
 # update the CDF path
 CDFpath(sampleDescription) <- cdfpath

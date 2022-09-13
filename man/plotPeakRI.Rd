@@ -68,7 +68,7 @@ require(TargetSearchData)
 data(TSExample)
 
 # get and set the RI file path
-RIpath(sampleDescription) <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+RIpath(sampleDescription) <- tsd_data_path()
 
 # search all peaks of Valine (GC.3) and selective masses. Retention index
 ri <- plotPeakRI(sampleDescription, refLibrary, 'GC.3')

@@ -28,9 +28,9 @@ require(TargetSearchData)
 data(TSExample)
 
 # process chormatograms and get a profile
-RI.path    <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+RI.path <- tsd_data_path()
 RIpath(sampleDescription) <- RI.path
-refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
+refLibrary    <- ImportLibrary(tsd_file_path('library.txt'))
 refLibrary    <- medianRILib(sampleDescription, refLibrary)
 corRI         <- sampleRI(sampleDescription, refLibrary, r_thres = 0.95)
 peakData      <- peakFind(sampleDescription, refLibrary, corRI)

@@ -25,7 +25,7 @@ require(TargetSearchData)
 data(TSExample)
 
 # get RI file path
-RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+RI.path <- tsd_data_path()
 # update RI file path
 RIpath(sampleDescription) <- RI.path
 

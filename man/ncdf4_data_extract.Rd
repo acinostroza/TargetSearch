@@ -61,10 +61,8 @@ create custom plots.
 
 ### create NCDF4 from NCDF3 from the package TargetSearchData
 require(TargetSearchData)
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-
 # pick first file
-cdffile <- dir(cdfpath, pattern="cdf", full=TRUE)[1]
+cdffile <- tsd_cdffiles()[1]
 nc4file <- tempfile(fileext=".nc4")
 ncdf4_convert(cdffile, nc4file)
 

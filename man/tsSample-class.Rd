@@ -108,7 +108,7 @@ showClass("tsSample")
 
 # get a list of CDF files from a directory
 require(TargetSearchData)
-CDFpath <- system.file("gc-ms-data", package = "TargetSearchData")
+CDFpath <- tsd_data_path()
 cdffiles <- dir(CDFpath, "cdf", full=TRUE)
 
 # define the RI file path

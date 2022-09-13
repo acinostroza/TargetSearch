@@ -45,10 +45,8 @@ A list with the following components:
 \examples{
 ### take a NCDF3 file from the package TargetSearchData
 require(TargetSearchData)
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-
-# pick first file and extract its data
-cdffile <- dir(cdfpath, pattern="cdf", full=TRUE)[1]
+# pick a CDF file and extract its data
+cdffile <- tsd_cdffiles()[4]
 peakData <- peakCDFextraction(cdffile)
 
 # it also works for NCDF4 files (we need to convert the file first)

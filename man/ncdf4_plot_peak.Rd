@@ -68,9 +68,8 @@ ncdf4_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, plot =
 require(TargetSearchData)
 
 # load CDF files, convert them and save them in a temporary directory
-path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
 dest <- tempdir()
-cdf <- dir(path, pattern='*.cdf', full=TRUE)[1:3]
+cdf <- tsd_cdffiles()[1:3]
 cdf <- sapply(cdf, function(x) ncdf4_convert(x, outFile=file.path(dest, basename(x))))
 
 # plot single m/z on many cdf files

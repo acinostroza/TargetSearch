@@ -63,8 +63,8 @@ but with different input parameters.
 }
 \examples{
 require(TargetSearchData)
-path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-rifile <- dir(path, pattern="RI_", full=TRUE)[1]
+path <- tsd_data_path()
+rifile <- tsd_rifiles()[1]
 
 # extract peak data for m/z 116 and 117 in time range 180 - 220 seconds
 data <- ri_data_extract(rifile, c(116, 117), c(180, 220), useRT=TRUE)

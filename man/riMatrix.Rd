@@ -33,7 +33,7 @@ require(TargetSearchData)
 # import refLibrary, rimLimits and sampleDescription.
 data(TSExample)
 # get the CDF files
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- tsd_data_path()
 
 # select a subset of samples
 smp <- sampleDescription[1:4]

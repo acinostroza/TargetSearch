@@ -83,7 +83,7 @@ In addition, the following attributes are defined. Note that only \code{creator}
 require(TargetSearchData)
 
 # get files from package TargetSearchData
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- tsd_data_path()
 
 # choose any file
 cdf <- file.path(cdfpath, '7235eg04.cdf')

@@ -30,11 +30,11 @@ require(TargetSearchData)
 data(TSExample)
 
 # get RI file path
-RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+RI.path <- tsd_data_path()
 # update RI file path
 RIpath(sampleDescription) <- RI.path
 # Import Library
-refLibrary        <- ImportLibrary(file.path(RI.path,'library.txt'))
+refLibrary        <- ImportLibrary(tsd_file_path('library.txt'))
 # update median RI
 refLibrary        <- medianRILib(sampleDescription, refLibrary)
 

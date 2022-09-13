@@ -84,8 +84,8 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
 require(TargetSearchData)
 
 # get RI files from TargetSearchData
-path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-rifiles <- dir(path, pattern='RI_*', full=TRUE)
+path <- tsd_data_path()
+rifiles <- tsd_rifiles()
 
 # simple plot no style
 z <- ri_plot_peak(rifiles, massValues=c(144, 145, 100, 218), timeRange=c(255, 265))

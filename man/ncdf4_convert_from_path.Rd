@@ -52,8 +52,7 @@ ncdf4_convert_from_path(cdf_path = ".", out_path = cdf_path, recursive = FALSE, 
 # get some files from package TargetSearchData and copy them
 # to `srcdir`
 require(TargetSearchData)
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-cdffiles <- dir(cdfpath, pattern="cdf$", full=TRUE)[1:4]
+cdffiles <- tsd_cdffiles()[1:4]
 srcdir <- file.path(tempdir(), 'gc-ms-data')
 dir.create(srcdir)
 file.copy(cdffiles, srcdir)

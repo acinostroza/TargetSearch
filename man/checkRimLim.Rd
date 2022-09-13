@@ -92,13 +92,13 @@ such as \code{col}, \code{lty}, \code{pch}, \code{lwd}.}
 require(TargetSearchData)
 
 # get the cdf path TargetSearchData
-cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
+cdfpath <- tsd_data_path()
 
 # import samples (see ImportSamples() for details)
-samples <- ImportSamples(file.path(cdfpath, "samples.txt"), CDFpath = cdfpath)
+samples <- ImportSamples(tsd_file_path("samples.txt"), CDFpath = cdfpath)
 
 # Import RI markers (see ImportFameSettings())
-rim <- ImportFameSettings(file.path(cdfpath, "rimLimits.txt"))
+rim <- ImportFameSettings(tsd_file_path("rimLimits.txt"))
 
 # choose a sample at random and plot the m/z traces around the retention time window
 ret <- checkRimLim(samples, rim)

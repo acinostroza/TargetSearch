@@ -76,12 +76,12 @@ ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
 require(TargetSearchData)
 data(TSExample)
 
-RI.path <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-refLibrary <- ImportLibrary(file.path(RI.path,"library.txt"))
+RI.path <- tsd_data_path()
+refLibrary <- ImportLibrary(tsd_file_path("library.txt"))
 # update RI file path
 RIpath(sampleDescription) <- RI.path
 # Import Library
-refLibrary        <- ImportLibrary(file.path(RI.path,'library.txt'))
+refLibrary        <- ImportLibrary(tsd_file_path('library.txt'))
 # update median RI
 refLibrary        <- medianRILib(sampleDescription, refLibrary)
 # get the sample RI
