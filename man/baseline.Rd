@@ -31,9 +31,9 @@ man pages for details.}
 \author{Alvaro Cuadros-Inostroza}
 \seealso{ \code{\link{RIcorrect}}, \code{\link{baselineCorrection}}, \code{\link{baselineCorrectionQuant}} }
 \examples{
-  # get sample CDF from TargetSearchData
+  # get a random sample CDF from TargetSearchData
   require(TargetSearchData)
-  cdffile <- tsd_cdffiles()[7]
+  cdffile <- sample(tsd_cdffiles(), 1)
   pdata <- peakCDFextraction(cdffile)
 
   # restrict mass range to reduce computing time (not needed for

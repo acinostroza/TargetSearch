@@ -51,10 +51,9 @@
 \author{Alvaro Cuadros-Inostroza}
 \seealso{ \code{\link{RIcorrect}}, \code{\link{baseline}}, \code{\link{baselineCorrection}} }
 \examples{
-  # get sample CDF from TargetSearchData
+  # get a random sample CDF from TargetSearchData
   require(TargetSearchData)
-  cdfpath <- file.path(find.package("TargetSearchData"), "gc-ms-data")
-  cdffile <- dir(cdfpath, pattern="cdf$", full=TRUE)[7]
+  cdffile <- sample(tsd_cdffiles(), 1)
   pdata <- peakCDFextraction(cdffile)
 
   # restrict mass range to reduce computing time (not needed for
