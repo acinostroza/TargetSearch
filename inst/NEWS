@@ -1,3 +1,37 @@
+		CHANGES IN VERSION 2.0.0:
+
+NEW FEATURES
+
+   o	Bug fix release despite being a 2.0 release. This release contains
+	mostly documentation improvements, in particular more examples
+	to functions that did not have them, and code clean-ups.
+
+   o	No significant user-visible changes on this release.
+
+BUG FIXES
+
+   o	C code: use variables of same size (size_t vs int)
+
+   o	C code: replace and update user-controlled memory interface macros.
+
+   o    Baseline quantiles. Update quantiles computation with partially sorted
+	data instead of sorted data. This yields a three-fold speed increase.
+
+   o	Function `Profile`: set correct rownames. The slots of the `msProfile`
+	object did not have correct rownames.
+
+   o	Example data: fix object inconsistencies due to incorrect rownames.
+
+   o	Plotting functions: they should return `invisible()`.
+
+   o	Modernize the DESCRIPTION file.
+
+   o	Import the whole `stats` package instead of listing each function.
+
+   o	Replace instances of T/F with TRUE/FALSE in functions and vignettes.
+
+   o	Add examples to functions that lacked them.
+
 		CHANGES IN VERSION 1.52.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
