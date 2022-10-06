@@ -136,6 +136,29 @@ setMethod("$", "tsSample", function(x, name) {
     ret
 })
 
+setMethod("c", "tsSample",
+    function(x, ..., recursive=FALSE)
+    {
+        assert_that(is.flag(recursive), !recursive,
+                    msg="\"c\" method for `tsSample` objects does not support the 'recursive' option")
+
+        z <- list(...)
+        if(length(z) == 0)
+            return(x)
+
+        z <- c(list(x), z)
+        stopifnot(all(vapply(z, validObject, FALSE)))
+        Names <- unlist(lapply(z, slot, 'Names'))
+        CDFfiles <- unlist(lapply(z, slot, 'CDFfiles'))
+        RIfiles <- unlist(lapply(z, slot, 'RIfiles'))
+        days <- unlist(lapply(z, slot, 'days'))
+        data <- do.call('rbind', lapply(z, slot, 'data'))
+        obj <- new('tsSample', CDFfiles=CDFfiles, RIfiles=RIfiles, days=days, data=data)
+        validObject(obj)
+        obj
+    }
+)
+
 setMethod("initialize",
           "tsSample",
           function(.Object, CDFfiles, Names, RIfiles, days, data,

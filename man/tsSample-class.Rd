@@ -20,6 +20,7 @@
 \alias{RIpath<-,tsSample-method}
 \alias{RIpath<-}
 \alias{length,tsSample-method}
+\alias{c,tsSample-method}
 \alias{sampleData,tsSample-method}
 \alias{sampleData}
 \alias{sampleData<-,tsSample-method}
@@ -77,6 +78,7 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{show}}{\code{signature(object = "tsSample")}: the show funtion. }
     \item{\code{fileFormat}}{\code{signature}{obj = "tsSample"}: Sets or gets the RI file format.
         Options are either "binary" or "text". See note below.}
+    \item{\code{c}}{Function to combine multiple objects.}
  }
 }
 \section{Notes}{
@@ -98,6 +100,12 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     However, the methods to set or get the paths will still work. The file
     paths is stored on the \code{CDFfiles} and \code{RIfiles} slots.
 
+    The \code{c} method requires that the combination of all objects have
+    unique identifiers (names), or in other words, the objects cannot share
+    identifiers. Duplicated identifiers are not allowed and an error will be thrown.
+    This method also requires that the column names of the \code{data} slot
+    (see method \code{sampleData}) are the same, because the method calls
+    \code{rbind} internally.
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{
@@ -172,5 +180,11 @@ sampleDays(sampleDescription) <- "1"
 
 ## Note: the length of `measurement days` variable must be 1 or equal
 ## to the number of samples, otherwise an error will be thrown
+
+## objects can be combined with the c() function
+samp1 <- sampleDescription[1:5]
+samp2 <- sampleDescription[6:10]
+samp3 <- sampleDescription[11:15]
+samp <- c(samp1, samp2, samp3)
 }
 \keyword{classes}
