@@ -14,6 +14,8 @@
 \alias{rimStandard}
 \alias{rimStandard<-,tsRim-method}
 \alias{rimStandard<-}
+\alias{length,tsRim-method}
+\alias{c,tsRim-method}
 
 \title{Class for representing retention index markers}
 \description{This is a class to represent retention index markers.}
@@ -40,6 +42,8 @@ standard = [a vector with RI standards], mass = [m/z marker])}.
     \item{\code{rimMass<-}}{\code{signature(obj = "tsRim")}: sets the m/z marker. }
     \item{\code{rimStandard}}{\code{signature(obj = "tsRim")}: gets the standars. }
     \item{\code{rimStandard<-}}{\code{signature(obj = "tsRim")}: sets the standars. }
+    \item{\code{length}}{Returns the number of retention index standards.}
+    \item{\code{c}}{Function to combine multiple objects.}
   }
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
@@ -59,6 +63,8 @@ Std <- c(250000, 420000, 630000)
 mass <- 87
 #  - create the object
 rimLimits <- new("tsRim", limits = Lim, standard = Std, mass = mass)
+#  - get the number of standards using `length`
+length(rimLimits)
 
 # sometimes you need to change the limits of a particular standard
 rimLimits(rimLimits)[2,] <- c(410, 450)
@@ -71,6 +77,12 @@ rim <- rimLimits[1:2]
 
 # remove a marker (number 3 in this case)
 rim <- rimLimits[-3]
+
+# objects can be combined using the `c` method
+obj <- new("tsRim", limits = cbind(100 * 1:6, 100 * 1:6 + 20),
+           standard = 1000 * 1:6, mass = 100) # a random object
+# combine objects
+obj <- c(rimLimits, obj)
 }
 \keyword{classes}
 % vim: set ts=4 sw=4 et:

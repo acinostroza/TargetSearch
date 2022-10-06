@@ -58,4 +58,33 @@ setMethod("[", "tsRim",
     }
 )
 
+setMethod("c", "tsRim",
+    function(x, ..., recursive=FALSE)
+    {
+        assert_that(is.flag(recursive), !recursive,
+                    msg="\"c\" method for `tsRim` objects does not support the 'recursive' option")
+        rep2 <- function(x, n)
+            if(length(x) == 1) rep(x, n) else x
+
+        z <- list(...)
+        if(length(z) == 0)
+            return(x)
+
+        z <- c(list(x), z)
+        lim <- lapply(z, slot, 'limits')
+        n   <- vapply(lim, nrow, 0)
+        lim <- do.call('rbind', lim)
+        std <- unlist(lapply(z, slot, 'standard'))
+        mass <- lapply(z, slot, 'mass')
+        m <- unique(unlist(mass))
+        mass <- if(length(m) == 1) m else
+                  unlist(mapply(rep2, mass, n, SIMPLIFY=FALSE))
+        obj <- new('tsRim', limits=lim, standard=std, mass=mass)
+        validObject(obj)
+        return(obj)
+    }
+)
+
+setMethod("length", "tsRim", function(x) length(x@standard))
+
 # vim: set ts=4 sw=4 et:
