@@ -2,11 +2,13 @@
 
 NEW FEATURES
 
-   o	Bug fix release despite being a 2.0 release. This release contains
-	mostly documentation improvements, in particular more examples
-	to functions that did not have them, and code clean-ups.
+   o	Despite being a 2.0 release, the new features are minimal as
+	these release contains mostly documentation improvements,
+	code refactoring and clean-ups, and bug fixes.
 
-   o	No significant user-visible changes on this release.
+   o	New methods for combining `tsLib`, `tsRim` and `tsSample` objects.
+	These objects can be combined with the `c` operator. The method
+	`length` reports the number of markers for objects of class `tsRim`.
 
 BUG FIXES
 
