@@ -6,6 +6,7 @@
 \alias{libId,tsLib-method}
 \alias{libId}
 \alias{length,tsLib-method}
+\alias{c,tsLib-method}
 \alias{libData,tsLib-method}
 \alias{libData}
 \alias{libData<-,tsLib-method}
@@ -83,6 +84,7 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{show}}{\code{signature(object = "tsLib")}: show method. }
     \item{\code{spectra}}{\code{signature(obj = "tsLib")}: gets the spectra. }
     \item{\code{topMass}}{\code{signature(obj = "tsLib")}: gets the top masses. }
+    \item{\code{c}}{Combine two or more \code{tsLib} objects.}
   }
 }
 
@@ -103,6 +105,12 @@ change the values of the other slots. In the future, these methods will be depre
 is better to not rely on them.
 
 See the last example on how this can lead to unexpected results.
+
+The \code{c} method requires that the combination of all objects have unique identifiers (names),
+or in other words, the objects cannot share identifiers. Duplicated identifiers are not
+allowed and an error will be thrown. This method also requires that the column names of the
+\code{libData} slot (see method \code{libData}) are the same, because the method calls
+\code{rbind} internally.
 }
 
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
@@ -145,6 +153,11 @@ topMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 RIdev(refLibrary)[3,] <- c(8,4,1)
 
 #####################################################################
+# objects can be subset and combined with the `[` and `c` operators
+lib1 <- refLibrary[1:2]
+lib2 <- refLibrary[3]
+lib  <- c(lib1, lib2) # this restores the object refLibrary
+
 #####################################################################
 # These examples show how changing a quantitaive or selective mass
 # could lead to unexpected results.

@@ -157,6 +157,35 @@ setMethod("$", "tsLib", function(x, name) {
     eval(substitute(libData(x)$NAME_ARG, list(NAME_ARG=name)))
 })
 
+setMethod("c", "tsLib",
+    function(x, ..., recursive=FALSE)
+    {
+        assert_that(is.flag(recursive), !recursive,
+                    msg="\"c\" method for `tsLib` objects does not support the 'recursive' option")
+
+        z <- list(...)
+        if(length(z) == 0)
+            return(x)
+
+        z <- c(list(x), z)
+        stopifnot(all(vapply(z, validObject, FALSE)))
+        Name <- unlist(lapply(z, slot, 'Name'))
+        RI <- unlist(lapply(z, slot, 'RI'))
+        medRI <- unlist(lapply(z, slot, 'medRI'))
+        RIdev <- do.call('rbind', lapply(z, slot, 'RIdev'))
+        selMass <- unlist(lapply(z, slot, 'selMass'), recursive=FALSE)
+        topMass <- unlist(lapply(z, slot, 'topMass'), recursive=FALSE)
+        quantMass <- unlist(lapply(z, slot, 'quantMass'))
+        spectra <- unlist(lapply(z, slot, 'spectra'), recursive=FALSE)
+        libData <- do.call('rbind', lapply(z, slot, 'libData'))
+        obj <- new('tsLib', Name=Name, RI=RI, selMass, medRI=medRI, RIdev=RIdev,
+                   topMass=topMass, quantMass=quantMass, spectra=spectra,
+                   libData=libData)
+        validObject(obj)
+        obj
+    }
+)
+
 setMethod("initialize",
           "tsLib",
           function(.Object, Name, RI, selMass, medRI=RI, RIdev=NULL,
