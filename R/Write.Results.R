@@ -1,9 +1,13 @@
 # this function saves all results in a text format
 `Write.Results` <-
-function(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'), prefix = NA) {
+function(Lib, metabProfile,
+         quantMatrix=c('quantmass', 'maxint', 'maxobs', 'none'),
+         prefix = NULL, selmass = FALSE)
+{
     opt <- options(stringsAsFactors=FALSE)
-    if(missing(prefix))
+    if(is.null_or_na(prefix))
         prefix <- paste("TargetSearch-", Sys.Date(), sep = "")
+    assert_that(is.string(prefix))
 
     file.peak.int <- paste(prefix, ".peak.intensity.txt", sep ="")
     file.peak.ri  <- paste(prefix, ".peak.RI.txt", sep = "")
@@ -14,9 +18,10 @@ function(Lib, metabProfile, quantMatrix=c('maxint','maxobs','none'), prefix = NA
 
     qm <- match.arg(quantMatrix)
     if(qm != 'none') {
-        M <- quantMatrix(Lib, metabProfile, value=qm)
-        M <- data.frame(Name=rownames(M), quantMass=attr(M, "quantMass"),
-            isSelectiveMass=attr(M, "isSelMass"), M, row.names=1:nrow(M))
+        M <- quantMatrix(Lib, metabProfile, value=qm, selmass=selmass)
+        M <- data.frame(libID=rownames(M), Name=attr(M, "libNames"),
+                        quantMass=attr(M, "quantMass"), isSelectiveMass=attr(M, "isSelMass"),
+                        isCorMass=attr(M, "isCorMass"), M)
         write.table(M, file=file.quantmat, sep="\t", quote=FALSE, row.names=FALSE)
     }
 
