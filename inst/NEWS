@@ -3,12 +3,24 @@
 NEW FEATURES
 
    o	Despite being a 2.0 release, the new features are minimal as
-	these release contains mostly documentation improvements,
+	this release contains mostly documentation improvements,
 	code refactoring and clean-ups, and bug fixes.
 
    o	New methods for combining `tsLib`, `tsRim` and `tsSample` objects.
 	These objects can be combined with the `c` operator. The method
 	`length` reports the number of markers for objects of class `tsRim`.
+
+   o	The function `quantMatrix` has been fixed and now it accepts
+	three methods to generate its output. `quantmass` uses the library's
+	quantification mass (QM), `maxint` takes the most abundant mass as
+	QM, and `maxobs` takes the QM with the most observations. In
+	addition the parameter `selmass` allows for selection of selective
+	masses only if turned on.
+
+   o	The function `Write.Results` has a new parameter `selmass` that is
+	passed to `quantMatrix`, and the argument `quantMatrix` accepts
+	the value `quantmass`, also passed to `quantMatrix`. The argument
+	`prefix` changed its default value from `NA` to `NULL`.
 
 BUG FIXES
 
@@ -16,7 +28,7 @@ BUG FIXES
 
    o	C code: replace and update user-controlled memory interface macros.
 
-   o    Baseline quantiles. Update quantiles computation with partially sorted
+   o	Baseline quantiles. Update quantiles computation with partially sorted
 	data instead of sorted data. This yields a three-fold speed increase.
 
    o	Function `Profile`: set correct rownames. The slots of the `msProfile`
@@ -33,6 +45,11 @@ BUG FIXES
    o	Replace instances of T/F with TRUE/FALSE in functions and vignettes.
 
    o	Add examples to functions that lacked them.
+
+   o	Fix `quantMatrix`. The function has been broken for years as it did
+	not work as intended. Nevertheless, the default option `quantmass`
+	means that the output is now correct (formely, the options `maxint`
+	and `maxobs` were simply ignored).
 
 		CHANGES IN VERSION 1.52.0:
 
