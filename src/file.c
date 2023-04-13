@@ -4,7 +4,7 @@
 #include <Rdefines.h>
 #include <ctype.h>
 #include "file.h"
-#include "getLine.h"
+#include "get_line.h"
 
 /* a random signature for the dat files */
 #define SIGLEN 8  /* signature length */
@@ -184,6 +184,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 	char *line = NULL;
 	int  len = 0;
 	int  err = 0;
+	int  next = EMPTY_CHAR;
 
 	char *ri_str = NULL, *sp_str = NULL, *rt_str = NULL;
 	int  ri_i, sp_i, rt_i, tabs, n;
@@ -191,7 +192,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 
 	spectra = (SPECTRA *) R_alloc(1, sizeof(SPECTRA));
 
-	while (getLine(&line, &len, fp) != -1) {
+	while (get_line(&line, &len, &next, fp) > 0) {
 		total++;
 	}
 
@@ -207,7 +208,7 @@ SPECTRA * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 	fseek(fp, 0, SEEK_SET);
 	j = 0;
 
-	while (getLine(&line, &len, fp) != -1) {
+	while (get_line(&line, &len, &next, fp) > 0) {
 		size_t i = 0;
 		if (header) {
 			header = 0;
