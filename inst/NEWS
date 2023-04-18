@@ -1,3 +1,9 @@
+		CHANGES IN VERSION 2.2.0:
+BUG FIXES
+
+   o	C code: Refactor the function get_line due to failures in files
+	with CR line terminators, commonly found in MacOS systems.
+
 		CHANGES IN VERSION 2.0.0:
 
 NEW FEATURES
