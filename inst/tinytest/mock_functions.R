@@ -18,6 +18,13 @@ mock_write_file <- function(data)
     outfile
 }
 
+mock_rifile <- function(rifile, ...)
+{
+    data <- mock_peak_data(...)
+    TargetSearch:::writeRIFile(rifile, data, data$Index, data$massRange, 'binary')
+    data
+}
+
 gauss_peak <- function(t, t0, A, s) A * exp(-(t-t0)^2/2/s^2)
 
 gen_rand_trace <- function(t, n) {
