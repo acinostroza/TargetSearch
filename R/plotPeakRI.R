@@ -1,5 +1,5 @@
 # select best peak according to method.
-best_peak <- function(peaks, RI, method=c('RI', 'Intensity'))
+best_peak <- function(peaks, RI, RT, method=c('RI', 'Intensity'))
 {
     method <- match.arg(method)
     b <- split(1:nrow(peaks), peaks[,'fid'])
@@ -7,7 +7,8 @@ best_peak <- function(peaks, RI, method=c('RI', 'Intensity'))
     if(method == 'Intensity') {
         a <- tapply(peaks[,'Int'], peaks[,'fid'], which.max)
     } else {
-        a <- tapply(abs(RI - peaks[,'RI']), peaks[,'fid'], which.min)
+        e <- if(!is.null_or_na(RI)) abs(RI - peaks[,'RI']) else abs(RT - peaks[,'RT'])
+        a <- tapply(e, peaks[,'fid'], which.min)
     }
     # stopifnot(names(a) == names(b))
     for(i in 1:length(a))
@@ -27,22 +28,24 @@ approxRT <- function(x, y) {
 }
 
 `plotPeakRI` <-
-function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
+function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,
          method=c('RI', 'Intensity'), useRI=TRUE, main=NULL,
          # graphical parameters:
          col=NULL, int_range=c(2,6), cex_range=c(.7,6), key_width=2)
 {
+    pk <- FindAllPeaks(samples, Lib, libID, dev, mz, RI, RT, mz_type='quantMass')
+    RIbak <- RI # save RI passed by the user
+
     if(is.null_or_na(RI))
         RI <- if(!is.na(medRI(Lib)[libID])) medRI(Lib)[libID] else libRI(Lib)[libID]
-
-    pk <- FindAllPeaks(samples, Lib, libID, dev, mz, RI, mz_type='quantMass')
-
     if(is.null(pk))
         return(invisible())
     if(nrow(pk) < 2)
         return(invisible())
 
-    best <- best_peak(pk, RI, method)
+    # preference is RI (user) > RT > RI (library)
+    RIbak <- if(is.null_or_na(RIbak) && is.null_or_na(RT)) RI else RIbak
+    best <- best_peak(pk, RIbak, RT, method)
 
     tmp <- rep(NA, length(samples))
     names(tmp) <- sampleNames(samples)
@@ -55,13 +58,13 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL,
     if(is.null(main)) {
         main <- sprintf("%s (%s) (%d)", libName(Lib)[libID], names(libName(Lib)[libID]), mz)
     }
-    baseplot(pk[, 'fid'], pk[, RItime], log10(pk[, 'Int']), pk[, RTtime], best, main, RIexp=RI,
+    baseplot(pk[, 'fid'], pk[, RItime], log10(pk[, 'Int']), pk[, RTtime], best, main, RIexp=RI, RTexp=RT,
              nSamp=length(samples), col=col, int_range=int_range, cex_range=cex_range, key_width=key_width)
     return(invisible(tmp))
 }
 
 # base plot
-baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
+baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL, RTexp=NA,
                      col=NULL, int_range=c(2,6), cex_range=c(.7,6), key_width=2)
 {
     if(is.null_or_na(nSamp))
@@ -91,6 +94,8 @@ baseplot <- function(x, y, z, w, best, RIexp=NA, main="", nSamp=NULL,
     plot(x, y, cex=.cex, pch=.pch, bg=.bg, col=.col, ylab='RI', xlab='samples', main=main,
         panel.first=grid(), xlim=c(1,nSamp))
     abline(h=c(RIexp, rimed), lty=1:2)
+    if(!is.null_or_na(RTexp))
+        abline(h=RTexp, lty=1)
 
     k <- setdiff(1:nSamp, x[best])
     if(length(k) > 0) {
