@@ -29,4 +29,66 @@
     result
 }
 
+#
+# R implementation for the above function, used for unit-testing
+#
+
+#' Extract peak data from a RI file (R version)
+#'
+#' A function to extract peak data from a RI file. This function is
+#' basically identical to `ri_data_extract` except it uses pure R instead
+#' of C. The idea is to use this function for unit testting
+#'
+#' @note Only text files are supported.
+#'
+#' @param RIfile A path to a RI file format (text only).
+#' @param massValues A numeric vector representing m/z values.
+#' @param timeRange A numeric vector of even length describing the lower and upper time limits
+#' @param useRT Logical. If `TRUE`, the time range is in seconds.
+#' @param ... extra parameters passed to internal functions
+#' @return A four column matrix with columm names RI, RT, Intensity, mz.
+#'
+`ri_data_extract_text` <- function(RIfile, massValues, timeRange, useRT=FALSE, ...)
+{
+    assert_that(is.string(RIfile))
+    assert_that(is.numeric(massValues))
+    assert_that(is.numeric(timeRange), length(timeRange) %% 2 == 0)
+    assert_that((length(massValues) %% (length(timeRange) / 2)) == 0)
+    assert_that(is.flag(useRT))
+    if(!is.matrix(timeRange)) timeRange <- matrix(timeRange, ncol=2)
+    assert_that(ncol(timeRange) == 2)
+
+    ref <- cbind(mz=massValues, minRI=timeRange[,1], maxRI=timeRange[,2])
+    opt <- as.integer(get.file.format.opt(RIfile, ...))
+    .r_find_peaks(RIfile, ref, useRT, opt)
+}
+
+#' R implementation of c_find_peaks, but only works on TXT files
+#'
+#' @param RIfile A path to a RI file format (text only)
+#' @param ref a three-column matrix with m/z, min RI and max RI to search
+#' @param useRT logical. if TRUE, search by RT, otherwise search by RI
+#' @param opt the output of a call to `get.file.format.opt`
+#' @return A four column matrix with columm names RI, RT, Intensity, mz.
+#'
+.r_find_peaks <- function(RIfile, ref, useRT, opt)
+{
+    search <- function(m, t_min, t_max) {
+        t <- if(useRT) rt else ri
+        j <- which(t > t_min & t < t_max)
+        x <- vapply(sp[j], function(x) x[ match(m, x[,1]), 2], 0)
+        n <- !is.na(x)
+        mm <- if(any(n)) m else numeric(0)
+        cbind(RI=ri[j][n], RT=rt[j][n], Intensity=x[n], mz=mm)
+    }
+    assert_that(opt[1] == 0)
+
+    z <- read.delim(RIfile)
+    sp <- Spectra( z[, opt[3] + 1] )
+    ri <- z[, opt[4] + 1]
+    rt <- z[, opt[5] + 1]
+    result <- mapply(search, ref[,'mz'], ref[,'minRI'], ref[,'maxRI'], SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    do.call('rbind', result)
+}
+
 # vim: set ts=4 sw=4 et:
