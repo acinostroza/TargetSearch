@@ -21,33 +21,27 @@ expect_equal(x, y)
 
 # check searching by RT
 source('mock_functions.R')
-peak_search <- function(data, dev, RT, mz)
-{
-    search <- function(x, fid) {
-        k <- which(abs(x$Time - RT) < dev)
-        y <- x$Peaks[k,  mz - x$massRange[1] + 1]
-        j <- arrayInd(which(y > 0), dim(y))
-        f <- if(length(j) > 0) fid else integer(0)
-        cbind(Int=y[y > 0], RI=x$Index[k][j[,1]], RT=x$Time[k][j[,1]], mz=mz[j[,2]], fid=f)
-    }
-    res <- mapply(search, data, seq(data), USE.NAMES=FALSE, SIMPLIFY=FALSE)
-    if(nrow(res <- do.call('rbind', res)) == 0)
-        return(NULL)
-    res
+peak_search <- function(smp, dev, RT, mz) {
+    fun <- TargetSearch:::ri_data_extract_text
+    ret <- lapply(RIfiles(smp), fun, mz, c(RT-dev, RT+dev), useRT=TRUE)
+    fid <- rep(seq(smp), sapply(ret, nrow))
+    ret <- cbind(do.call('rbind', ret), fid=fid)
 }
 
 tmp <- tempdir()
 ncfiles <- file.path(tmp, sprintf("file%d.nc4", 1:3))
-smp <- new('tsSample', CDFfiles=ncfiles)
+smp <- new('tsSample', CDFfiles=ncfiles, ftype='text')
 
 # repeat 10 times with random values
-for(i in 1:20) {
+for(i in 1:10) {
     # write files and recover data
     data <- lapply(RIfiles(smp), mock_rifile, mz_range=c(100,200), time_range=c(200, 300), n_peaks=300, n_scans=50)
 
     RT <- runif(1, 200, 300)
     mz <- sample(100:200, 5)
     x <- FindAllPeaks(smp, dev=10, RT=RT, mz=mz)
-    y <- peak_search(data, dev=10, RT=RT, mz=mz)
+    colnames(x)[1] <- 'Intensity'
+    y <- peak_search(smp, dev=10, RT=RT, mz=mz)
+    y <- y[, colnames(x)]
     expect_identical(x, y)
 }

@@ -21,7 +21,7 @@ mock_write_file <- function(data)
 mock_rifile <- function(rifile, ...)
 {
     data <- mock_peak_data(...)
-    TargetSearch:::writeRIFile(rifile, data, data$Index, data$massRange, 'binary')
+    TargetSearch:::writeRIFile(rifile, data, data$Index, data$massRange, 'text')
     data
 }
 
