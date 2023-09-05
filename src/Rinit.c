@@ -4,7 +4,7 @@
 
 /* .Call interface */
 /* FindPeaks */
-#include "find_peaks.h"
+#include "find.h"
 /* cdffix and ncdf_to_matrix */
 #include "ncdf.h"
 /* from dectection.c */

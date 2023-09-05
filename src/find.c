@@ -3,7 +3,7 @@
 #include <Rdefines.h>
 #include <ctype.h>
 
-#include "find_peaks.h"
+#include "find.h"
 #include "utils.h"
 
 #define BUFFER 4096
