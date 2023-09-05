@@ -18,33 +18,45 @@ typedef enum {
 struct point_list_s *
 init_point_list(int size)
 {
-	struct point_list_s *x = Calloc(1, struct point_list_s);
-	x->p = Calloc(size, struct point_s);
+	struct point_list_s *x = R_Calloc(1, struct point_list_s);
+	if(x == NULL)
+		return NULL;
+	if((x->p = R_Calloc(size, struct point_s)) == NULL) {
+		R_Free(x);
+		return NULL;
+	}
 	x->alloc = size;
 	x->length = 0;
 	return x;
 }
 
-void
+int
 add_point(struct point_list_s *x, struct point_s *p)
 {
 	int k = x->length;
 	if(k == x->alloc) {
-		x->alloc *= 2;
-		x->p = Realloc(x->p, x->alloc, struct point_s);
+		int alloc = x->alloc ? 2 * x->alloc : BUFFER;
+		struct point_s * q = R_Realloc(x->p, alloc, struct point_s);
+		if(q == NULL)
+			return 0;
+		x->p = q;
+		x->alloc = alloc;
 	}
 	x->p[k] = *p;
 	x->length++;
+	return 1;
 }
 
 void
 free_point_list(struct point_list_s *x)
 {
-	Free(x->p);
-	Free(x);
+	if(x) {
+		R_Free(x->p);
+		R_Free(x);
+	}
 }
 
-void
+int
 find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 		SPECTRA *sp, struct point_list_s *plist, int use_rt, int idx)
 {
@@ -71,11 +83,13 @@ find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 					p.mz = sp->pk[i].mass[j];
 					p.idx = idx;
 					p.err = fabs(ri_exp - ri[i]);
-					add_point(plist, &p);
+					if(!add_point(plist, &p))
+						return 0;
 				}
 			}
 		}
 	}
+	return 1;
 }
 
 struct point_list_s *
@@ -88,13 +102,15 @@ filter_results(struct point_list_s *plist, SearchType st)
 	if(st == ALL || plist->length <= 1)
 		return plist;
 
-	result = init_point_list(plist->length);
+	if((result = init_point_list(plist->length)) == NULL)
+		return NULL;
 
 	for(int i = 0; i < plist->length; i++) {
 		struct point_s *p = plist->p + i;
 		if(p->idx != prev) {
 			if(best != NULL) {
-				add_point(result, best);
+				if(!add_point(result, best))
+					goto error;
 			}
 			prev = p->idx;
 			best = p;
@@ -112,9 +128,13 @@ filter_results(struct point_list_s *plist, SearchType st)
 		}
 	}
 	if(best != NULL) {
-		add_point(result, best);
+		if(!add_point(result, best))
+			goto error;
 	}
 	return result;
+error:
+	free_point_list(result);
+	return NULL;
 }
 
 SPECTRA *

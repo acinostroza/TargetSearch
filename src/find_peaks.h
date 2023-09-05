@@ -21,7 +21,7 @@ struct point_list_s {
 	int alloc;
 };
 
-void
+int
 find_all_peaks(double, double, double, double, SPECTRA *,
 		struct point_list_s *, int, int);
 
