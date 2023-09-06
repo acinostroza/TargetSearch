@@ -1,7 +1,7 @@
 #ifndef _FIND_PEAKS_H
 #define _FIND_PEAKS_H
 
-/* require SPECTRA data type */
+/* require spectra_t data type */
 #include "file.h"
 
 /* Function prototypes */
@@ -22,7 +22,7 @@ struct point_list_s {
 };
 
 int
-find_all_peaks(double, double, double, double, SPECTRA *,
+find_all_peaks(double, double, double, double, spectra_t *,
 		struct point_list_s *, int, int);
 
 SEXP find_peaks(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);

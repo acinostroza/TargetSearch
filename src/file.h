@@ -17,19 +17,26 @@
 
 #define STRLEN 256
 
-struct peaks {
-	int  *mass; /* mass */
-	int    *in; /* intensity */
+struct _spectrum {
+	int *mz;   /* mass or m/z */
+	int *in;   /* intensity */
+	int len;   /* number of points */
+	int alloc; /* allocated memory */
 };
 
-typedef struct {
+typedef struct _spectrum spectrum_t;
+
+struct _spectra {
 	int n_scans;  /* number of scans */
 	int p_count;  /* point count */
+	int alloc;    /* size of allocated memory */
 	double *ri;
 	double *rt;
 	int *n;
-	struct peaks *pk;
-} SPECTRA;
+	struct _spectrum *sp;
+};
+
+typedef struct _spectra spectra_t;
 
 /* Function prototypes */
 int checksig(unsigned char *);
@@ -37,16 +44,16 @@ int checksig(unsigned char *);
 void swapb(void *, int);
 void swapp(void *, int, int);
 
-SPECTRA * read_dat(FILE *, int);
-void write_dat(FILE *, SPECTRA *, int);
+spectra_t * read_dat(FILE *, int);
+void write_dat(FILE *, spectra_t *, int);
 void write_peaks_dat(char **, double *, double *, int *, int *, int *, int *);
 
-SPECTRA * read_txt(FILE *, int, int, int);
+spectra_t * read_txt(FILE *, int, int, int);
 int read_spectrum(char *, int *, int *);
-void write_txt(FILE *, SPECTRA *, char *);
+void write_txt(FILE *, spectra_t *, char *);
 void write_peaks_text(char **, double *, double *, int *, int *, int *, char **);
 
-SPECTRA pktosp(double *, double *, int *, int *, int);
+spectra_t pktosp(double *, double *, int *, int *, int);
 
 void text_to_dat(char **, char **, int *, int *);
 void dat_to_text(char **, char **, int *, char **);

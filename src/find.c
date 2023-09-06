@@ -58,7 +58,7 @@ free_point_list(struct point_list_s *x)
 
 int
 find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
-		SPECTRA *sp, struct point_list_s *plist, int use_rt, int idx)
+		spectra_t *sp, struct point_list_s *plist, int use_rt, int idx)
 {
 	int i, j;
 	int n_scans = sp->n_scans;
@@ -76,11 +76,11 @@ find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 			break;
 		else if (ri_min < ri[i] && ri_max > ri[i]) {
 			for (j = 0; j < sp->n[i]; j++) {
-				if (mass == sp->pk[i].mass[j]) {
+				if (mass == sp->sp[i].mz[j]) {
 					p.rt = sp->rt[i];
 					p.ri = sp->ri[i];
-					p.in = sp->pk[i].in[j];
-					p.mz = sp->pk[i].mass[j];
+					p.in = sp->sp[i].in[j];
+					p.mz = sp->sp[i].mz[j];
 					p.idx = idx;
 					p.err = fabs(ri_exp - ri[i]);
 					if(!add_point(plist, &p))
@@ -137,11 +137,11 @@ error:
 	return NULL;
 }
 
-SPECTRA *
+spectra_t *
 read_file(const char *file, int ftype, int swap, int sp_COL, int ri_COL, int rt_COL)
 {
 	FILE *fp;
-	SPECTRA *spectra;
+	spectra_t *spectra;
 	if(ftype == 0) {
 		fp = fopen(file, "r");
 		if(fp == NULL)
@@ -162,7 +162,7 @@ read_file(const char *file, int ftype, int swap, int sp_COL, int ri_COL, int rt_
 }
 
 struct point_list_s *
-do_search(SPECTRA *spectra, int *mass, double *ri_exp, double *ri_min, double *ri_max,
+do_search(spectra_t *spectra, int *mass, double *ri_exp, double *ri_min, double *ri_max,
 		int use_rt, SearchType st, int libtotal)
 {
 	struct point_list_s *plist = init_point_list(2 * libtotal);
@@ -211,7 +211,7 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	/* internal variables */
 	char *file;
 	int  libtotal = GET_LENGTH(Mass);
-	SPECTRA *spectra;
+	spectra_t *spectra;
 	struct point_list_s *res;
 
 	/* R variables */
