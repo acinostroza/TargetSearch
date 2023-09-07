@@ -17,25 +17,7 @@
 
 #define STRLEN 256
 
-struct _spectrum {
-	int *mz;   /* mass or m/z */
-	int *in;   /* intensity */
-	int len;   /* number of points */
-	int alloc; /* allocated memory */
-};
-
-typedef struct _spectrum spectrum_t;
-
-struct _spectra {
-	int n_scans;  /* number of scans */
-	int p_count;  /* point count */
-	int alloc;    /* size of allocated memory */
-	double *ri;
-	double *rt;
-	struct _spectrum *sp;
-};
-
-typedef struct _spectra spectra_t;
+#include "spectrum.h"
 
 /* Function prototypes */
 int checksig(unsigned char *);
