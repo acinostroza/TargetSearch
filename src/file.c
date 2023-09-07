@@ -51,7 +51,7 @@ void swapp(void *ptr, int size, int len) {
 spectra_t * read_dat(FILE *fp, int swap)
 {
 	spectra_t * spectra;
-	int i, splen=0, sptotal=0;
+	int i, splen=0, sptotal=0, *pcount = NULL;
 	unsigned char s[SIGLEN];
 
 	spectra = (spectra_t *) R_alloc(1, sizeof(spectra_t));
@@ -78,18 +78,18 @@ spectra_t * read_dat(FILE *fp, int swap)
 
 	spectra->ri = (double *) R_alloc(splen, sizeof(double));
 	spectra->rt = (double *) R_alloc(splen, sizeof(double));
-	spectra->n  = (int *) R_alloc(splen, sizeof(int));
+	pcount  = (int *) R_alloc(splen, sizeof(int));
 	spectra->sp = (spectrum_t *) R_alloc(splen, sizeof(spectrum_t));
 
 	if(!fread(spectra->ri, splen * sizeof(double), 1, fp))
 		return NULL;
 	if(!fread(spectra->rt, splen * sizeof(double), 1, fp))
 		return NULL;
-	if(!fread(spectra->n, splen *  sizeof(int), 1, fp))
+	if(!fread(pcount, splen *  sizeof(int), 1, fp))
 		return NULL;
 
 	if(swap == 1) {
-		swapp(spectra->n, sizeof(int), splen);
+		swapp(pcount, sizeof(int), splen);
 		swapp(spectra->ri, sizeof(double), splen);
 		swapp(spectra->rt, sizeof(double), splen);
 	}
@@ -98,17 +98,19 @@ spectra_t * read_dat(FILE *fp, int swap)
 	spectra->sp[0].in   = (int *) R_alloc(sptotal, sizeof(int));
 
 	for(i = 0; i < splen; i++) {
+		spectrum_t * z = spectra->sp + i;
+		z->len = pcount[i];
 		if(i > 0) {
-			spectra->sp[i].mz   = spectra->sp[i-1].mz   + spectra->n[i-1];
-			spectra->sp[i].in   = spectra->sp[i-1].in   + spectra->n[i-1];
+			spectra->sp[i].mz   = spectra->sp[i-1].mz   + pcount[i-1];
+			spectra->sp[i].in   = spectra->sp[i-1].in   + pcount[i-1];
 		}
-		if(!fread(spectra->sp[i].mz, spectra->n[i] * sizeof(int), 1, fp))
+		if(!fread(spectra->sp[i].mz, pcount[i] * sizeof(int), 1, fp))
 			return NULL;
-		if(!fread(spectra->sp[i].in, spectra->n[i] * sizeof(int), 1, fp))
+		if(!fread(spectra->sp[i].in, pcount[i] * sizeof(int), 1, fp))
 			return NULL;
 		if(swap == 1) {
-			swapp(spectra->sp[i].mz, sizeof(int), spectra->n[i]);
-			swapp(spectra->sp[i].in, sizeof(int), spectra->n[i]);
+			swapp(spectra->sp[i].mz, sizeof(int), pcount[i]);
+			swapp(spectra->sp[i].in, sizeof(int), pcount[i]);
 		}
 	}
 	return spectra;
@@ -153,20 +155,20 @@ void write_dat(FILE *fp, spectra_t *sp, int swap)
 
         /* write N */
         for(i = 0; i < splen; i++) {
-		n = sp->n[i];
+		n = sp->sp[i].len;
 		if(swap == 1)
 			swapb(&n, sizeof(n));
                 fwrite(&n, sizeof(n), 1, fp);
 	}
 
         for(i = 0; i < splen; i++) {
-		for(j = 0; j < sp->n[i]; j++) {
+		for(j = 0; j < sp->sp[i].len; j++) {
 			tmp = sp->sp[i].mz[j];
 			if(swap == 1)
 				swapb(&tmp, sizeof(tmp));
 			fwrite(&tmp, sizeof(tmp), 1, fp);
 		}
-		for(j = 0; j < sp->n[i]; j++) {
+		for(j = 0; j < sp->sp[i].len; j++) {
 			tmp = sp->sp[i].in[j];
 			if(swap == 1)
 				swapb(&tmp, sizeof(tmp));
@@ -202,7 +204,6 @@ spectra_t * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 
 	spectra->ri = (double *) R_alloc(total, sizeof(double));
 	spectra->rt = (double *) R_alloc(total, sizeof(double));
-	spectra->n  = (int *) R_alloc(total, sizeof(int));
 	spectra->sp = (spectrum_t *) R_alloc(total, sizeof(spectrum_t));
 
 	fseek(fp, 0, SEEK_SET);
@@ -251,12 +252,12 @@ spectra_t * read_txt(FILE *fp, int SPECTRUM_COL, int RI_COL, int RT_COL)
 		}
 		spectra->p_count += n;
 
-		spectra->n[j]  = n;
+		spectra->sp[j].len = n;
 		spectra->ri[j] = atof(ri_str);
 		spectra->rt[j] = atof(rt_str);
 
 		spectra->sp[j].mz = (int *) R_alloc(n , sizeof(int));
-		spectra->sp[j].in   = (int *) R_alloc(n , sizeof(int));
+		spectra->sp[j].in = (int *) R_alloc(n , sizeof(int));
 
 		if(read_spectrum(sp_str, spectra->sp[j].mz, spectra->sp[j].in) == 0) {
 			REprintf("Error reading spectra. Invalid spectrum format:\n");
@@ -345,7 +346,6 @@ spectra_t pktosp(double *rt, double *ri, int *in, int *mass, int nscans)
 
 	sp.n_scans = -1;
 	sp.sp = NULL;
-	sp.n  = NULL;
 	sp.rt = NULL;
 	sp.ri = NULL;
 	sp.p_count = 0;
@@ -370,7 +370,6 @@ spectra_t pktosp(double *rt, double *ri, int *in, int *mass, int nscans)
 
 	sp.ri         = (double *) R_alloc(splen, sizeof(double));
 	sp.rt         = (double *) R_alloc(splen, sizeof(double));
-	sp.n          = (int *) R_alloc(splen, sizeof(int));
 	sp.sp         = (spectrum_t *) R_alloc(splen, sizeof(spectrum_t));
 	sp.sp[0].mz   = (int *) R_alloc(sptotal, sizeof(int));
 	sp.sp[0].in   = (int *) R_alloc(sptotal, sizeof(int));
@@ -379,12 +378,12 @@ spectra_t pktosp(double *rt, double *ri, int *in, int *mass, int nscans)
 	for(i = 0; i < nscans; i++) {
 		if(n[i] == 0)
 			continue;
-		sp.n[k]  = n[i];
+		sp.sp[k].len = n[i];
 		sp.rt[k] = rt[i];
 		sp.ri[k] = ri[i];
 		if(k > 0) {
-			sp.sp[k].mz = sp.sp[k-1].mz + sp.n[k-1];
-			sp.sp[k].in   = sp.sp[k-1].in   + sp.n[k-1];
+			sp.sp[k].mz = sp.sp[k-1].mz + sp.sp[k - 1].len;
+			sp.sp[k].in = sp.sp[k-1].in + sp.sp[k - 1].len;
 		}
 		l = 0;
 		for(j = 0; j < nmz; j++) {
@@ -443,9 +442,9 @@ void write_txt(FILE *fp, spectra_t *sp, char *header)
 	fprintf(fp, "%s\n", header);
 	for(i = 0; i < sp->n_scans; i++) {
 		fprintf(fp, "%.15g\t", sp->rt[i]);
-		for(j = 0; j < sp->n[i]; j++) {
+		for(j = 0; j < sp->sp[i].len; j++) {
 			fprintf(fp, "%d:%d", sp->sp[i].mz[j], sp->sp[i].in[j]);
-			c = (j == sp->n[i] - 1) ? '\t' : ' ';
+			c = (j == sp->sp[i].len - 1) ? '\t' : ' ';
 			fputc(c, fp);
 		}
 		fprintf(fp, "%.15g\n", sp->ri[i]);

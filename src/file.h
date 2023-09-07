@@ -32,7 +32,6 @@ struct _spectra {
 	int alloc;    /* size of allocated memory */
 	double *ri;
 	double *rt;
-	int *n;
 	struct _spectrum *sp;
 };
 

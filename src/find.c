@@ -75,7 +75,7 @@ find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 		if (ri_max < ri[i])
 			break;
 		else if (ri_min < ri[i] && ri_max > ri[i]) {
-			for (j = 0; j < sp->n[i]; j++) {
+			for (j = 0; j < sp->sp[i].len; j++) {
 				if (mass == sp->sp[i].mz[j]) {
 					p.rt = sp->rt[i];
 					p.ri = sp->ri[i];
@@ -265,4 +265,3 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	UNPROTECT(5);
 	return result;
 }
-
