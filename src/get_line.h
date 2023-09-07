@@ -4,7 +4,10 @@
 #define EMPTY_CHAR -1
 #define READSIZE 4096
 
-#include <stdio.h>
+#include <R.h>
+#ifndef USING_R
+	#include <stdio.h>
+#endif
 
 /**
  * read an entire line from stream
@@ -23,6 +26,9 @@
  *
  * The function returns the number of character read, or zero if
  * it reaches the end of the stream.
+ *
+ * If there is an allocation error, then returns a negative value,
+ * though it should not happen in an R environment
  */
 int get_line(char **lineptr, int *size, int *next, FILE *fp);
 

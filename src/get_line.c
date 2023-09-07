@@ -1,6 +1,8 @@
-#include <R.h>
-#include <Rdefines.h>
+
 #include "get_line.h"
+#include <Rdefines.h>
+
+#define ALLOC_ERROR -1
 
 static inline int _getc(FILE *fp, int *next)
 {
@@ -15,7 +17,10 @@ static inline int _pushc(char **line, int *size, int c, int k)
 {
 	if(k >= *size) {
 		*size = (*size) ? (*size) * 2 : READSIZE;
-		*line = R_Realloc(*line, *size, char);
+		char * tmp = R_Realloc(*line, *size, char);
+		if(tmp == NULL)
+			return ALLOC_ERROR;
+		*line = tmp;
 	}
 	(*line)[k] = (char) c;
 	return k + 1;
@@ -23,17 +28,20 @@ static inline int _pushc(char **line, int *size, int c, int k)
 
 int get_line(char **line, int *size, int *next, FILE *fp)
 {
-	int c, len = 0;
+	int c, len = 0, ret;
 
 	while(1) {
 		c = _getc(fp, next);
 
 		if(c == EOF) {
-			_pushc(line, size, '\0', len);
+			if(_pushc(line, size, '\0', len) == ALLOC_ERROR)
+				return ALLOC_ERROR;
 			return len;
 		}
 
-		len = _pushc(line, size, c, len);
+		if((ret = _pushc(line, size, c, len)) == ALLOC_ERROR)
+			 return ret;
+		len = ret;
 
 		if(c == '\n')
 			break;
@@ -41,7 +49,9 @@ int get_line(char **line, int *size, int *next, FILE *fp)
 		if(c == '\r') {
 			int c2 = _getc(fp, next);
 			if(c2 == '\n') {
-				len = _pushc(line, size, c2, len - 1);
+				if((ret = _pushc(line, size, c2, len - 1)) == ALLOC_ERROR)
+					return ret;
+				len = ret;
 			} else {
 				(*line)[len - 1] = '\n';
 				*next = c2;
@@ -49,6 +59,7 @@ int get_line(char **line, int *size, int *next, FILE *fp)
 			break;
 		}
 	}
-	_pushc(line, size, '\0', len);
+	if(_pushc(line, size, '\0', len) == ALLOC_ERROR)
+		return ALLOC_ERROR;
 	return len;
 }
