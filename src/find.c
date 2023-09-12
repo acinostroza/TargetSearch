@@ -61,17 +61,15 @@ find_all_peaks(double mass, double ri_exp, double ri_min,  double ri_max,
 		spectra_t *sp, struct point_list_s *plist, int use_rt, int idx)
 {
 	int i, j;
-	int n_scans = sp->n_scans;
-	double *ri;
 	struct point_s p;
 
 	/* uses RT or RI to perform the search */
-	ri = (use_rt == 0) ? sp->ri : sp->rt;
+	double *ri = (use_rt == 0) ? sp->ri : sp->rt;
 
 	/* This returns approximately the scan index of ri_min */
-	i = binsearch(ri, ri_min, n_scans);
+	i = binsearch(ri, ri_min, sp->n_scans);
 
-	for (; i < n_scans; i++) {
+	for (; i < sp->n_scans; i++) {
 		if (ri_max < ri[i])
 			break;
 		else if (ri_min < ri[i] && ri_max > ri[i]) {
@@ -138,26 +136,20 @@ error:
 }
 
 spectra_t *
-read_file(const char *file, int ftype, int swap, int sp_COL, int ri_COL, int rt_COL)
+read_file(const char *file, int ftype, int swap,
+	  const char *sp_COL, const char *ri_COL, const char *rt_COL, const int * cols)
 {
-	FILE *fp;
-	spectra_t *spectra;
-	if(ftype == 0) {
-		fp = fopen(file, "r");
-		if(fp == NULL)
-			error("Error opening file %s\n", file);
-		spectra = read_txt(fp, sp_COL, ri_COL, rt_COL);
-		if(!spectra)
-			error("Error reading file %s\n", file);
-	} else {
-		fp = fopen(file, "rb");
-		if(fp == NULL)
-			error("Error opening file %s\n", file);
-		spectra = read_dat(fp, swap);
-		if(!spectra)
-			error("Error reading file %s\n", file);
-	}
+	FILE *fp = NULL;
+	char *mode = ftype == 0 ? "rt" : "rb";
+
+	if((fp = fopen(file, mode)) == NULL)
+		error("Error opening file %s\n", file);
+
+	spectra_t * spectra = ftype == 0 ? read_txt(fp, sp_COL, ri_COL, rt_COL, cols) :
+				read_dat(fp, swap);
 	fclose(fp);
+	if(!spectra)
+		error("Error reading file %s\n", file);
 	return spectra;
 }
 
@@ -166,18 +158,26 @@ do_search(spectra_t *spectra, int *mass, double *ri_exp, double *ri_min, double 
 		int use_rt, SearchType st, int libtotal)
 {
 	struct point_list_s *plist = init_point_list(2 * libtotal);
-	struct point_list_s *res;
+	struct point_list_s *res = NULL;
+	if(plist == NULL)
+		return NULL;
 
 	for (int j = 0; j < libtotal; j++) {
 		double ri = (ri_exp == NULL) ? 0.0 : ri_exp[j];
 		if (ISNAN(ri_min[j]) || (mass[j] == NA_INTEGER) || ISNAN(ri_max[j]))
 			continue;
-		find_all_peaks(mass[j], ri, ri_min[j], ri_max[j], spectra, plist, use_rt, j);
+		if(!find_all_peaks(mass[j], ri, ri_min[j], ri_max[j], spectra, plist, use_rt, j))
+			goto error;
 	}
-	res = filter_results(plist, st);
+	if((res = filter_results(plist, st)) == NULL)
+		goto error;
 	if(plist != res)
 		free_point_list(plist);
 	return res;
+error:
+	free_point_list(plist);
+	free_point_list(res);
+	return NULL;
 }
 
 /*
@@ -230,13 +230,14 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	int sp_COL = INTEGER(Options)[2]; /* Spectra column number */
 	int ri_COL = INTEGER(Options)[3]; /* R.I. column number */
 	int rt_COL = INTEGER(Options)[4]; /* R.T. column number */
+	int cols[] = {sp_COL, ri_COL, rt_COL};
 
 	/* Copy file name to a string */
 	file = R_alloc(strlen(CHAR(STRING_ELT(RI_file, 0))), sizeof(char));
 	strcpy(file, CHAR(STRING_ELT(RI_file, 0)));
 
 	/* parse file */
-	spectra = read_file(file, ftype, swap, sp_COL, ri_COL, rt_COL);
+	spectra = read_file(file, ftype, swap, NULL, NULL, NULL, cols);
 
 	/* search peaks */
 	res = do_search(spectra, mass, ri_exp, ri_min, ri_max, use_rt, st, libtotal);

@@ -2,6 +2,7 @@
 #define GET_LINE_H
 
 #define EMPTY_CHAR -1
+#define ALLOC_ERROR -1
 #define READSIZE 4096
 
 #include <R.h>
