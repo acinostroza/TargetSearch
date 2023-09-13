@@ -204,11 +204,9 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 # function to plot the median intensities across all the samples with the reference spectrum
 # for a given metabolite.
 
-plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
+plotSpectra <- function(Lib, peaks, libID = 1, type = c("ht", "ss", "diff")) {
 
-	ptype <- pmatch(type, c("ht", "ss", "diff"))
-	if(is.na(ptype))
-		stop("Unknown type parameter ", type)
+	type <- match.arg(type, c("ht", "ss", "diff"))
 
     id <- libID
 	x <- t(Intensity(peaks)[[id]])
@@ -235,7 +233,7 @@ plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
             sp.int <- rep(0, length(sp.mz))
      	}
 
-		if(ptype == 1) {
+		if(type == "ht") {
 			plot  (mz, x.median, type = 'h', col = 'blue', ylim = c(-1000,1000), main = libName(Lib)[id],
 				xlab = "mz", ylab = "Intensity", yaxt = "n")
 			points(sp.mz, - sp.int, type = 'h', col = 'red')
@@ -247,7 +245,7 @@ plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
 			text(sp.mz[o2], -sp.int[o2], as.character(sp.mz[o2]), cex = 0.7)
 			legend("bottomright", "reference spectrum", box.lty = 0, cex = 0.8)
 			legend("topright", "median spectrum", box.lty = 0, cex = 0.8)
-		} else if (ptype == 2) {
+		} else if (type == "ss") {
 			plot  (mz, x.median, type = 'h', col = 'blue', ylim = c(0,1000), main = libName(Lib)[id],
 				xlab = "mz", ylab = "Intensity")
 			points(sp.mz+0.5, sp.int, type = 'h', col = 'red')
@@ -255,7 +253,7 @@ plotSpectra <- function(Lib, peaks, libID = 1, type = "ht") {
 			text(mz[o1], x.median[o1], as.character(mz[o1]), cex = 0.7)
 			legend("topright", c("reference spectrum", "median spectrum"), text.col = c("red","blue"), box.lty = 0, cex = 0.8)
 
-		} else if (ptype == 3) {
+		} else if (type == "diff") {
 
 			plot(mz, x.median, type = 'n', ylim = c(-1000,1000), main = libName(Lib)[id],
 				xlab = "mz", ylab = "Intensity", yaxt = "n")

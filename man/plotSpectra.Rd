@@ -8,7 +8,7 @@ given metabolite in the library. \code{plotAllRIdev} saves the plots of the medi
 spectra comparisons of all the metabolites in the reference library into a PDF file.
 }
 \usage{
-plotSpectra(Lib, peaks, libID = 1, type = "ht")
+plotSpectra(Lib, peaks, libID = 1, type = c("ht", "ss", "diff"))
 
 plotAllSpectra(Lib, peaks, type = "ht", pdfFile, width = 8, height = 8, ...)
 }

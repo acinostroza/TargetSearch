@@ -6,7 +6,11 @@ function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"), colum
         stop("Error: missing columns in 'ref'")
 
     opt <- as.integer(get.file.format.opt(file, columns))
+
+    # c_find_peaks needs an Integer matching the search type options
+    searchType <- match.arg(searchType)
     searchType <- pmatch(searchType, c("all", "minRI", "maxInt"))
+
     z <- .Call(c_find_peaks, file, as.integer(ref[,'mz']), NULL,
                as.numeric(ref[,'minRI']), as.numeric(ref[,'maxRI']), opt, useRT, searchType)
     z <- do.call('cbind', z)

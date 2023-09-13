@@ -4,28 +4,26 @@
 #  - x: a library file or a data.frame
 #  - type: the file type: options are "auto" (autodetection), "tab" and "msp"
 
-ImportLibrary <- function(x, type = "auto", ...) {
+ImportLibrary <- function(x, type = c("auto", "tab", "msp"), ...) {
 
     # detects file type: either tab-delimited or NIST MSP format
     if(is.data.frame(x)) {
         return(ImportLibrary.tab(libdata=x, ...))
     }
-    type <- pmatch(type[1], c("auto", "tab", "msp"))
-    if(is.na(type))
-        stop("Invalided 'type' option.")
+    type <- match.arg(type)
 
-    if(type == 1) {
+    if(type == "auto") {
         line <- readLines(x, n = 1)
         if(grepl("\t", line)) {
-            type <- 2
+            type <- "tab"
         } else if(grepl("^Name:", line)) {
-            type <- 3
+            type <- "msp"
         } else {
             stop("Error: library format not recognized")
         }
     }
 
-    if(type == 2)
+    if(type == "tab")
         ImportLibrary.tab(x, ...)
     else
         ImportLibrary.msp(x, ...)

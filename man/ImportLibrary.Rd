@@ -9,7 +9,7 @@
     more common NIST MSP format.
 }
 \usage{
-ImportLibrary(x, type = "auto", ...)
+ImportLibrary(x, type = c("auto", "tab", "msp"), ...)
 
 ImportLibrary.tab(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL,
