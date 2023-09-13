@@ -104,21 +104,22 @@
     tmp <- data.frame(RT=c(101.5,102.5), SPEC=c('12:100 23:100', '114:46 162:30'), RI=c(300, 400) + .75)
 
     # file must be tab-delimited, unquoted strings and no row names
-    write.table(tmp, file="RI_test.txt", sep="\t", quote=FALSE, row.names=FALSE)
+    RI_test <- tempfile(fileext=".txt")
+    write.table(tmp, file=RI_test, sep="\t", quote=FALSE, row.names=FALSE)
 
     # convert this text file to binary format
     ## wrong! It fails because of invalid columns
-    # text2bin("RI_test.txt")
+    # text2bin(RI_test)
 
     # correct! The columns are correct
-    text2bin("RI_test.txt", columns=c('SPEC', 'RI', 'RT'))
+    text2bin(RI_test, columns=c('SPEC', 'RI', 'RT'))
 
     # same example but using integers (not recommended)
-    text2bin("RI_test.txt", columns=c(1, 2, 0)) # note they start from zero.
+    text2bin(RI_test, columns=c(1, 2, 0)) # note they start from zero.
 
     # Alternative, set a global option (so it can be used in a session)
     opt <- options(TS_RI_columns=c('SPEC', 'RI', 'RT'))
-    text2bin("RI_test.txt")
+    text2bin(RI_test)
 
     # unset options
     options(opt)
