@@ -42,7 +42,11 @@
     is tedious, so the global option \code{TS_RI_columns} can be set at the beginning, for example:
 
     \preformatted{
+        # using column names
         options(TS_RI_columns=c('spec_column', 'RI_column', 'RT_column'))
+
+        # using column indices (zero-based!)
+        options(TS_RI_columns=c(1, 2, 0))
     }
 
     where "spec_column", "RI_column", and "RT_columns" are the names of the spectrum, retention index
@@ -119,6 +123,10 @@
 
     # Alternative, set a global option (so it can be used in a session)
     opt <- options(TS_RI_columns=c('SPEC', 'RI', 'RT'))
+    text2bin(RI_test)
+
+    # or using integers (again, not recomended)
+    options(TS_RI_columns=c(1, 2, 0))
     text2bin(RI_test)
 
     # unset options
