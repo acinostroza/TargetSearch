@@ -8,10 +8,10 @@
 # function to get the default RI text columns
 `get.columns.name` <- function(cols)
 {
-	if(!is.null(cols) && all(!is.na(cols)))
-		return(cols)
-	cols <- getOption('TS_RI_columns', get.columns.name.default())
-	return(cols)
+	if(is.null(cols) || any(is.na(cols)))
+		cols <- getOption('TS_RI_columns', get.columns.name.default())
+	assert_that(length(cols) == 3)
+	cols
 }
 
 # return file header as string to write TXT files
