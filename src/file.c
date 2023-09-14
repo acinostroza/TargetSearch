@@ -321,40 +321,52 @@ error:
 	return NULL;
 }
 
-/* R interface to write_dat functions */
-void write_peaks_dat(char **fout, double *rt, double *ri, int *in, int *mass,
-	int *nscans, int *swap)
+#define ERROR(...) do { REprintf(__VA_ARGS__); goto error; } while(0)
+
+/* C wrapper to write_dat / write_txt functions */
+static int _write_peaks(const char *fout, double *rt, double *ri, int *in, int *mass,
+	int nscans, int swap, const char *header, char ftype)
 {
-	FILE *fp;
-	spectra_t *sp = pktosp(rt, ri, in, mass, *nscans);
-	if(sp == NULL)
-		error("Error creating spectra struct.\n");
+	int ret = 0;
+	spectra_t *sp = NULL;
+	FILE *fp = NULL;
 
-	fp = fopen(fout[0], "wb");
-	if(fp == NULL)
-		error("Error writing file %s\n", fout[0]);
+	if((sp = pktosp(rt, ri, in, mass, nscans)) == NULL)
+		ERROR("Error creating spectra struct.\n");
 
-	write_dat(fp, sp, *swap);
+	if((fp = fopen(fout, "wb")) == NULL)
+		ERROR("Error writing file %s\n", fout);
+
+	if(ftype == 'b')
+		write_dat(fp, sp, swap);
+	else if(ftype == 't')
+		write_txt(fp, sp, header);
+	ret = 1;
+error:
 	spectra_free(sp);
-	fclose(fp);
+	if(fp) fclose(fp);
+	return ret;
 }
+#undef ERROR
 
-/* R interface to write_text functions */
-void write_peaks_text(char **fout, double *rt, double *ri, int *in, int *mass,
-	int *nscans, char **header)
+/* R interface to C wrapper */
+SEXP write_peaks(SEXP Output, SEXP RT, SEXP RI, SEXP IN, SEXP Mass, SEXP Swap, SEXP Header)
 {
-	FILE *fp;
-	spectra_t *sp = pktosp(rt, ri, in, mass, *nscans);
-	if(sp == NULL)
-		error("Error creating spectra struct.\n");
+	const char *file = CHARACTER_VALUE(Output), *header = NULL;
+	int swap = INTEGER_VALUE(Swap), *in = INTEGER(IN), *mass = INTEGER(Mass);
+	double *rt = REAL(RT), *ri = REAL(RI);
+	int nscans = GET_LENGTH(RI);
+	char ftype = 'b';
+	SEXP ans = PROTECT(NEW_LOGICAL(1));
 
-	fp = fopen(fout[0], "wb");
-	if(fp == NULL)
-		error("Error writing file %s\n", fout[0]);
-
-	write_txt(fp, sp, header[0]);
-	spectra_free(sp);
-	fclose(fp);
+	if(swap == -1) {
+		header = CHARACTER_VALUE(Header);
+		ftype = 't';
+	}
+	int ret = _write_peaks(file, rt, ri, in, mass, nscans, swap, header, ftype);
+	SET_LOGICAL_ELT(ans, 0, ret);
+	UNPROTECT(1);
+	return ans;
 }
 
 /**
