@@ -1,6 +1,5 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
-#include <R_ext/Rdynload.h>
 
 /* .Call interface */
 /* FindPeaks */

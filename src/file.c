@@ -12,17 +12,8 @@
 
 const unsigned char signature[]={42,243,27,10,183,75,1,0};
 
-int checksig(unsigned char *s)
-{
-	int i = 0;
-	for(i = 0; i < SIGLEN; i++)
-		if(s[i] != signature[i])
-			return 0;
-	return 1;
-}
-
 /* from R source code: swap bytes for big endian machines */
-void swapb(void *ptr, int size)
+static void swapb(void *ptr, int size)
 {
 	int i;
 	char *p=ptr, tmp;
@@ -36,7 +27,7 @@ void swapb(void *ptr, int size)
 }
 
 /* apply byte swapping to an array */
-void swapp(void *ptr, int size, int len) {
+static void swapp(void *ptr, int size, int len) {
 	int i;
 	char *p=ptr;
 	for(i = 0; i < len; i++)

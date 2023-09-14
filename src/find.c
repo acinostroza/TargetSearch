@@ -209,7 +209,7 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	SEXP useRT, SEXP Search)
 {
 	/* internal variables */
-	char *file;
+	const char *file = CHARACTER_VALUE(RI_file);
 	int  libtotal = GET_LENGTH(Mass);
 	spectra_t *spectra;
 	struct point_list_s *res;
@@ -231,10 +231,6 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	int ri_COL = INTEGER(Options)[3]; /* R.I. column number */
 	int rt_COL = INTEGER(Options)[4]; /* R.T. column number */
 	int cols[] = {sp_COL, ri_COL, rt_COL};
-
-	/* Copy file name to a string */
-	file = R_alloc(strlen(CHAR(STRING_ELT(RI_file, 0))), sizeof(char));
-	strcpy(file, CHAR(STRING_ELT(RI_file, 0)));
 
 	/* parse file */
 	spectra = read_file(file, ftype, swap, NULL, NULL, NULL, cols);
