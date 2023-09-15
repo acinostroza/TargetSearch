@@ -32,8 +32,7 @@ for(i in seq(repeats)) {
     fake <- search_data(data, mz, tm)
     if(nrow(fake) == 0) # do not check if we do not get any peak
         next
-    real <- ri_plot_peak(files, massValues=mz, timeRange=tm, plot=FALSE)
-
+    expect_silent(real <- ri_plot_peak(files, massValues=mz, timeRange=tm))
     expect_identical(real, fake)
 }
 
