@@ -40,8 +40,8 @@ standard = [a vector with RI standards], mass = [m/z marker])}.
     \item{\code{rimLimits<-}}{\code{signature(obj = "tsRim")}: sets the time limits. }
     \item{\code{rimMass}}{\code{signature(obj = "tsRim")}: gets the m/z marker. }
     \item{\code{rimMass<-}}{\code{signature(obj = "tsRim")}: sets the m/z marker. }
-    \item{\code{rimStandard}}{\code{signature(obj = "tsRim")}: gets the standars. }
-    \item{\code{rimStandard<-}}{\code{signature(obj = "tsRim")}: sets the standars. }
+    \item{\code{rimStandard}}{\code{signature(obj = "tsRim")}: gets the standards. }
+    \item{\code{rimStandard<-}}{\code{signature(obj = "tsRim")}: sets the standards. }
     \item{\code{length}}{Returns the number of retention index standards.}
     \item{\code{c}}{Function to combine multiple objects.}
   }

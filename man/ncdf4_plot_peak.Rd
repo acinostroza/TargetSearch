@@ -16,7 +16,7 @@ ncdf4_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, plot =
     \item{showRT}{Logical. Whether the \emph{x}-axis of the resulting plot should represent seconds
         (\code{TRUE}) or retention index units (\code{FALSE}). This allows, for example, to search
         for a time range in seconds and display a graph in index units.}
-    \item{plot}{Logical. if \code{FALSE} nothing is plotted. This option may be used to simply
+    \item{plot}{Logical. If \code{FALSE} nothing is plotted. This option may be used to simply
         extract the data from the CDF files, but see also \code{\link{ncdf4_data_extract}}.}
     \item{\dots}{Extra arguments, such as \code{pch}, \code{col}, ..., to be passed to the plotting
         functions. See details below.}

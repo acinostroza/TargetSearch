@@ -146,7 +146,7 @@ libName(refLibrary) <- c("Metab01", "Metab02", "Metab03")
 libRI(refLibrary)
 # set the retention time index for metabolite 3 to 310 seconds
 libRI(refLibrary)[3] <- 310
-# change the seleccion and top masses of metabolite 3
+# change the selection and top masses of metabolite 3
 selMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 topMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 # change the retention time deviations
@@ -165,7 +165,7 @@ lib  <- c(lib1, lib2) # this restores the object refLibrary
 # show quantMasses
 quantMass(refLibrary)
 
-# suposse that we want to change the quant mass of metabolite 1 to 96 due
+# suppose that we want to change the quant mass of metabolite 1 to 96 due
 # to a typo in the library. We could do just
 quantMass(refLibrary)[1] <- 96
 
@@ -173,7 +173,7 @@ quantMass(refLibrary)[1] <- 96
 selMass(refLibrary)[[1]]
 topMass(refLibrary)[[1]]
 
-# to remove the mass 95, set the topMass and selMass explicitely, noting that
+# to remove the mass 95, set the topMass and selMass explicitly, noting that
 # the first masses coincides with 96 (the quantMass)
 selMass(refLibrary)[[1]] <- c(96, 204, 361)
 topMass(refLibrary)[[1]] <- c(96, 204, 361)

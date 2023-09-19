@@ -99,14 +99,14 @@
   additional columns will be created with the prefix \code{Cor_} followed
   by a string, such as \code{Cor_RI}. These columns contain information
   of \dQuote{collapsed} metabolites that correlate to mean that they could
-  conflict. The collapsed values are ofter separated by a vertical bar \code{|}.
+  conflict. The collapsed values are often separated by a vertical bar \code{|}.
 
   The slots \code{profRT}, \code{profRI} and \code{profInt} contain averaged
   (median) values for each the matrices in the slots \code{RT}, \code{RI},
   and \code{Intensity}. The values are computed only considering the masses
   that correlate (the other masses are ignored). They represent an average of
   RT, RI and Intensity per metabolite per sample, given that each selected mass
-  has their own values and often only and averege is needed. These matrices are
+  has their own values and often only and average is needed. These matrices are
   accessed with the methods \code{profileRT}, \code{profileRI} and
   \code{profileRT}.
 

@@ -10,7 +10,7 @@ writeMSP(metlib, metprof, file, append = FALSE)
 }
 \arguments{
   \item{metlib}{ A \code{tsLib} object. A metabolite library. }
-  \item{metprof}{ A \code{tsProfile} object. Usually the ouput of \code{\link{Profile}} or
+  \item{metprof}{ A \code{tsProfile} object. Usually the output of \code{\link{Profile}} or
 	 \code{\link{ProfileCleanUp}} functions. }
   \item{file}{ A string naming the output file. }
   \item{append}{ Logical. If \code{TRUE} the results will be appended to \code{file}.
@@ -23,7 +23,7 @@ writeMSP(metlib, metprof, file, append = FALSE)
   \url{https://chemdata.nist.gov/dokuwiki/doku.php?id=chemdata:nistlibs}
 
   Note: the output file usually has extension \code{.msp}, which conflicts with
-  MS Windows Software Patch files. Care is needed to not accidentaly double
+  MS Windows Software Patch files. Care is needed to not accidentally double
   click the file.
 }
 \author{Alvaro Cuadros-Inostroza}
@@ -34,7 +34,7 @@ writeMSP(metlib, metprof, file, append = FALSE)
 #(refLibrary) and the metabolite profile (metabProfile).
 data(TSExample)
 
-# to call the function, simply use the aforemention objects as inputs
+# to call the function, simply use the aforementioned objects as inputs
 # the file 'output_file.msp' can be open in NIST Search Software
 writeMSP(refLibrary, metabProfile, file="output_file.msp")
 }

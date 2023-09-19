@@ -37,7 +37,7 @@ A list with the following components:
 
     The function does not know whether a CDF file was baseline corrected (for
     example by the GC-MS software vendor), unless it was performed by the
-    function \code{\link{baseline}}. It is perfectably possible to have a
+    function \code{\link{baseline}}. It is perfectly possible to have a
     baseline corrected file and the element \code{baselineCorrected} be \code{FALSE}.
 }
 \seealso{\code{\link{ncdf4_data_extract}} for an updated and more flexible version

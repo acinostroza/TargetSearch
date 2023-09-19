@@ -75,7 +75,7 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{sampleData}}{\code{signature(obj = "tsSample")}: additional sample information. }
     \item{\code{sampleDays}}{\code{signature(obj = "tsSample")}: measurement days. }
     \item{\code{sampleNames}}{\code{signature(obj = "tsSample")}: sample names. The names must be unique}
-    \item{\code{show}}{\code{signature(object = "tsSample")}: the show funtion. }
+    \item{\code{show}}{\code{signature(object = "tsSample")}: the show function. }
     \item{\code{fileFormat}}{\code{signature}{obj = "tsSample"}: Sets or gets the RI file format.
         Options are either "binary" or "text". See note below.}
     \item{\code{c}}{Function to combine multiple objects.}
@@ -127,7 +127,7 @@ sampleDescription <- new("tsSample", CDFfiles = cdffiles, RIpath = RIpath)
 
 ## ## ## ## ##
 
-# Alternatively, the CDF path and CDF file names can be given separatedly
+# Alternatively, the CDF path and CDF file names can be given separately
 # (this was the old TargetSearch behavior)
 cdffiles <- basename(cdffiles)
 
@@ -155,7 +155,7 @@ smp_data <- data.frame(CDF_FILE =cdffiles, GROUP = gl(5,3))
 sampleDescription <- new("tsSample", Names = smp_names, CDFfiles = cdffiles, CDFpath = CDFpath,
     RIpath = RIpath, days = days, RIfiles = RIfiles, data = smp_data)
 
-# chang the file paths (relative to the working path)
+# change the file paths (relative to the working path)
 CDFpath(sampleDescription) <- "my_cdfs"
 RIpath(sampleDescription)  <- "my_RIs"
 

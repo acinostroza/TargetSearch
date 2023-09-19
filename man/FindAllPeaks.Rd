@@ -20,7 +20,7 @@ FindAllPeaks(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,
   \item{mz}{A list of m/z values to search or \code{NULL}. }
   \item{RI}{ The expected retention index  or \code{NULL}. }
   \item{RT}{ The expected retention time to search for instead of retention index, or \code{NULL}. }
-  \item{mz_type}{ whether to search for the selective, quant or top masses of the respective
+  \item{mz_type}{ whether to search for the selective, quantification or top masses of the respective
     metabolite.}
   \item{columns}{Either \code{NULL}, a \code{character} vector, or an \code{integer} vector. In
     most cases, leave it as \code{NULL}. This parameter is used to configure the column names or

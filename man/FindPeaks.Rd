@@ -26,7 +26,7 @@ FindPeaks(my.files, refLib, columns = NULL, showProgressBar = FALSE)
     be used to iteratively search in the corresponding file.
 
     The RI files format can be either "text" or "binary". The type is detected
-    dinamically.
+    dynamically.
 }
 \value{
     A \code{tsMSdata} object.

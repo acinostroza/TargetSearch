@@ -29,7 +29,7 @@ plotPeakRI(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,
   \item{col}{ A color vector (length > 2) to show different levels of peak intensity. }
   \item{int_range}{ A length-two vector. The limits of the intensity for the color key. Note that
       the intensity is expressed in log10, for example, a value of 2 represents an intensity of 100.}
-  \item{cex_range}{ The 'cex' range value of the points. lower-intense peaks are represented
+  \item{cex_range}{ The 'cex' range value of the points. Lower-intense peaks are represented
       as points of smaller size. }
   \item{key_width}{ The width in cm of the area allocated for the color key. }
 }

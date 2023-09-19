@@ -15,7 +15,7 @@ ncdf4_data_extract(cdfFile, massValues, timeRange, useRT = FALSE)
 time limits.}
 
 \item{useRT}{Logical. If \code{TRUE}, the time range is in seconds, otherwise if \code{FALSE}
-(default), the time range is inretention time index units (\code{TRUE}).}
+(default), the time range is in retention time index units (\code{TRUE}).}
 }
 \value{
 A named list with the following components.
@@ -47,11 +47,11 @@ extracted. If both are missing, the function behaves as \code{\link[=peakCDFextr
 the output (a named list) uses slightly different names.
 
 The NetCDF must be have been previously converted to the custom "TargetSearch" format,
-otherwise an error will be raised. See \code{\link[=ncdf4_convert]{ncdf4_convert()}} for the convertion.
+otherwise an error will be raised. See \code{\link[=ncdf4_convert]{ncdf4_convert()}} for the conversion.
 }
 \note{
 An error will be produced for invalid files. Also, this function is intended
-to be used internally, but it is exposed for convinience, for example, to
+to be used internally, but it is exposed for convenience, for example, to
 create custom plots.
 }
 \examples{

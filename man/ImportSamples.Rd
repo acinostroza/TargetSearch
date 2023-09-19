@@ -45,7 +45,7 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"),
 	found, then it looks for columns with the substrings 'cdf', 'day' and 'name' respectively.
 	If the 'cdf' column is not found, the function raises an error, but if 'day'
 	is not found, then it assumes the measurement day is the same for all.
-	Moreover, if the column for sample names/idenfiers is missing, then the function uses
+	Moreover, if the column for sample names/identifiers is missing, then the function uses
 	the 'cdf' file names as identifiers.
 
 	During the column matching, the first match is taken in case of ambiguity.
@@ -70,7 +70,7 @@ ImportSamplesFromDir(CDFpath=".", RIfiles=FALSE, ftype=c("binary", "text"),
 	for speed, of the text format (TargetSearch >= 1.12.0). The file format
 	can be identified by the file extension (".txt" for text, ".dat" for
 	binary), but this is just an indicator: the file format is detected
-	dinamically during file reading. Use the method \code{\link{fileFormat}}
+	dynamically during file reading. Use the method \code{\link{fileFormat}}
 	to set or get this parameter.
 
 	The function \code{ImportSamplesFromDir} scans for cdf files in the current

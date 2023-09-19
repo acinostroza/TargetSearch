@@ -62,13 +62,13 @@ RIcorrect(samples, rimLimits = NULL, massRange=NULL, Window, IntThreshold,
     format. The files will be saved in the same directory as the original CDF-3.
     If it is character vector representing file paths, then the CDF-4 will be
     saved in those paths instead (re-cycled to the length of samples).
-    Finally, if \code{FALSE}, then no CDF convertion will be performed. This is not
+    Finally, if \code{FALSE}, then no CDF conversion will be performed. This is not
     recommended, but if possible if you want to match the old \code{\link{TargetSearch}}
     behaviour. Note that also the baseline correction or the retention
     time indices will not be updated as well.
 
     If \code{baseline} is \code{TRUE}, the CDF files will be baseline corrected
-    by passing the extra parameters to \code{\link{baseline}}. See that manpage for
+    by passing the extra parameters to \code{\link{baseline}}. See there for
     details.
 }
 \value{

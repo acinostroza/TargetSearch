@@ -44,7 +44,7 @@ Write.Results(Lib, metabProfile,
       intensities per metabolite. This value is an average of all correlating
       masses normalized to the mean.
     \item \code{prefix.profile.ri.txt}. Contains information on average retention
-      indeces of the correlating masses. This value is an average of all correlating
+      indices of the correlating masses. This value is an average of all correlating
       masses.
     \item \code{prefix.profile.quantmatrix.txt}. The quantification matrix
       as tab-delimited text file. See \code{\link{quantMatrix}} for details.

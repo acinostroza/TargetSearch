@@ -64,13 +64,13 @@ of \code{retention_time}.
 values (integer).
 \item \code{intensity} is matrix of intensity values (integer) where columns represent
 ion traces and rows are scans. The dimensions are length of "retention time"
-times the number of ions, ie, mass max - mass min + 1.
+times the number of ions, i.e., mass max - mass min + 1.
 }
 
 In addition, the following attributes are defined. Note that only \code{creator} and
 \code{version} are mandatory.
 \itemize{
-\item \code{creator} a string equal to "TargetSearch" (for indentification purposes).
+\item \code{creator} a string equal to "TargetSearch" (for identification purposes).
 \item \code{version} file format version (string). Currently "1.1".
 \item \code{time_corrected} (optional) a flag (short integer) to indicate RI correction.
       If missing it defaults to \code{false}.

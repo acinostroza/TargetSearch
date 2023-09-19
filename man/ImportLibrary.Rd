@@ -74,7 +74,7 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     \item \code{SEL_MASS} - A list of selective masses separated with semicolon.
     \item \code{TOP_MASS} - A list of the most abundant masses to be searched, separated
         with semicolons.
-    \item \code{Win_k} - The RI windows, k = 1,2,3. Mass search is perfomed in three
+    \item \code{Win_k} - The RI windows, k = 1,2,3. Mass search is performed in three
         steps. A RI window required for each one of them.
     \item \code{SPECTRUM} - The metabolite spectrum. m/z and intensity are separated by
         spaces and colons.

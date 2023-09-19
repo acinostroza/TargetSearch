@@ -1,6 +1,6 @@
 \name{ri2rt}
 \alias{ri2rt}
-\title{Retention Time Index to Retention Time convertion}
+\title{Retention Time Index to Retention Time conversion}
 \description{
   Convert retention time indices to retention times indices based on observed FAME RI
   and their standard values.

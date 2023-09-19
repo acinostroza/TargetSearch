@@ -25,7 +25,7 @@ This is a wrapper function around the different baseline correction algorithms. 
 is not intended to be executed by the average user. Please refer to the respective
 man pages for details.}
 \value{
-  Returns a list with the same elements as the the input, but the element \code{"Peaks"}
+  Returns a list with the same elements as the input, but the element \code{"Peaks"}
   containing baseline corrected values.
 }
 \author{Alvaro Cuadros-Inostroza}

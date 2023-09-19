@@ -125,7 +125,7 @@
     opt <- options(TS_RI_columns=c('SPEC', 'RI', 'RT'))
     text2bin(RI_test)
 
-    # or using integers (again, not recomended)
+    # or using integers (again, not recommended)
     options(TS_RI_columns=c(1, 2, 0))
     text2bin(RI_test)
 
