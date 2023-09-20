@@ -8,10 +8,14 @@
 # function to get the default RI text columns
 `get.columns.name` <- function(cols)
 {
-	if(is.null(cols) || any(is.na(cols)))
+	if(missing(cols) || is.null(cols) || any(is.na(cols)))
 		cols <- getOption('TS_RI_columns', get.columns.name.default())
-	assert_that(length(cols) == 3)
-	cols
+	assert_that(length(cols) == 3, msg='Option `TS_RI_columns` must have length=3')
+	if(is.character(cols) || is.integer(cols))
+		return(cols)
+	if(is.numeric(cols))
+		return(as.integer(cols))
+	stop('Option `TS_RI_columns` must be integer or character')
 }
 
 # return file header as string to write TXT files
@@ -157,3 +161,5 @@ function(f)
 	close(z)
 	cbind(retIndex=RI,retTime=RT)
 }
+
+# vim: set ts=4 sw=4 noet:
