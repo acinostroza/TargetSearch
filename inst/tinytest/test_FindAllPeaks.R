@@ -45,3 +45,12 @@ for(i in 1:10) {
     y <- y[, colnames(x)]
     expect_identical(x, y)
 }
+
+# Edge case when no peaks are found. FindPeaks used to return NULL.
+x <- FindAllPeaks(smp, dev=1, RT=RT, mz=mz)
+expect_true(!is.null(x))
+
+# Check mz and RT out of range
+x <- FindAllPeaks(smp, dev=1, RT=300, mz=400)
+expect_true(!is.null(x))
+expect_true(nrow(x) == 0)
