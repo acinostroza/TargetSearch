@@ -76,9 +76,6 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,
     pk <- do.call('rbind', peaks)
     pk <- cbind(pk, fid=n)
 
-    if(nrow(pk) == 0)
-        return(NULL)
-
     rownames(pk) <- NULL
     return(pk[, c('Int', 'RI', 'RT', 'mz', 'fid'), drop=FALSE])
 }
