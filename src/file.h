@@ -7,10 +7,10 @@
 
 /* Function prototypes */
 spectra_t * read_dat(FILE *, int);
-void write_dat(FILE *, spectra_t *, int);
+int write_dat(FILE *, spectra_t *, int);
 
 spectra_t * read_txt(FILE *fp, const char *, const char *, const char *, const int *);
-void write_txt(FILE *, spectra_t *, const char *);
+int write_txt(FILE *, spectra_t *, const char *);
 
 spectra_t * pktosp(double *, double *, int *, int *, int);
 

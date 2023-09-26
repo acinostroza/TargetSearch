@@ -110,19 +110,22 @@ error:
 }
 
 /* function to write a dat file */
-void write_dat(FILE *fp, spectra_t *sp, int swap)
+int write_dat(FILE *fp, spectra_t *sp, int swap)
 {
+#define f_write(x) do { \
+	if(fwrite(&(x), sizeof(x), 1, fp) != 1) return 0; } while(0)
+
         int i, j, tmp, n, splen=sp->n_scans, pcount = 0;
 	double ri, rt;
 
 	/* write files signatures */
-	fwrite(signature, SIGLEN, 1, fp);
+	f_write(signature);
 
         /* write len*/
 	n = sp->n_scans;
 	if(swap == 1)
 		swapb(&n, sizeof(n));
-        fwrite(&n, sizeof(int), 1, fp);
+	f_write(n);
 
 	/* write point count */
 	for(i = 0; i < splen; i++)
@@ -130,14 +133,14 @@ void write_dat(FILE *fp, spectra_t *sp, int swap)
 	if(swap == 1)
 		swapb(&pcount, sizeof(n));
 
-        fwrite(&pcount, sizeof(int), 1, fp);
+	f_write(pcount);
 
         /* write RI */
         for(i = 0; i < splen; i++) {
 		ri = sp->ri[i];
 		if(swap == 1)
 			swapb(&ri, sizeof(ri));
-                fwrite(&ri, sizeof(ri), 1, fp);
+                f_write(ri);
 	}
 
         /* write RT */
@@ -145,7 +148,7 @@ void write_dat(FILE *fp, spectra_t *sp, int swap)
 		rt = sp->rt[i];
 		if(swap == 1)
 			swapb(&rt, sizeof(rt));
-                fwrite(&rt, sizeof(rt), 1, fp);
+		f_write(rt);
 	}
 
         /* write N */
@@ -153,7 +156,7 @@ void write_dat(FILE *fp, spectra_t *sp, int swap)
 		n = sp->sp[i].len;
 		if(swap == 1)
 			swapb(&n, sizeof(n));
-                fwrite(&n, sizeof(n), 1, fp);
+		f_write(n);
 	}
 
         for(i = 0; i < splen; i++) {
@@ -161,15 +164,17 @@ void write_dat(FILE *fp, spectra_t *sp, int swap)
 			tmp = sp->sp[i].mz[j];
 			if(swap == 1)
 				swapb(&tmp, sizeof(tmp));
-			fwrite(&tmp, sizeof(tmp), 1, fp);
+			f_write(tmp);
 		}
 		for(j = 0; j < sp->sp[i].len; j++) {
 			tmp = sp->sp[i].in[j];
 			if(swap == 1)
 				swapb(&tmp, sizeof(tmp));
-			fwrite(&tmp, sizeof(tmp), 1, fp);
+			f_write(tmp);
 		}
         }
+	return 1;
+#undef f_write
 }
 
 /* macros needed to read a TXT file with peak data */
@@ -378,20 +383,23 @@ SEXP write_peaks(SEXP Output, SEXP RT, SEXP RI, SEXP IN, SEXP Mass, SEXP Swap, S
  *        write the RT column follow by the SPECTRUM and the RI columns).
  *        Example string "RT\tSPECTRUM\tRI" (note that the columns are joined
  *        and separated by a tab char).
- * @return void
+ * @return 1 on success, 0 otherwise
  */
-void write_txt(FILE *fp, spectra_t *sp, const char *header)
+int write_txt(FILE *fp, spectra_t *sp, const char *header)
 {
-	fprintf(fp, "%s\n", header);
+#define f_printf(...) if(fprintf(__VA_ARGS__) < 0) return 0
+	f_printf(fp, "%s\n", header);
 	for(int i = 0; i < sp->n_scans; i++) {
 		spectrum_t *p = sp->sp + i;
 		if(p->len == 0)
 			continue;
-		fprintf(fp, "%.15g\t", sp->rt[i]);
+		f_printf(fp, "%.15g\t", sp->rt[i]);
 		for(int j = 0; j < p->len; j++)
-			fprintf(fp, "%s%d:%d", j > 0 ? " " : "", p->mz[j], p->in[j]);
-		fprintf(fp, "\t%.15g\n", sp->ri[i]);
+			f_printf(fp, "%s%d:%d", j > 0 ? " " : "", p->mz[j], p->in[j]);
+		f_printf(fp, "\t%.15g\n", sp->ri[i]);
 	}
+	return 1;
+#undef f_printf
 }
 
 #define ERROR(...) do { snprintf(msg, sizeof(msg), __VA_ARGS__); goto clean; } while(0)
