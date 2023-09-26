@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <ctype.h>
 
 #include "strutils.h"
@@ -156,4 +157,15 @@ int file_type(const char * fname)
 			return 0;
 	}
 	return 1;
+}
+
+/**
+ * simple routine to get the endiannes at runtime
+ *
+ * @returns 0 for little endian, 1 for big endian
+ */
+int endianness(void) {
+	uint16_t x = 0x1122;
+	uint8_t * y = (uint8_t *) &x;
+	return *y == 0x11;
 }

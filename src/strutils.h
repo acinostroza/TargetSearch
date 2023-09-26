@@ -7,3 +7,4 @@ int stod(const char *s, double *pd);
 int ascii(const char *line, int n);
 int get_col_index(const char *, const char *, char);
 int file_type(const char * fname);
+int endianness(void);
