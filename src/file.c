@@ -181,7 +181,7 @@ int write_dat(FILE *fp, spectra_t *sp, int swap)
 #define MAX(a, b)  ((a) > (b) ? (a) : (b))
 #define CHKCOL(x, col) do \
 	if((x) < 0) { \
-		REprintf("Unable to find colum `%s'\n", col); \
+		REprintf("Unable to find colum `%s'\n", col ? col : "NULL"); \
 		goto clean; \
 	} while(0)
 
@@ -402,60 +402,73 @@ int write_txt(FILE *fp, spectra_t *sp, const char *header)
 #undef f_printf
 }
 
-#define ERROR(...) do { snprintf(msg, sizeof(msg), __VA_ARGS__); goto clean; } while(0)
-#define Fclose(fp) do { if(fp) fclose(fp); fp = NULL; } while(0)
-
-/* Function to convert from TXT to DAT format*/
-void text_to_dat(char **infile, char **outfile, int *swap, int *cols)
+/* get column names or positions depending on the type of columns */
+int get_columns(SEXP columns, struct column_s * col)
 {
-	FILE *fpin = NULL, *fpout = NULL;
-	spectra_t *sp = NULL;
-	// char *SPECTRUM_COL = cols[0], *RI_COL = cols[1], *RT_COL = cols[2];
-	char msg[256] = {'\0'};
-	int status = EXIT_FAILURE;
-
-	if((fpin = fopen(infile[0], "r")) == NULL)
-		ERROR("Error opening file %s\n", infile[0]);
-
-	if((sp = read_txt(fpin, NULL, NULL, NULL, cols)) == NULL)
-		ERROR("Error reading file %s\n", infile[0]);
-
-	if((fpout = fopen(outfile[0], "wb")) == NULL)
-		ERROR("Error opening file %s\n", outfile[0]);
-
-	write_dat(fpout, sp, *swap);
-	status = EXIT_SUCCESS;
-clean:
-	spectra_free(sp);
-	Fclose(fpin);
-	Fclose(fpout);
-	if(status == EXIT_FAILURE)
-		error("%s", msg);
+	memset(col, 0, sizeof(*col));
+	if(isNull(columns) || GET_LENGTH(columns) != 3)
+		return 0;
+	if(isString(columns)) {
+		col->sp_col = CHAR(STRING_ELT(columns, 0));
+		col->ri_col = CHAR(STRING_ELT(columns, 1));
+		col->rt_col = CHAR(STRING_ELT(columns, 2));
+		return 1;
+	}
+	if(isInteger(columns)) {
+		col->icols = INTEGER(columns);
+		return 1;
+	}
+	return 0;
 }
 
-/* Function to convert from DAT to TXT format*/
-void dat_to_text(char **infile, char **outfile, int *swap, char **header)
+static inline SEXP mkInt(int x)
 {
-	FILE *fpin = NULL, *fpout = NULL;
-	char msg[256] = {'\0'};
-	int status = EXIT_FAILURE;
-	spectra_t *sp = NULL;
+	SEXP ans = PROTECT(NEW_INTEGER(1));
+	SET_LOGICAL_ELT(ans, 0, x);
+	UNPROTECT(1);
+	return ans;
+}
 
-	if((fpin = fopen(infile[0], "rb")) == NULL)
-		ERROR("Error opening file %s\n", infile[0]);
+static inline spectra_t *
+rdfile(FILE *fp, int type, int swap, const struct column_s * c)
+{
+	return type == 0 ? read_dat(fp, swap) :
+		read_txt(fp, c->sp_col, c->ri_col, c->rt_col, c->icols);
+}
 
-	if((sp = read_dat(fpin, *swap)) == NULL)
-		ERROR("Error reading file %s\n", infile[0]);
+static inline int
+wrfile(FILE *fp, spectra_t * s, int type, int swap, const char * header)
+{
+	return type == 0 ? write_dat(fp, s, swap) : write_txt(fp, s, header);
+}
 
-	if((fpout = fopen(outfile[0], "w")) == NULL)
-		ERROR("Error opening file %s\n", outfile[0]);
+#define err(x, ...) do { ret = x; REprintf(__VA_ARGS__); goto error; } while(0)
+#define close(x) if(x) fclose(x);
 
-	write_txt(fpout, sp, header[0]);
-	status = EXIT_SUCCESS;
-clean:
-	Fclose(fpin);
-	Fclose(fpout);
+SEXP convert_ri_file(SEXP IN, SEXP OUT, SEXP Type, SEXP Columns, SEXP Header)
+{
+	FILE *fin = NULL, *fout = NULL;
+	int type = INTEGER_VALUE(Type);
+	const char *header = CHARACTER_VALUE(Header);
+	struct column_s c;
+	int swap = endianness();
+	int ret = 0;
+	spectra_t * sp = NULL;
+
+	if(type == 1 && get_columns(Columns, &c) == 0)
+		err(1, "Unable to parse file columns\n");
+	if(!(fin = fopen(CHARACTER_VALUE(IN), type == 1 ? "rt" : "rb")))
+		err(2, "Unable to open file `%s`\n", CHARACTER_VALUE(IN));
+	if(!(fout = fopen(CHARACTER_VALUE(OUT), type == 1 ? "wb" : "wt")))
+		err(3, "Unable to open file `%s`\n", CHARACTER_VALUE(OUT));
+	if(!(sp = rdfile(fin, type, swap, &c)))
+		err(4, "Unable to read file `%s`\n", CHARACTER_VALUE(IN));
+	if(!(wrfile(fout, sp, 1 - type, swap, header)))
+		err(5, "Unable to write file `%s`\n", CHARACTER_VALUE(OUT));
+	ret = 0;
+error:
 	spectra_free(sp);
-	if(status == EXIT_FAILURE)
-		error("%s", msg);
+	close(fin);
+	close(fout);
+	return mkInt(ret);
 }

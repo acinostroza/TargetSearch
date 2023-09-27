@@ -25,22 +25,24 @@
 }
 
 # Convert RI files from text to binary format and viceversa.
+`.convert_ri_file` <-
+function(in.file, ...)
+{
+	if((ret <- .Call(c_convert_ri_file, in.file, ...)) != 0)
+		stop("An error occurred converting file '", in.file, "'")
+	ret
+}
+
 `bin2text` <-
 function(in.files, out.files=NULL)
 {
 	if(is.null(out.files))
 		out.files <- paste(sub("\\.\\w+$", "", in.files), ".txt", sep="")
 
-	swap <- pmatch(.Platform$endian, c("little", "big")) - 1
+	assert_that(length(in.files) == length(out.files))
 	header <- get.file.header()
-
-	stopifnot(length(in.files) == length(out.files))
-	for(i in 1:length(in.files)) {
-		opt <- get.file.format.opt(in.files[i], "none")
-		if(opt[1] != 1) stop("Incorrect file format")
-		res <- .C(c_dat_to_text, as.character(in.files[i]), as.character(out.files[i]),
-				as.integer(swap), as.character(header), PACKAGE="TargetSearch")
-	}
+	ret <- vapply(seq(length(in.files)), function(k)
+				  .convert_ri_file(in.files[k], out.files[k], 0L, NULL, header), 0L)
 	invisible(out.files)
 }
 
@@ -50,15 +52,10 @@ function(in.files, out.files=NULL, columns=NULL)
 	if(is.null(out.files))
 		out.files <- paste(sub("\\.\\w+$", "", in.files), ".dat", sep="")
 
-	swap <- pmatch(.Platform$endian, c("little", "big")) - 1
-
-	stopifnot(length(in.files) == length(out.files))
-	for(i in 1:length(in.files)) {
-		opt <- get.file.format.opt(in.files[i], columns)
-		if(opt[1] != 0) stop("Incorrect file format")
-		res <- .C(c_text_to_dat, as.character(in.files[i]), as.character(out.files[i]),
-				as.integer(swap), as.integer(opt[3:5]), PACKAGE="TargetSearch")
-	}
+	assert_that(length(in.files) == length(out.files))
+	columns <- get.columns.name(columns)
+	ret <- vapply(seq(length(in.files)), function(k)
+				.convert_ri_file(in.files[k], out.files[k], 1L, columns, NULL), 0L)
 	invisible(out.files)
 }
 

@@ -25,20 +25,17 @@ static const R_CallMethodDef R_CallDef[] = {
         {"peak_detection_main", (DL_FUNC)&peak_detection_main, 6},
         {"baseline", (DL_FUNC)&baseline, 5},
         {"write_peaks", (DL_FUNC)&write_peaks, 7},
+        {"convert_ri_file", (DL_FUNC)&convert_ri_file, 5},
         {NULL, NULL, 0},
 };
 
 static R_NativePrimitiveArgType hpf_t[] = {REALSXP, REALSXP, INTSXP, REALSXP};
 static R_NativePrimitiveArgType windowing_t[] = {
                 INTSXP, INTSXP, INTSXP, INTSXP, INTSXP};
-static R_NativePrimitiveArgType text_to_dat_t[] = {STRSXP, STRSXP, INTSXP, INTSXP};
-static R_NativePrimitiveArgType dat_to_text_t[] = {STRSXP, STRSXP, INTSXP, STRSXP};
 
 static const R_CMethodDef cMethods[] = {
         {"hpf", (DL_FUNC)&hpf, 4, hpf_t},
         {"windowing", (DL_FUNC)&windowing, 5, windowing_t},
-        {"text_to_dat", (DL_FUNC)&text_to_dat, 4, text_to_dat_t},
-        {"dat_to_text", (DL_FUNC)&dat_to_text, 4, dat_to_text_t},
         {NULL, NULL, 0, NULL}
 };
 
