@@ -1,8 +1,8 @@
 Package: TargetSearch
 Type: Package
 Title: A package for the analysis of GC-MS metabolite profiling data
-Version: 2.3.5
-Date: 2023-09-22
+Version: 2.3.6
+Date: 2023-09-27
 Authors@R: c(person("Alvaro", "Cuadros-Inostroza", role=c("aut", "cre"),
                      email="acuadros+bioc@gmail.com"),
              person("Jan", "Lisec", role="aut"),
