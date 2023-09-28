@@ -16,21 +16,16 @@
 #'    of columns of 'Peaks' should match the m/z range (one nominal mass per
 #'    column.
 #' @param ftype a string to indicate the file format: 'binary' or 'text'
-#' @return TRUE on success, FALSE otherwise. And error is raised if the
-#'    aforementioned conditions are not met.
+#' @return TRUE on success, FALSE otherwise. A message is printed if an error
+#'    happens on the C side, but no error is raised. In this case, is up to
+#'    the caller to check for its return value.
+#' @note If the input paremeters are invalid, an assertion error is thrown.
 `writeRIFile` <-
 function(outFile, Peaks, riInde, massRange, ftype=c("binary", "text"))
 {
-    ftype <- match.arg(ftype)
-
-    if(ftype == 'text') {
-        Header <- get.file.header()
-        swap <- - 1L
-    }
-    else if(ftype == 'binary') {
-        Header <- NULL
-        swap <- pmatch(.Platform$endian, c("little", "big")) - 1L
-    }
+    op <- switch(match.arg(ftype),
+                    text=list(type=1L, head=get.file.header()),
+                    binary=list(type=0L, head=NULL))
     assert_that(is.string(outFile))
     assert_that(is.numeric(Peaks$Peaks))
     assert_that(is.numeric(riInde), is.numeric(massRange))
@@ -40,7 +35,7 @@ function(outFile, Peaks, riInde, massRange, ftype=c("binary", "text"))
     assert_that(length(riInde) == nrow(Peaks$Peaks))
     assert_that(length(riInde) == length(Peaks$Time))
 
-    ret <- .Call('write_peaks', outFile, Peaks$Time, riInde,
-                 as.integer(Peaks$Peaks), as.integer(massRange), swap, Header)
-    invisible(ret)
+    ret <- .Call(c_write_peaks, outFile, Peaks$Time, riInde,
+               as.integer(Peaks$Peaks), as.integer(massRange), op$type, op$head)
+    invisible(ret == 0)
 }
