@@ -42,7 +42,7 @@ for(i in 1:10) {
     x <- FindAllPeaks(smp, dev=10, RT=RT, mz=mz)
     colnames(x)[1] <- 'Intensity'
     y <- peak_search(smp, dev=10, RT=RT, mz=mz)
-    y <- y[, colnames(x)]
+    y <- y[, colnames(x), drop=FALSE]
     expect_identical(x, y)
 }
 
