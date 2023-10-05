@@ -62,4 +62,15 @@ SEXP write_peaks(SEXP Output, SEXP RT, SEXP RI, SEXP IN, SEXP Mass,
  */
 SEXP convert_ri_file(SEXP IN, SEXP OUT, SEXP Type, SEXP Columns, SEXP Header);
 
+/**
+ * Wrapper for function `file_type`
+ *
+ * It takes a file path as input and returns an integer which guesses
+ * whether the file is TEXT or BINARY.
+ *
+ * @param Filename (string) path to file.
+ * @return An integer: 1 if text, 0 if binary, -1 on error.
+ */
+SEXP guess_file_type(SEXP filename);
+
 #endif

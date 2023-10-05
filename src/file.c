@@ -448,3 +448,9 @@ error:
 	close(fp);
 	return mkInt(ret);
 }
+
+/* R interface to C function file_type */
+SEXP guess_file_type(SEXP filename)
+{
+	return mkInt(file_type(CHARACTER_VALUE(filename)));
+}

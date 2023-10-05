@@ -159,4 +159,19 @@ function(f)
 	cbind(retIndex=RI,retTime=RT)
 }
 
+#' Wrapper to C function guess_file_type
+#'
+#' This is calls the C function `guess_file_type` which in turns calls
+#' `file_type`. This function returns 1 for text files, 0 for binary
+#' files, and -1 for errors (for example if file does not exist).
+#'
+#' @param filename (string) path to file
+#' @return integer. The (guessed) type of the file
+`file_type` <-
+function(filename)
+{
+	assert_that(is.string(filename))
+	.Call(c_guess_file_type, filename)
+}
+
 # vim: set ts=4 sw=4 noet:

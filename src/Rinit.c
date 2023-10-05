@@ -26,6 +26,7 @@ static const R_CallMethodDef R_CallDef[] = {
         {"baseline", (DL_FUNC)&baseline, 5},
         {"write_peaks", (DL_FUNC)&write_peaks, 7},
         {"convert_ri_file", (DL_FUNC)&convert_ri_file, 5},
+        {"guess_file_type", (DL_FUNC)&guess_file_type, 1},
         {NULL, NULL, 0},
 };
 
