@@ -25,6 +25,20 @@ spectra_t * pktosp(double *, double *, int *, int *, int);
 void text_to_dat(char **, char **, int *, int *);
 void dat_to_text(char **, char **, int *, char **);
 
+/**
+ * Function to parse and valide column options
+ *
+ * The R function `get.columns.name` is used to set the column names or
+ * column positions. The output can be either strings or integers,
+ * so this function checks for both options.
+ *
+ * @param columns. The columns object passed by R. The object must have
+ *        three elements and be either strings or integers.
+ * @param col. Pointer to parsed columns, which can be strings or ints.
+ * @return one on success, zero otherwise.
+ */
+int get_columns(SEXP columns, struct column_s * col);
+
 /*
  * C interface to write RI files (peak list) from R
  *

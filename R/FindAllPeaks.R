@@ -1,23 +1,3 @@
-# low level search of peaks in a RI file.
-`getAllPeaks` <-
-function(file, ref, useRT=FALSE, searchType = c("all", "minRI", "maxInt"), columns = NULL)
-{
-    if(!all(c('mz', 'minRI', 'maxRI') %in% colnames(ref)))
-        stop("Error: missing columns in 'ref'")
-
-    opt <- as.integer(get.file.format.opt(file, columns))
-
-    # c_find_peaks needs an Integer matching the search type options
-    searchType <- match.arg(searchType)
-    searchType <- pmatch(searchType, c("all", "minRI", "maxInt"))
-
-    z <- .Call(c_find_peaks, file, as.integer(ref[,'mz']), NULL,
-               as.numeric(ref[,'minRI']), as.numeric(ref[,'maxRI']), opt, useRT, searchType)
-    z <- do.call('cbind', z)
-    z[,4] <- z[,4] + 1
-    colnames(z) <- c('Int', 'RI', 'RT', 'rowid')
-    cbind(z, mz=ref[z[, 'rowid'],2])
-}
 
 `FindAllPeaks` <-
 function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,

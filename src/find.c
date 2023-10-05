@@ -5,6 +5,7 @@
 
 #include "find.h"
 #include "utils.h"
+#include "strutils.h" /* for endianness */
 
 #define BUFFER 4096
 
@@ -135,21 +136,19 @@ error:
 	return NULL;
 }
 
-spectra_t *
-read_file(const char *file, int ftype, int swap,
-	  const char *sp_COL, const char *ri_COL, const char *rt_COL, const int * cols)
+static spectra_t *
+read_file(const char *file, int ftype, struct column_s * c)
 {
 	FILE *fp = NULL;
-	char *mode = ftype == 0 ? "rt" : "rb";
+	int swap = endianness();
 
-	if((fp = fopen(file, mode)) == NULL)
-		error("Error opening file %s\n", file);
+	if((fp = fopen(file, ftype == 0 ? "rb" : "rt")) == NULL)
+		return NULL;
 
-	spectra_t * spectra = ftype == 0 ? read_txt(fp, sp_COL, ri_COL, rt_COL, cols) :
-				read_dat(fp, swap);
+	spectra_t * spectra = ftype == 0 ? read_dat(fp, swap) :
+			read_txt(fp, c->sp_col, c->ri_col, c->rt_col, c->icols);
+
 	fclose(fp);
-	if(!spectra)
-		error("Error reading file %s\n", file);
 	return spectra;
 }
 
@@ -196,47 +195,48 @@ error:
      RIexp. Expected Retention Index (RI)
      RI_Min. RI minimum value.
      RI_Max. RI maximum value.
-     Options. Vector of file format options (see comment below).
      useRT. Should use RT or RI. Obviouly RIexp, RI_Min, RI_max units should be
             Time in seconds or Index units.
      Search: 1. all peaks, 2. closest to expected RI, 3. most intense.
+     Columns: A vector of columns needed only for tab-delimited type files.
   Notes:
      RI_exp can be NULL, but filterResult cannot be 1. In this case RI_exp
      is ignored.
  */
 
-SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, SEXP Options,
-	SEXP useRT, SEXP Search)
+#define err(...) do { REprintf(__VA_ARGS__); goto error; } while(0)
+
+SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max,
+		SEXP useRT, SEXP Search, SEXP Columns)
 {
 	/* internal variables */
 	const char *file = CHARACTER_VALUE(RI_file);
 	int  libtotal = GET_LENGTH(Mass);
-	spectra_t *spectra;
-	struct point_list_s *res;
+	spectra_t *spectra = NULL;
+	struct point_list_s *res = NULL;
+	struct column_s c;
+	memset(&c, 0, sizeof(c));
 
 	/* R variables */
 	int *mass  = INTEGER(Mass);
-	int use_rt = LOGICAL(useRT)[0];
-	SearchType st  = (SearchType) INTEGER(Search)[0];
+	int use_rt = LOGICAL_VALUE(useRT), ftype = 0;
+	SearchType st  = (SearchType) INTEGER_VALUE(Search);
 	double *ri_min = REAL(RI_Min), *ri_max = REAL(RI_Max);
 	double *ri_exp = isNull(RI_exp) ? NULL : REAL(RI_exp);
+
+	if((ftype = file_type(file)) < 0)
+		err("Unable to open file `%s`\n", file);
+	if(ftype == 1 && get_columns(Columns, &c) == 0)
+		err("Columns names are of incorrect type\n");
+	if(!(spectra = read_file(file, ftype, &c)))
+		err("Unable to parse file `%s`\n", file);
 
 	/* output variables */
 	SEXP RI_Found, RT_Found, INT_Found, I_Found, result;
 
-	/* parse options */
-	int ftype  = INTEGER(Options)[0]; /* file type: 0 = TXT; 1 = DAT */
-	int swap   = INTEGER(Options)[1]; /* swap = 1 in big endian platforms */
-	int sp_COL = INTEGER(Options)[2]; /* Spectra column number */
-	int ri_COL = INTEGER(Options)[3]; /* R.I. column number */
-	int rt_COL = INTEGER(Options)[4]; /* R.T. column number */
-	int cols[] = {sp_COL, ri_COL, rt_COL};
-
-	/* parse file */
-	spectra = read_file(file, ftype, swap, NULL, NULL, NULL, cols);
-
 	/* search peaks */
-	res = do_search(spectra, mass, ri_exp, ri_min, ri_max, use_rt, st, libtotal);
+	if(!(res = do_search(spectra, mass, ri_exp, ri_min, ri_max, use_rt, st, libtotal)))
+		err("Unable to perform a search\n");
 
 	RI_Found  = PROTECT(allocVector(REALSXP, res->length));
 	RT_Found  = PROTECT(allocVector(REALSXP, res->length));
@@ -262,4 +262,8 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	spectra_free(spectra);
 	UNPROTECT(5);
 	return result;
+error:
+	free_point_list(res);
+	spectra_free(spectra);
+	return R_NilValue;
 }

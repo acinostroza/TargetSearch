@@ -24,47 +24,32 @@ function(my.files, refLib, columns = NULL, showProgressBar = FALSE)
             libId <- rownames(refLib)
         }
         mz    <- refLib[,2]
+        refLib <- list(refLib)
     }
 
     resInt           <- matrix(nrow = nmz, ncol = length(my.files))
     colnames(resInt) <- my.names
     rownames(resInt) <- mz
+    refLen           <- length(refLib)
 
     resRI <- resRT <- resInt
 
     if(showProgressBar)
         pb <- ProgressBar(title="Finding Peaks...", label="File in processing...")
 
-    for (i in 1:length(my.files)) {
-
-        # Guess the file format. See file "file.R"
-        opts <- get.file.format.opt(my.files[i], columns)
-        # set option too select for max intensity (default behaviour)
-        searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
-
-        out  <- if(is.list(refLib)) {
-                    .Call(c_find_peaks,
+    for (i in seq_along(my.files)) {
+        lib <- refLib[ (i - 1) %% refLen + 1 ][[ 1 ]]
+        out <- .c_find_peaks(
                             as.character(my.files[i]),   # MyFile
                             as.integer(mz),              # Mass
                             NULL,                        # RI_exp
-                            as.numeric(refLib[[i]][,1]), # RI_min
-                            as.numeric(refLib[[i]][,3]), # RI_max
-                            as.integer(opts),            # Options
+                            as.numeric(lib[,1]),         # RI_min
+                            as.numeric(lib[,3]),         # RI_max
                             FALSE,                       # useRT
-                            searchType,                  # max intensity
-                            PACKAGE="TargetSearch")
-                } else {
-                    .Call(c_find_peaks,
-                            as.character(my.files[i]), # MyFile
-                            as.integer(mz),            # Mass
-                            NULL,                      # RI_exp
-                            as.numeric(refLib[,1]),    # RI_min
-                            as.numeric(refLib[,3]),    # RI_max
-                            as.integer(opts),          # Options
-                            FALSE,                     # useRT
-                            searchType,                # max intensity
-                            PACKAGE="TargetSearch")
-                }
+                            'maxInt',                    # max intensity
+                            columns)
+        assert_that(!is.null(out),
+                    msg=sprintf("Error processing file %s", my.files[i]))
         resInt[ out[[4]] + 1, i] <- out[[1]]
         resRI [ out[[4]] + 1, i] <- out[[2]]
         resRT [ out[[4]] + 1, i] <- out[[3]]

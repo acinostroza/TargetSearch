@@ -21,9 +21,9 @@
     assert_that(ncol(timeRange) == 2)
 
     ref <- cbind(mz=massValues, minRI=timeRange[,1], maxRI=timeRange[,2])
-    opt <- as.integer(get.file.format.opt(RIfile, ...))
-    result <- .Call(c_find_peaks, RIfile, as.integer(ref[,'mz']), NULL, ref[,'minRI'],
-                                  ref[,'maxRI'], opt, useRT, 1L)
+    result <- .c_find_peaks(RIfile, as.integer(ref[,'mz']), NULL, ref[,'minRI'],
+                                  ref[,'maxRI'], useRT, 1L, ...)
+    assert_that(!is.null(result), msg="An error occurred during processing")
     result <- cbind(RI=result[[2]], RT=result[[3]], Intensity=result[[1]],
                     mz=massValues[result[[4]] + 1])
     result

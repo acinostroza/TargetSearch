@@ -67,21 +67,17 @@ riMatrix <- function(samples, rim)
 	if(length(mass) == 1)
 		mass <- rep(mass, dim(rLimits)[1])
 
-	searchType <- pmatch("maxInt", c("all", "minRI", "maxInt"))
-
-	useRT <- TRUE
 	for (i in 1:length(ri.files)) {
-		opts <- get.file.format.opt(ri.files[i])
-		out  <- .Call(c_find_peaks,
+		out  <- .c_find_peaks(
 						as.character(ri.files[i]), # MyFile
 						as.integer(mass),          # Mass
 						NULL,                      # RI_exp
 						as.numeric(rLimits[,1]),   # RI_min
 						as.numeric(rLimits[,2]),   # RI_max
-						as.integer(opts),          # Options
-						useRT,                     # useRT
-						searchType,                # max intensity
-						PACKAGE="TargetSearch")
+						TRUE,                      # useRT
+						"maxInt",                  # max intensity
+						NULL)
+		assert_that(!is.null(out), msg=sprintf("Error processing `%s`", ri.files[i]))
 		RImat[out[[4]]+1,i] <- out[[3]]
 	}
 	RImat
