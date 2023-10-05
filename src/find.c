@@ -259,6 +259,7 @@ SEXP find_peaks(SEXP RI_file, SEXP Mass, SEXP RI_exp, SEXP RI_Min, SEXP RI_Max, 
 	SET_VECTOR_ELT(result, 3, I_Found);
 
 	free_point_list(res);
+	spectra_free(spectra);
 	UNPROTECT(5);
 	return result;
 }
