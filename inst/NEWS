@@ -1,3 +1,24 @@
+		CHANGES IN VERSION 2.4.0:
+NEW FEATURES
+
+   o	`plotPeakRI`: new option to plot by RT. This, however, needs the
+	parameter `dev` because the relationship between RI and RT is unknown.
+
+   o	`FindPeaksAll`: new option to search by RT. Basically this change
+	implements the functionality of `plotPeakRI`.
+
+   o	C code: refactor or most part of the code that deals with file parsing,
+	in particular the text parser. The parser is now based on regular
+	expressions, which should be more robust in detecting errors.
+
+   o	Tests: though is not relevant to the user, TargetSearch include more
+	unit testing for several internal functions.
+
+BUG FIXES
+
+   o	Add assertion that the option `TS_RI_columns` has three elements and
+	that it is a character or integer vector.
+
 		CHANGES IN VERSION 2.2.0:
 BUG FIXES
 
