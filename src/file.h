@@ -22,9 +22,6 @@ int write_txt(FILE *, spectra_t *, const char *);
 
 spectra_t * pktosp(double *, double *, int *, int *, int);
 
-void text_to_dat(char **, char **, int *, int *);
-void dat_to_text(char **, char **, int *, char **);
-
 /**
  * Function to parse and valide column options
  *
