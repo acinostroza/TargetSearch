@@ -12,7 +12,6 @@ typedef struct _spectrum spectrum_t;
 
 struct _spectra {
 	int n_scans;  /* number of scans */
-	int p_count;  /* point count */
 	int alloc;    /* size of allocated memory */
 	double *ri;
 	double *rt;
