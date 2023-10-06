@@ -135,9 +135,7 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 	cdfFile   <- CDFfiles(samples)[which.smp]
 	riFile    <- RIfiles(samples)[which.smp]
 
-	if(missing(rawpeaks))
-		rawpeaks <- peakCDFextraction(cdfFile, massRange)
-	if(is.null(rawpeaks))
+	if(missing(rawpeaks) || is.null(rawpeaks))
 		rawpeaks <- peakCDFextraction(cdfFile, massRange)
 	if(is.null(massRange)) {
 		if(!is.null(rawpeaks$massRange))
@@ -147,17 +145,22 @@ plotPeak <- function(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1, 
 	}
 
 	# code to transform from RI to RT
-	opt       <- get.file.format.opt(riFile)
-
-	if(opt[1] == 0) {
-        # retention index and retention time columns (only for text RI files)
-        ri_col <- opt[4] + 1
-        rt_col <- opt[5] + 1
-		tmp  <- read.delim(riFile, as.is = TRUE)
-		ri   <- rt2ri(rawpeaks$Time, tmp[, rt_col], tmp[, ri_col])
-	} else if(opt[1] == 1) {
-		tmp <- readRIBin(riFile)
-		ri  <- rt2ri(rawpeaks$Time, tmp$retTime, tmp$retIndex)
+	if(is.null(rawpeaks$Index)) {
+		ftype <- file_type(riFile)
+		if(ftype == 1) {
+			if(is.integer(cols <- get.columns.name()))
+				cols <- cols + 1
+			ri_col <- cols[2]
+			rt_col <- cols[3]
+			tmp  <- read.delim(riFile, as.is = TRUE)
+			ri   <- rt2ri(rawpeaks$Time, tmp[, rt_col], tmp[, ri_col])
+		} else if(ftype == 0) {
+			tmp <- readRIBin(riFile)
+			ri  <- rt2ri(rawpeaks$Time, tmp$retTime, tmp$retIndex)
+		} else {
+			stop('Unable to determine file type')
+		}
+		rawpeaks$Index <- ri
 	}
 
 	id <- as.character(which.met)
@@ -285,3 +288,5 @@ plotAllSpectra <- function(Lib, peaks, type = "ht", pdfFile, width = 8, height =
 	}
     invisible()
 }
+
+# vim: set ts=4 sw=4 noet:

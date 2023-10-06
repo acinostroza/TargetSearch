@@ -59,8 +59,7 @@
     assert_that(ncol(timeRange) == 2)
 
     ref <- cbind(mz=massValues, minRI=timeRange[,1], maxRI=timeRange[,2])
-    opt <- as.integer(get.file.format.opt(RIfile, ...))
-    .r_find_peaks(RIfile, ref, useRT, opt)
+    .r_find_peaks(RIfile, ref, useRT, ...)
 }
 
 #' R implementation of c_find_peaks, but only works on TXT files
@@ -68,10 +67,10 @@
 #' @param RIfile A path to a RI file format (text only)
 #' @param ref a three-column matrix with m/z, min RI and max RI to search
 #' @param useRT logical. if TRUE, search by RT, otherwise search by RI
-#' @param opt the output of a call to `get.file.format.opt`
+#' @param ... potentially pass the column options
 #' @return A four column matrix with columm names RI, RT, Intensity, mz.
 #'
-.r_find_peaks <- function(RIfile, ref, useRT, opt)
+.r_find_peaks <- function(RIfile, ref, useRT, ...)
 {
     search <- function(m, t_min, t_max) {
         t <- if(useRT) rt else ri
@@ -81,12 +80,14 @@
         mm <- if(any(n)) m else numeric(0)
         cbind(RI=ri[j][n], RT=rt[j][n], Intensity=x[n], mz=mm)
     }
-    assert_that(opt[1] == 0)
+
+    if(is.integer(cols <- get.columns.name(...)))
+        cols <- cols + 1
 
     z <- read.delim(RIfile)
-    sp <- Spectra( z[, opt[3] + 1] )
-    ri <- z[, opt[4] + 1]
-    rt <- z[, opt[5] + 1]
+    sp <- Spectra( z[, cols[1] ] )
+    ri <- z[, cols[2] ]
+    rt <- z[, cols[3] ]
     result <- mapply(search, ref[,'mz'], ref[,'minRI'], ref[,'maxRI'], SIMPLIFY=FALSE, USE.NAMES=FALSE)
     do.call('rbind', result)
 }

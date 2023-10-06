@@ -59,44 +59,6 @@ function(in.files, out.files=NULL, columns=NULL)
 	invisible(out.files)
 }
 
-# Function to guess the file type (binary or text)
-# get column indices (text file only)
-`get.columns` <-
-function(my.file, columns)
-{
-	columns <- get.columns.name(columns)
-	if(length(columns) != 3)
-		stop("Incorrect length of 'columns' argument. Should be exactly 3.")
-
-	if(is.character(columns)) {
-		header <- scan(my.file, what = "character", nlines = 1, quiet = TRUE)
-		tmp <- sapply(columns, function(x) which( header == x ))
-		if(length(unlist(tmp)) != length(columns))
-			stop("Column name not found. Check your RI file.")
-		columns <- unlist(tmp) - 1
-	}
-	return(columns)
-}
-
-# Checks automatically the file format and return a numeric vector
-#  - file type: 0 = TXT; 1 = DAT
-#  - swap: 0, 1 in little, big endian platforms
-#  - SPECTRUM column number (*)
-#  - RETENTION_TIME_INDEX column number (*)
-#  - RETENTION_TIME column number (*)
-#    (*) numbering starts from 0
-`get.file.format.opt` <-
-function(my.file, columns=NULL)
-{
-	x <- readBin(my.file, what="int", n=2, endian="little")
-	if(all(x == c(169603882,84919))) { # bin file signature
-		opt <- c(1, pmatch(.Platform$endian, c("little", "big")) - 1,0,0,0)
-	} else { # text format
-		opt <- c(0,0, get.columns(my.file, columns))
-	}
-	opt
-}
-
 # Read peak list in binary format using the R (not C) interface.
 # Args:
 #  - f: RI binary file name

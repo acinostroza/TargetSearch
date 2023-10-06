@@ -12,17 +12,17 @@ fixRIcorrection <- function(...) {
        fameTimes <- RImatrix[,i]
        if(!quiet)
            message(sprintf("Correcting File %s", ri.files[i]))
-       opt    <- get.file.format.opt(ri.files[i])
 
-       # retention index and retention time columns (only for text RI files)
-       ri_col <- opt[4] + 1
-       rt_col <- opt[5] + 1
+       ftype <- file_type(ri.files[i])
 
-       if(opt[1] == 0) {
-           tmp    <- read.delim(ri.files[i], as.is = TRUE)
+       if(ftype == 1) {
+           if(is.integer(cols <- get.columns.name()))
+               cols <- cols + 1
+           tmp  <- read.delim(ri.files[i], as.is = TRUE)
+           ri_col <- cols[2] ; rt_col <- cols[3]
            tmp[, ri_col] <- rt2ri(tmp[, rt_col], fameTimes, standard)
            write.table(tmp, file = ri.files[i], row.names = FALSE, sep="\t", quote=FALSE)
-       } else if(opt[1] == 1) {
+       } else if(ftype == 0) {
            z <- readRIBin(ri.files[i])
            z$retIndex <- rt2ri(z$retTime, fameTimes, standard)
            writeRIBin(z, ri.files[i])
