@@ -4,7 +4,7 @@
 \description{
     Plot selected ions in a given time range. This is the old plot peak interface.
     \emph{Note}: This function is considered \strong{deprecated} and its usage is
-    discouraged.
+    discouraged; users should use \code{\link{ncdf4_plot_peak}}.
 }
 \usage{
 plotPeakSimple(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE,
@@ -31,7 +31,10 @@ plotPeakSimple(rawpeaks, time.range, masses, cdfFile = NULL, useRI = FALSE,
     so we kept the old version and renamed it 'plotPeakSimple'.
 
     \emph{Important}: This function is considered \strong{deprecated}, though it is not yet labeled as such.
-    This function can still be used to plot peaks for CDF files version 3 without the need
+    Please consider using \code{\link{ncdf4_plot_peak}}. This function, however, needs CDF files
+    version 4.
+
+    That said, this function can still be used to plot peaks for CDF files version 3 without the need
     to convert them to CDF format 4.
 }
 \examples{
@@ -64,6 +67,6 @@ plotPeakSimple(rawpeaks, time.range = libRI(refLibrary)[3] + c(-2000,2000),
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{\code{\link{plotPeak}}, \code{\link{RIcorrect}}, \code{\linkS4class{tsMSdata}}, \code{\linkS4class{tsRim}},
-\code{\link{peakCDFextraction}}, \code{\link{matplot}} }
+\code{\link{peakCDFextraction}}, \code{\link{matplot}}, \code{\link{ncdf4_plot_peak}} for the new interface. }
 
 % vim: set ts=4 sw=4 et:

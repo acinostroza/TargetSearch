@@ -30,9 +30,13 @@ plotPeak(samples, Lib, metProf, rawpeaks, which.smp=1, which.met=1,
     format. See the documentation in function \code{\link{text2bin}}.
 }
 \value{
-  A two component list containing the retention time and the intensity matrices. This
-  list can be recycled as the 'rawpeaks' parameter for further plots (for example in a loop),
-  so the CDF file doesn't need to be read again.
+  The output is the same as the function \code{\link{peakCDFextraction}}, that is, a list
+  containing the retention time (\code{Time}), the intensity matrix (\code{Peaks}),
+  the retention index (\code{Index}), the m/z range (\code{massRange}), and a flag indicating
+  whether the chromatogram was baseline corrected (\code{baselineCorrected}).
+
+  The list can be recycled as the \code{rawpeaks} parameter for further plots (for example
+  in a loop), so the CDF file doesn't need to be read again.
 }
 \examples{
 require(TargetSearchData)
