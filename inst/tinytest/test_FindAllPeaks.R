@@ -19,6 +19,10 @@ x <- FindAllPeaks(smp, dev=2000, RI=271500, mz=m)
 y <- FindAllPeaks(smp, lib, 'GC.3')
 expect_equal(x, y)
 
+# check that integer types don't fail (bug in 2.4.0)
+expect_silent( FindAllPeaks(smp, dev=2000L, RI=271500L, mz=144L) )
+expect_silent( FindAllPeaks(smp, dev=2L, RT=261L, mz=144L) )
+
 # check searching by RT
 source('mock_functions.R')
 peak_search <- function(smp, dev, RT, mz) {

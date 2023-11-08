@@ -15,10 +15,11 @@
 `.c_find_peaks` <-
 function(file, mz, exp_ri, min_ri, max_ri, useRT, search, columns)
 {
+    ad <- function(x) if(!is.null(x)) as.double(x) else x
     columns <- get.columns.name(columns)
     search <- c(all=1L, minRI=2L, maxInt=3L)[ search ]
-    .Call(c_find_peaks, file, as.integer(mz), exp_ri, min_ri, max_ri, useRT,
-                        search, columns)
+    .Call(c_find_peaks, file, as.integer(mz), ad(exp_ri), ad(min_ri), ad(max_ri),
+                        useRT, search, columns)
 }
 
 # low level search of peaks in a RI file.
