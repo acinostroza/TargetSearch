@@ -1,3 +1,10 @@
+		CHANGES IN VERSION 2.4.1:
+BUG FIXES
+
+   o	An error is thrown if all paramaters passed to `FindAllPeaks` are
+	integers (a rare occurrence). Make sure that arguments are doubles
+	before passing them to the C interface. Also add a test for it.
+
 		CHANGES IN VERSION 2.4.0:
 NEW FEATURES
 
