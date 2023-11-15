@@ -402,7 +402,7 @@ SEXP convert_ri_file(SEXP IN, SEXP OUT, SEXP Type, SEXP Columns, SEXP Header)
 	FILE *fin = NULL, *fout = NULL;
 	int type = INTEGER_VALUE(Type);
 	const char *header = CHARACTER_VALUE(Header);
-	struct column_s c;
+	struct column_s c = {NULL, NULL, NULL, NULL};
 	int swap = endianness();
 	int ret = 0;
 	spectra_t * sp = NULL;
