@@ -15,11 +15,12 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
 
     # extract addictonal information
     addiData  <- libData(Lib)
-    addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData), value=TRUE, perl=TRUE, invert=TRUE)
+    addiNames <- grep("^(Name|RI|Win_\\d*|SPECTRUM|TOP_MASS)$", colnames(addiData),
+                      value=TRUE, perl=TRUE, invert=TRUE)
 
     searchData <- data.frame(matrix(ncol=7,nrow=length(Lib)))
-    colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_Count_per_Mass", "Masses",
-        "RI", "Score_all_masses", "Score_cor_masses")
+    colnames(searchData) <- c("Mass_count", "Non_consecutive_Mass_count", "Sample_Count_per_Mass",
+                              "Masses", "RI", "Score_all_masses", "Score_cor_masses")
 
     medInt <- matrix(ncol=length(my.files),nrow=length(Lib))
     colnames(medInt) <- my.names

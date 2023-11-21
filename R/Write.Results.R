@@ -45,10 +45,10 @@ function(Lib, metabProfile,
     Out <- data.frame(libId=libIndex, Name= Name, Lib_RI=libRI, Mass = mass,
          med_RI, IS_SEL = is_sel, IS_COR=is_cor)
 
-    write.table( data.frame(Out, metPrf$Intensity, row.names = NULL,
-            check.names = FALSE), file = file.peak.int, sep = "\t", quote = FALSE, row.names = FALSE)
-    write.table( data.frame(Out, metPrf$RI, row.names = NULL,
-            check.names = FALSE), file = file.peak.ri, sep = "\t", quote = FALSE, row.names = FALSE)
+    write.table( data.frame(Out, metPrf$Intensity, row.names = NULL, check.names = FALSE),
+                file = file.peak.int, sep = "\t", quote = FALSE, row.names = FALSE)
+    write.table( data.frame(Out, metPrf$RI, row.names = NULL, check.names = FALSE),
+                file = file.peak.ri, sep = "\t", quote = FALSE, row.names = FALSE)
     options(opt)
     invisible()
 }

@@ -122,7 +122,8 @@ windowingStep <- function(x, n, wm) {
 #'   algorithm does not compute the estimate in each single scan, but in intervals of `steps`
 #'   steps. The intermediate points are estimated by simple linear regression.
 #' @return a netCDF object list or a baseline corrected matrix
-baselineCorrectionQuant <- function(peaks, time, smooth=0, qntl=0.50, width=30, unit=c("seconds", "points"), steps=10)
+baselineCorrectionQuant <- function(peaks, time, smooth=0, qntl=0.50, width=30,
+                                    unit=c("seconds", "points"), steps=10)
 {
     bslinefun <- function(x, ...) .Call(c_baseline, x, ...)
 

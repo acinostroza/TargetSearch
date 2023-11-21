@@ -1,7 +1,9 @@
 `ImportFameSettings` <-
 function(tmp.file=NA, mass = NA, ...) {
   ## next line specifies the correct RI-value's of your marker metabolites
-  rim.perfect <- c(262320, 323120, 381020, 487220, 582620, 668720, 747420, 819620, 886620, 948820, 1006900, 1061700, 1113100)
+  rim.perfect <- c(262320, 323120, 381020, 487220, 582620, 668720, 747420,
+                   819620, 886620, 948820, 1006900, 1061700, 1113100)
+
   ## here you set up the search frames for these markers (in seconds)
   ## if you specify a path for 'tmp.file' you can load settings from a tab-delimited file
   if (is.na(tmp.file)) {

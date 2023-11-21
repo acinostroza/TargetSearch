@@ -58,8 +58,9 @@ function(samples, Lib, libID, dev=NULL, mz=NULL, RI=NULL, RT=NULL,
     if(is.null(main)) {
         main <- sprintf("%s (%s) (%d)", libName(Lib)[libID], names(libName(Lib)[libID]), mz)
     }
-    baseplot(pk[, 'fid'], pk[, RItime], log10(pk[, 'Int']), pk[, RTtime], best, main, RIexp=RI, RTexp=RT,
-             nSamp=length(samples), col=col, int_range=int_range, cex_range=cex_range, key_width=key_width)
+    baseplot(pk[, 'fid'], pk[, RItime], log10(pk[, 'Int']), pk[, RTtime], best, main,
+             RIexp=RI, RTexp=RT, nSamp=length(samples), col=col, int_range=int_range,
+             cex_range=cex_range, key_width=key_width)
     return(invisible(tmp))
 }
 

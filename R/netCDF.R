@@ -107,7 +107,8 @@
 #'   extension is not \code{.cdf}, then \code{.nc4} is just appended. If the path to
 #'   the file does not exist, it will be created automatically.
 #' @param force Logical. Set to \code{TRUE} to allow file overwrites, for example
-#'   if the destination file still exists, in which case a warning is thrown. Default to \code{FALSE}.
+#'   if the destination file still exists, in which case a warning is thrown.
+#'   Default to \code{FALSE}.
 #' @param baseline Logical. Whether or not baseline correct the input file.
 #' @param \dots extra options passed to [baseline()].
 #'
@@ -190,7 +191,8 @@ function(cdf, retTime, Peaks, massRange, retIndex=NULL, baseline=FALSE, chunksiz
 	range_dim <- ncdim_def('range', '', 1:2, create_dimvar=FALSE)
 
 	# define variables
-	int_var <- ncvar_def('intensity', 'count', list(time_dim, mass_dim), prec='integer', compression=1, chunksizes=chunksizes)
+	int_var <- ncvar_def('intensity', 'count', list(time_dim, mass_dim), prec='integer',
+                         compression=1, chunksizes=chunksizes)
 	RT_var  <- ncvar_def('retention_time', 'second', time_dim, prec='double', compression=1)
 	RI_var  <- ncvar_def('retention_index', 'unit',  time_dim, prec='double', compression=1)
 	mr_var  <- ncvar_def('mass_range', 'mz', range_dim, prec='integer')
@@ -456,7 +458,8 @@ function(cdfFile, massValues, timeRange, useRT=FALSE)
             if(x < MR[1] | x > MR[2])
                 numeric(length(index))
             else
-                ncvar_get(nc, 'intensity', start=c(index[1], x - MR[1] + 1), count=c(length(index), 1))
+                ncvar_get(nc, 'intensity', start=c(index[1], x - MR[1] + 1),
+                                           count=c(length(index), 1))
         })
 
         if(!is.matrix(z))

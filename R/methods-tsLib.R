@@ -272,7 +272,8 @@ setMethod("initialize",
     names(lib@topMass) <- names(lib@quantMass) <- names(lib@spectra) <- id
 
     # remove extra columns from dat
-    k <- setdiff(colnames(dat), c("Win_1", "Win_2", "Win_3", "SEL_MASS", "TOP_MASS", "SPECTRUM", "QUANT_MASS"))
+    extra <- c("Win_1", "Win_2", "Win_3", "SEL_MASS", "TOP_MASS", "SPECTRUM", "QUANT_MASS")
+    k <- setdiff(colnames(dat), extra)
     dat <- dat[, k,drop=FALSE]
 
     lib@libData <- dat
@@ -291,7 +292,8 @@ setMethod("initialize",
         }
     }
     else {
-        stop(sprintf("\nMultiple colnames match 'libID'. Expecting exactly one match. Please rename/remove the extra columns"))
+        stop("Multiple colnames match 'libID'. Expecting exactly one match. ",
+             "Please rename/remove the extra columns")
     }
     id <- make.names(lib$libID, TRUE)
     if(any(id != lib$libID))

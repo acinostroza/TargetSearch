@@ -140,7 +140,8 @@ setMethod("c", "tsSample",
     function(x, ..., recursive=FALSE)
     {
         assert_that(is.flag(recursive), !recursive,
-                    msg="\"c\" method for `tsSample` objects does not support the 'recursive' option")
+                    msg=paste("`c` method for `tsSample` objects does not support",
+                              "the 'recursive' option,"))
 
         z <- list(...)
         if(length(z) == 0)
@@ -178,7 +179,7 @@ setMethod("initialize",
                 days <- rep(days, length(CDFfiles))
 
             if(missing(data))
-                data <- data.frame(SAMPLE_NAME = Names, stringsAsFactors = FALSE, row.names = Names)
+                data <- data.frame(SAMPLE_NAME=Names, stringsAsFactors=FALSE, row.names=Names)
             else
                 rownames(data) <- Names
 

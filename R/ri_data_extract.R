@@ -88,8 +88,8 @@
     sp <- Spectra( z[, cols[1] ] )
     ri <- z[, cols[2] ]
     rt <- z[, cols[3] ]
-    result <- mapply(search, ref[,'mz'], ref[,'minRI'], ref[,'maxRI'], SIMPLIFY=FALSE, USE.NAMES=FALSE)
-    do.call('rbind', result)
+    rs <- mapply(search, ref[,'mz'], ref[,'minRI'], ref[,'maxRI'], SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    do.call('rbind', rs)
 }
 
 # vim: set ts=4 sw=4 et:
