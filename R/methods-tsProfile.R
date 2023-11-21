@@ -54,28 +54,32 @@ setMethod("show", "tsMSdata", function(object) {
 })
 
 validMSdataObject <- function(object) {
+    # get lengths of objects
     nri <- length(object@RI)
     nrt <- length(object@RT)
     nin <- length(object@Intensity)
+
+    # get number of samples per component
+    nc.ri <- sapply(object@RI, ncol)
+    nc.in <- sapply(object@Intensity, ncol)
+    nc.rt <- sapply(object@RT, ncol)
+
     if(nri != nin)
-        return(paste("Unequal number of RIs and Intensities: ", nri,", ", nin, sep = ""))
+        return(sprintf("Unequal number of `RI` (%d) and `Intensity` (%d) components.", nri, nin))
+
+    if(nri != nrt)
+        return(sprintf("Unequal number of `RI` (%d) and `RT` (%d) components.", nri, nrt))
 
     # check that all the column numbers are the same
-    nc.ri <- sapply(object@RI, ncol)
-    if(!all(nc.ri == nc.ri[1]))
-        return(paste("Some elements of the RI slot have different number of samples"))
-    nc.in <- sapply(object@Intensity, ncol)
-    if(!all(nc.in == nc.in[1]))
-        return(paste("Some elements of the Intensity slot have different number of samples"))
+    if(any(nc.ri != nc.ri[1]))
+        return("Some elements of the `RI` slot have different number of samples.")
 
-    # check RT slot
-    if(nrt > 0) {
-        if(nri != nrt)
-            return(paste("Unequal number of RIs and RTs: ", nri,", ", nrt, sep = ""))
-        nc.rt <- sapply(object@RT, ncol)
-        if(!all(nc.rt == nc.rt[1]))
-            return(paste("Some elements of the RT slot have different number of samples"))
-    }
+    if(any(nc.in != nc.in[1]) || (nc.in[1] != nc.ri[1]))
+        return("Some elements of the `Intensity` slot have different number of samples.")
+
+    if(any(nc.rt != nc.rt[1]) || (nc.rt[1] != nc.ri[1]))
+        return("Some elements of the `RT` slot have different number of samples.")
+
     TRUE
 }
 
@@ -121,18 +125,27 @@ setValidity("tsProfile", function(object) {
     validMSdataObject(object)
     n <- length(object@RI)
     s <- sapply(object@RI, ncol)[1]
-    if(any(dim(object@profRI)!=c(n,s)))
-        paste("Unequal dimensions of 'profRI' slot.", dim(object@profRI)[1],", ", dim(object@profRI)[2], sep = "")
-    if(any(dim(object@profInt)!=c(n,s)))
-        paste("Unequal dimensions of 'profInt' slot.", dim(object@profInt)[1],", ", dim(object@profInt)[2], sep = "")
-    if(nrow(object@info)!=n)
-        paste("Unequal number of row of 'info' slot.", nrow(object@info), sep="")
-    if(any(dim(object@profRI) > 0) & any(dim(object@profRI)!=c(n,s)))
-        paste("Unequal dimensions of 'profRT' slot.", dim(object@profRT)[1],", ", dim(object@profRT)[2], sep = "")
-     else  TRUE
-})
 
-    
+    if( (nr <- nrow(object@profRI)) != n )
+        paste0("Invalid number of rows in slot `profRI`. Found ", nr, ", expected ", n, ".")
+    else if( (nc <- ncol(object@profRI)) != s )
+        paste0("Invalid number of columns in slot `profRI`. Found ", nc, ", expected ", s, ".")
+
+    else if( (nr <- nrow(object@profRT)) != n )
+        paste0("Invalid number of rows in slot `profRT`. Found ", nr, ", expected ", n, ".")
+    else if( (nc <- ncol(object@profRT)) != s )
+        paste0("Invalid number of columns in slot `profRT`. Found ", nc, ", expected ", s, ".")
+
+    else if( (nr <- nrow(object@profInt)) != n )
+        paste0("Invalid number of rows in slot `profInt`. Found ", nr, ", expected ", n, ".")
+    else if( (nc <- ncol(object@profInt)) != s )
+        paste0("Invalid number of columns in slot `profInt`. Found ", nc, ", expected ", s, ".")
+
+    else if( (nr <- nrow(object@info)) != n )
+        paste0("Invalid number of rows in slot `info`. Found ", nr, ", expected ", n, ".")
+    else
+        TRUE
+})
 
 setGeneric("as.list.tsProfile", function(x, ...) standardGeneric("as.list.tsProfile"))
 setMethod("as.list.tsProfile", "tsMSdata", function(x, ...) as.list.tsMSdata(x))

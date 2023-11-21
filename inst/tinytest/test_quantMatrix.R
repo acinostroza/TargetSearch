@@ -34,11 +34,12 @@ mk_prof <- function(lib, nsamp=7) {
     pkdata <- new('tsMSdata', Intensity=Int, RI=Int, RT=Int)
     cormass <- vapply(topMass(lib), mk_cormass, "")
     nfo <- cbind(libData(lib), Masses=cormass)
-    prof <- new('tsProfile', pkdata, info=nfo)
+    z <- t( vapply(Int, colMeans, numeric(nsamp), na.rm=TRUE) )
+    prof <- new('tsProfile', pkdata, info=nfo, profRT=z, profRI=z, profInt=z)
 }
 
-lib <- mk_lib(10)
-prof <- mk_prof(lib)
+expect_silent(lib <- mk_lib(10))
+expect_silent(prof <- mk_prof(lib))
 expect_true(validObject(lib))
 expect_true(validObject(prof))
 
