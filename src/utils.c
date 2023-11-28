@@ -315,6 +315,8 @@ int binsearch(double *x, double y, int n)
 	int imin = 0, imax = n, i = n / 2;
 	if(n <= 0 || y <= x[0])
 		return 0;
+	if(y > x[n - 1])
+		return n;
 
 	while(imax - imin > 1) {
 		if(x[i] == y)
