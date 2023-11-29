@@ -139,6 +139,8 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 }
 
 Top.Masses <- function(sp, TopMasses, ExcludeMasses = NULL) {
+    if(is.null(sp) || length(sp) == 0)
+        return(numeric(0))
 	m <- sp[order(sp[,2], decreasing = TRUE),1]
 	if(!missing(ExcludeMasses) & !is.null(ExcludeMasses)) {
 			if(!is.numeric(ExcludeMasses))

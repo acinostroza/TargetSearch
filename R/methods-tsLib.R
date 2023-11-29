@@ -33,7 +33,6 @@ setMethod("medRI", "tsLib", function(obj) obj@medRI)
 setGeneric("medRI<-", function(obj, value) standardGeneric("medRI<-"))
 setReplaceMethod("medRI", "tsLib", function(obj, value) { obj@medRI <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 setMethod("length", "tsLib", function(x) length(x@medRI))
@@ -43,7 +42,6 @@ setMethod("selMass", "tsLib", function(obj) obj@selMass)
 setGeneric("selMass<-", function(obj, value) standardGeneric("selMass<-"))
 setReplaceMethod("selMass", "tsLib", function(obj, value) { obj@selMass <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 
@@ -52,7 +50,6 @@ setMethod("topMass", "tsLib", function(obj) obj@topMass)
 setGeneric("topMass<-", function(obj, value) standardGeneric("topMass<-"))
 setReplaceMethod("topMass", "tsLib", function(obj, value) { obj@topMass <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 setGeneric("quantMass", function(obj) standardGeneric("quantMass"))
@@ -60,24 +57,27 @@ setMethod("quantMass", "tsLib", function(obj) obj@quantMass)
 setGeneric("quantMass<-", function(obj, value) standardGeneric("quantMass<-"))
 setReplaceMethod("quantMass", "tsLib", function(obj, value) { obj@quantMass <- as.numeric(value)
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 
 setGeneric("spectra", function(obj) standardGeneric("spectra"))
 setMethod("spectra", "tsLib", function(obj) obj@spectra)
 setGeneric("spectra<-", function(obj, value) standardGeneric("spectra<-"))
-setReplaceMethod("spectra", "tsLib", function(obj, value) { obj@spectra <- value
- obj <- .setLibrary(obj)
- validObject(obj)
- obj })
+setReplaceMethod("spectra", "tsLib", function(obj, value) {
+    if(is.null(value) || length(value) == 0)
+        obj@spectra <- vector("list", length(obj))
+    else if(is.list(value) && length(obj) == length(value))
+        obj@spectra <- value
+    else
+        stop("Invalid value. `spectra` must be a ", length(obj), "-list of matrices.")
+    .setLibrary(obj)
+})
 
 setGeneric("libName", function(obj) standardGeneric("libName"))
 setMethod("libName", "tsLib", function(obj) obj@Name)
 setGeneric("libName<-", function(obj, value) standardGeneric("libName<-"))
 setReplaceMethod("libName", "tsLib", function(obj, value) { obj@Name <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 setGeneric("libRI", function(obj) standardGeneric("libRI"))
@@ -85,7 +85,6 @@ setMethod("libRI", "tsLib", function(obj) obj@RI)
 setGeneric("libRI<-", function(obj, value) standardGeneric("libRI<-"))
 setReplaceMethod("libRI", "tsLib", function(obj, value) { obj@RI <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj })
 
 setGeneric("libData", function(obj) standardGeneric("libData"))
@@ -94,7 +93,6 @@ setGeneric("libData<-", function(obj, value) standardGeneric("libData<-"))
 setReplaceMethod("libData", "tsLib", function(obj, value) {
 	obj@libData <- value
 	obj <- .setLibrary(obj)
-	validObject(obj)
 	obj
 })
 
@@ -105,7 +103,6 @@ setGeneric("RIdev<-", function(obj, value) standardGeneric("RIdev<-"))
 setReplaceMethod("RIdev", "tsLib", function(obj, value) {
  obj@RIdev <- value
  obj <- .setLibrary(obj)
- validObject(obj)
  obj
 })
 
@@ -131,6 +128,11 @@ setMethod("[", "tsLib", function(x, i, j, ..., drop) {
 })
 
 setValidity("tsLib", function(object) {
+    check_spectra <- function(spectra) {
+        check <- function(x)
+            (is.null(x)) || (length(x) == 0) || (is.numeric(x) && is.matrix(x) && (ncol(x) == 2))
+        all(sapply(spectra, check))
+    }
 	n <- length(object@Name)
 	if(length(object@RI) != n)
 		paste("Unequal number of Names and RI: ", n,", ", length(object@RI), sep = "")
@@ -150,6 +152,8 @@ setValidity("tsLib", function(object) {
 		paste("Unequal number of Names and spectra: ", n,", ", length(object@spectra), sep = "")
 	else if(nrow(object@libData) != n)
 		paste("Unequal number of Names and libData: ", n,", ", nrow(object@libData), sep = "")
+    else if(!check_spectra(object@spectra))
+        paste("Detected invalid elements in `spectra`. Expecting a list of two-column matrices.")
 	else TRUE
 })
 

@@ -34,3 +34,10 @@ expect_equal(medRI(x), medRI(lib))
 expect_equal(RIdev(x), RIdev(lib))
 expect_equal(spectra(x), spectra(lib))
 expect_equal(quantMass(x), quantMass(lib))
+
+# test spectra assignment methods
+expect_error(spectra(lib) <- list(1,2, 3, 4))
+expect_silent(spectra(lib) <- list())
+expect_silent(spectra(lib) <- NULL)
+expect_silent(spectra(lib) <- sp)
+expect_silent(spectra(lib)[[2]] <- numeric(0))
