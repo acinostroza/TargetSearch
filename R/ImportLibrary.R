@@ -151,20 +151,23 @@ Top.Masses <- function(sp, TopMasses, ExcludeMasses = NULL) {
 	m[1:min(length(m), TopMasses)]
 }
 
-Spectra <- function(x) {
-	# check spectra format
-	if(any(is.na(x))) stop("Error: Invalid spectrum format.")
-	if(length(grep("[^0-9 :]", x))) stop("Error: Invalid spectrum format.")
+Spectra <- function(spectrum)
+{
+    # check spectra format
+    assert_that(is.character(spectrum))
+    if(any(k <- grepl("[^0-9 :;]", spectrum)))
+        stop("Error: Invalid characters in entry #", which(k)[1], ": '", spectrum[k][1], "'")
 
-	# remove extra spaces
-	x <- gsub(" +", " ", x)
-	x <- sub("^ ","", x)
-	x <- sub(" $","", x)
-
-	y <- strsplit(as.character(x), " +")
-	z <- sapply(y, function(x) unlist(strsplit(x, ":")), simplify=FALSE)
-	z <- sapply(z, function(x) matrix(as.numeric(x), ncol=2, byrow=TRUE), simplify=FALSE)
-	return(z)
+    spectrum[is.na(spectrum)] <- ''
+    spectrum <- gsub("[:;]", " ", spectrum)
+    y <- lapply(strsplit(spectrum, " +"), function(z) as.numeric(z[z != ""]))
+    makemat <- function(x) {
+        n <- length(x)
+        n <- n - (n %% 2)
+        if(n > 0) matrix(x[seq(n)], ncol=2, byrow=TRUE) else numeric(0)
+    }
+    z <- sapply(y, makemat, simplify=FALSE)
+    return(z)
 }
 
 # function to read a msp file. Returns a list where every component represent

@@ -76,8 +76,8 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
         with semicolons.
     \item \code{Win_k} - The RI windows, k = 1,2,3. Mass search is performed in three
         steps. A RI window required for each one of them.
-    \item \code{SPECTRUM} - The metabolite spectrum. m/z and intensity are separated by
-        spaces and colons.
+    \item \code{SPECTRUM} - The metabolite spectrum. \emph{m/z} and intensity values
+        are separated by spaces, colons or semicolons (see notes on the format below).
     \item \code{QUANT_MASS} - A list of masses that might be used for quantification.
     One value per metabolite and it must be one of the selective masses. (optional)
     }
@@ -89,6 +89,16 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     used only when masses are obtained from the spectra.
     The parameter \code{RI_dev} can be used to set the RI windows.
     Note that in this case, all metabolites would have the same RI windows.
+
+    The \code{SPECTRUM} format can be a list of \emph{m/z}-intensity pairs separated
+    by colons: \code{85:8 86:13 87:5 88:4 ...}, or similar to the MSP spectrum format (shown
+    below): \code{85 8; 86 13; 87 5; 88 4; ...}. The internal parser is \strong{not} strict,
+    so even a list of integers separated by spaces is allowed, for example,
+    \code{86 8 86 13 ...}. The only restriction is that the number of integers is even,
+    otherwise the input is truncated. If the spectrum is not available for some analytes,
+    simply leave the respective cell empty or use \code{NA}. \strong{Note:} Only
+    digits(0-9), spaces, colons(:) and semicolons(;) are allowed in this column; the
+    presence of other characters will generate and error, unless it is \code{NA}.
 
     A unique identifier may be provided as well (\code{libID}). This could be a
     external database identifier. If it is not provided, a random identifier will be created
@@ -152,4 +162,3 @@ RIdev(refLibrary)[3,] <- c(3000,1500,150)
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{ \code{\link{ImportSamples}}, \code{\linkS4class{tsLib}} }
-
