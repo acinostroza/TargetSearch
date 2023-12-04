@@ -1,3 +1,14 @@
+		CHANGES IN VERSION 2.4.2:
+BUG FIXES
+
+   o	Fix `maybe-uninitialized` warning in some platforms. Set the struct
+	elements to `NULL`.
+
+   o	Fix RI files format incompatibility (affected versions: 2.4.0 and .1).
+	Starting from 2.4.0, these files allow for empty spectra data, but
+	older version raise an error. Therefore, we enforce non empty
+	spectra data to keep compatibility.
+
 		CHANGES IN VERSION 2.4.1:
 BUG FIXES
 
