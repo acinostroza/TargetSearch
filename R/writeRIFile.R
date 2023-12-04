@@ -35,7 +35,28 @@ function(outFile, Peaks, riInde, massRange, ftype=c("binary", "text"))
     assert_that(length(riInde) == nrow(Peaks$Peaks))
     assert_that(length(riInde) == length(Peaks$Time))
 
-    ret <- .Call(c_write_peaks, outFile, Peaks$Time, riInde,
-               as.integer(Peaks$Peaks), as.integer(massRange), op$type, op$head)
+    peaks <- .remove_empty(Peaks$Time, riInde, Peaks$Peaks)
+    ret <- .Call(c_write_peaks, outFile, peaks$retTime, peaks$retIndex,
+               as.integer(peaks$Peaks), as.integer(massRange), op$type, op$head)
     invisible(ret == 0)
+}
+
+#' Remove empty rows before writing
+#'
+#' RI corrected "dat" files generated with TS >= 2.4 are incompatible with
+#' earlier TS versions, so we have to remove the empty rows (spectrum  with no
+#' peaks) before writing to a file to make them compatible. From TS >= 2.4
+#' empty spectra are allowed.
+#'
+#' @param retTime the retention time (numeric vector)
+#' @param retIndex the retention time index (numeric vector)
+#' @param Peaks matrix of intensities
+#' @return a named list: 'retTime', 'retIndex', 'Peaks' with filtered data
+#' @note the function does not do checks as this is (should be) called only
+#'       from `writeRIFile`.
+`.remove_empty` <-
+function(retTime, retIndex, Peaks)
+{
+    k <- which(rowSums(Peaks) > 0)
+    list(retTime=retTime[k], retIndex=retIndex[k], Peaks=Peaks[k,,drop=FALSE])
 }
