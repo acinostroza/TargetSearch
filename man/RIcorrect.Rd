@@ -28,7 +28,7 @@ RIcorrect(samples, rimLimits = NULL, massRange=NULL, Window, IntThreshold,
     \item{writeCDF4path}{Whether or not convert a CDF-3 into a CDF-4. It can
         take a logical value or a character vector representing file paths.
         See details below.}
-  \item{\dots}{A list of options passed to \code{\link{baseline}}}.
+  \item{\dots}{A list of options passed to \code{\link{baseline}}.}
 }
 \details{
 	There are three pick picking methods available: "ppc", "smoothing", "gaussian".
