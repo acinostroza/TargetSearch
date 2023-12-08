@@ -3,14 +3,36 @@ useDynLib(TargetSearch, .registration = TRUE, .fixes = "c_")
 import("methods")
 import("stats")
 
-importFrom("graphics", "abline", "axis", "box", "boxplot", "grid", "image",
-           "layout", "lcm",  "legend", "matlines", "matplot", "mtext",
-           "par", "plot.new", "points", "rect", "text", "title")
+importFrom("graphics",
+	"abline",
+	"axis",
+	"box",
+	"boxplot",
+	"grid",
+	"image",
+	"layout",
+	"lcm",
+	"legend",
+	"matlines",
+	"matplot",
+	"mtext",
+	"par",
+	"plot.new",
+	"points",
+	"rect",
+	"text",
+	"title"
+)
 
 importFrom("grDevices", "colorRamp", "dev.off", "pdf", "gray", "rgb")
 
-importFrom("utils", "head", "read.delim", "setTxtProgressBar", "txtProgressBar",
-           "write.table")
+importFrom("utils",
+	"head",
+	"read.delim",
+	"setTxtProgressBar",
+	"txtProgressBar",
+	"write.table"
+)
 
 importFrom("ncdf4", "nc_open", "nc_close", "ncvar_get", "ncvar_put",
            "ncatt_get", "ncatt_put", "ncdim_def", "ncvar_def", "nc_create")
@@ -92,54 +114,53 @@ S3method("as.list", "tsMSdata")
 S3method("as.list", "tsProfile")
 
 export(
-	"checkRimLim",
-	"FAMEoutliers",
-	"FindPeaks",
-	"FindAllPeaks",
-	"medianRILib",
-	"Profile",
-	"sampleRI",
-	"ImportLibrary",
-	"ImportLibrary.tab",
-	"ImportLibrary.msp",
-	"ImportSamples",
-	"ImportSamplesFromDir",
-	"ImportFameSettings",
-	"NetCDFPeakFinding",
-	"peakCDFextraction",
-	"peakFind",
-	"plotFAME",
-	"plotRIdev",
-	"plotAllRIdev",
-	"plotPeakSimple",
-	"plotPeak",
-	"plotSpectra",
-	"plotPeakRI",
-	"plotAllSpectra",
-	"quantMatrix",
-	"ProfileCleanUp",
-	"RIcorrect",
-	"rt2ri",
-	"ri2rt",
-	"Write.Results",
-	"writeMSP",
 	"baseline",
 	"baselineCorrection",
 	"baselineCorrectionQuant",
-	"fixRIcorrection",
-	"TargetSearchGUI",
-	"writeLibText",
 	"bin2text",
-	"text2bin",
+	"checkRimLim",
+	"FAMEoutliers",
+	"FindAllPeaks",
+	"FindPeaks",
+	"fixRI",
+	"fixRIcorrection",
+	"ImportFameSettings",
+	"ImportLibrary",
+	"ImportLibrary.msp",
+	"ImportLibrary.tab",
+	"ImportSamples",
+	"ImportSamplesFromDir",
+	"medianRILib",
+	"ncdf4_convert",
+	"ncdf4_convert_from_path",
+	"ncdf4_data_extract",
+	"ncdf4_plot_peak",
+	"ncdf4_update_ri",
+	"NetCDFPeakFinding",
+	"peakCDFextraction",
+	"peakFind",
+	"plotAllRIdev",
+	"plotAllSpectra",
+	"plotFAME",
+	"plotPeak",
+	"plotPeakRI",
+	"plotPeakSimple",
+	"plotRIdev",
+	"plotSpectra",
+	"Profile",
+	"ProfileCleanUp",
+	"quantMatrix",
+	"ri2rt",
+	"RIcorrect",
 	"riMatrix",
-	"fixRI"
+	"ri_data_extract",
+	"ri_plot_peak",
+	"rt2ri",
+	"sampleRI",
+	"TargetSearchGUI",
+	"text2bin",
+	"updateRI",
+	"Write.Results",
+	"writeLibText",
+	"writeMSP"
 )
-
-export(ncdf4_convert)
-export(ncdf4_convert_from_path)
-export(ncdf4_data_extract)
-export(ncdf4_update_ri)
-export(ncdf4_plot_peak)
-export(updateRI)
-export(ri_data_extract)
-export(ri_plot_peak)
