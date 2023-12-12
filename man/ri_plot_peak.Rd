@@ -45,7 +45,7 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
     Because the styles can be applied per sample or per \emph{m/z} value, it is possible
     to prefix a \sQuote{s} to those parameters to specify that the style applies to samples and
     no masses. The available parameters are \code{scol}, \code{spch}, \code{sbg} and \code{scex}.
-    See examples below.
+    See examples and also the notes below.
 
     The parameter \code{sizefun} is a function that takes a numeric vector as input and
     returns a positive value which correspond to the point size (parameter \code{cex}).
@@ -74,6 +74,11 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
 \note{
     This function is intended for advanced users and for debugging purposes when \code{\link{TargetSearch}}
     fails to detect a peak.
+
+    Not all graphical parameters passed by \code{\dots} will work, in particular
+    \code{panel.first} and \code{panel.last} are known to \emph{not} work.
+    Therefore, for more personalized plots, it is recommended to set \code{plot=FALSE}
+    and use the returned data for plotting.
 }
 \seealso{
     \code{\link{plotPeakRI}},

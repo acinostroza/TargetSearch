@@ -62,6 +62,11 @@ ncdf4_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, plot =
     This function is only for CDF-4 files. Use the method \code{\link{ncdf4Convert}} or the function
     \code{\link{ncdf4_convert}} for conversion of CDF-3 files. You may also use function
     \code{\link{plotPeakSimple}} if you don't want to convert the files.
+
+    Not all graphical parameters passed by \code{\dots} will work, in particular
+    \code{panel.first} and \code{panel.last} are known to \emph{not} work.
+    Therefore, for more personalized plots, it is recommended to set \code{plot=FALSE}
+    and use the returned data for plotting.
 }
 \examples{
 
