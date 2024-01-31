@@ -20,3 +20,19 @@ write.table(cbind(lim, std, mass), file=rimfile, sep="\t")
 
 expect_silent(x <- ImportFameSettings(rimfile))
 expect_equal(rimMass(x),rep(mass, length(std)))
+
+# test ImportFameSettings (new function)
+
+write.table(lim, file=rimfile, sep="\t")
+expect_silent(x <- ImportFameSettings(rimfile, mass=mass, standard=std))
+
+# this should fail
+expect_error(x <- ImportFameSettings(rimfile, mass=mass))
+expect_error(x <- ImportFameSettings(rimfile, mass=mass, standard=std, colnames=TRUE))
+
+colnames(lim) <- c('lowerlimit', 'upperlimit')
+expect_silent(x <- ImportFameSettings(lim, mass=mass, standard=std, colnames=TRUE))
+
+lim <- cbind(lim, ristandard=std, mass=mass)
+expect_silent(x <- ImportFameSettings(lim, mass=mass, standard=std, colnames=FALSE))
+expect_silent(x <- ImportFameSettings(lim, mass=mass, standard=std, colnames=TRUE))
