@@ -22,15 +22,15 @@ setReplaceMethod("rimStandard", "tsRim", function(obj, value) { obj@standard <- 
  obj })
 
 setValidity("tsRim", function(object) {
-	if(ncol(object@limits) != 2)
-		paste("Number of columns of limits it is not equal to 2")
-	else if(nrow(object@limits) != length(object@standard))
-		paste("Unequal number of standards and limits: ", length(object@standard),
-			", ", nrow(object@limits), sep = "")
-	else if(length(object@mass) != 1 & length(object@mass) != length(object@standard))
-		paste("Unequal number of standards and mass markers: ", length(object@standard),
-		", ", length(object@mass), sep = "")
-	else TRUE
+    if(ncol(object@limits) != 2)
+        sprintf("Number of columns of limits (%d) it's not equal to 2.", ncol(object@limits))
+    else if(nrow(object@limits) != length(object@standard))
+        sprintf("Unequal number of standards (%d) and limits (%d)",
+                length(object@standard), nrow(object@limits))
+    else if(length(object@mass) != 1 && length(object@mass) != length(object@standard))
+        sprintf("Unequal number of standards (%d) and mass markers (%d)",
+                length(object@standard), length(object@mass))
+    else TRUE
 })
 
 setMethod("[", "tsRim",
@@ -86,5 +86,20 @@ setMethod("c", "tsRim",
 )
 
 setMethod("length", "tsRim", function(x) length(x@standard))
+
+setMethod("initialize", "tsRim", function(.Object, limits, standard, mass, ...)
+{
+    if(!is.numeric(limits))
+        stop("The RI marker limit definition must be a numeric matrix")
+
+    if(is.null(rownames(limits)) && !is.null(dim(limits)))
+        rownames(limits) <- paste("RI.Marker", seq(nrow(limits)))
+
+    .Object@limits <- limits
+    .Object@standard <- standard
+    .Object@mass <- mass
+    validObject(.Object)
+    .Object
+})
 
 # vim: set ts=4 sw=4 et:
