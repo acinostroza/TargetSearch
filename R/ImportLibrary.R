@@ -53,10 +53,8 @@ ImportLibrary <- function(x, type = c("auto", "tab", "msp"), ...) {
 #  - file.opt: A list. Further options passed to read.delim
 
 ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
-	SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata, file.opt=NULL) {
-
-	op <- options(stringsAsFactors=FALSE)
-
+    SelMasses = 5, TopMasses = 15, ExcludeMasses = NULL, libdata, file.opt=NULL)
+{
 	if(missing(libfile)) {
 		if(missing(libdata)) {
 			stop("argument \"libfile\" and \"libdata\" are missing, with no default")
@@ -71,71 +69,58 @@ ImportLibrary.tab <- function(libfile, fields = NULL, RI_dev = c(2000,1000,200),
 	}
 	M <- .check.data.frame(M)
 
-	if(is.null(M$Name))
-		stop("Column 'Name' is missing!!")
-	if(is.null(M$RI)) {
-		stop("Column 'RI' is missing!!")
-	} else { # force numeric
-		M$RI <- as.numeric(M$RI)
-		if(any(is.na(M$RI))) {
-			stop("Missing values in RI definition found. Please check input data.")
-		}
-	}
+    if(is.null(M[[ 'Name' ]]))
+        stop("Column 'Name' is missing!!")
 
-	options(op)
+    if(is.null(M[[ 'RI' ]]))
+        stop("Column 'RI' is missing!!")
 
-	has.spectra <- TRUE
-	spectra     <- NULL
+    cols <- c('SEL_MASS', 'TOP_MASS', 'SPECTRUM')
+    if(all(!cols %in% colnames(M)))
+        stop("One of the following columns must be given: ",
+             paste(cols, collapse=", "), ".")
 
-	if(is.null(M$SPECTRUM)) has.spectra <- FALSE
-	if(is.null(M$SEL_MASS)) M$SEL_MASS <- NA
-	if(is.null(M$TOP_MASS)) M$TOP_MASS <- NA
+    # force numeric
+    M$RI <- as.numeric(M$RI)
+    if(any(is.na(M$RI)))
+        stop("Missing values in RI definition found. Please check input data.")
 
-	sel.mass  <- strsplit(as.character(M$SEL_MASS), "[;\\|:, ]+")
-	top.mass  <- strsplit(as.character(M$TOP_MASS), "[;\\|:, ]+")
+    if(is.null(M[[ 'SEL_MASS' ]]))
+        M$SEL_MASS <- ""
+    if(is.null(M[[ 'TOP_MASS' ]]))
+        M$TOP_MASS <- ""
 
-	if(has.spectra)
-		spectra <- Spectra(as.character(M$SPECTRUM))
+    q_mass <- M[[ 'QUANT_MASS' ]]
 
-	selMass <- list()
-	topMass <- list()
+    v <- Vectorize(function(x) {
+                       x <- as.numeric(x)
+                       x[!is.na(x)]
+    }, SIMPLIFY=FALSE, USE.NAMES=FALSE)
 
-	for(i in 1:length(sel.mass)) {
-		sm <- as.numeric(sel.mass[[i]])
-		tm <- as.numeric(top.mass[[i]])
+    sel_mass  <- v(strsplit(as.character(M$SEL_MASS), "[;\\|:, ]+"))
+    top_mass  <- v(strsplit(as.character(M$TOP_MASS), "[;\\|:, ]+"))
 
-		if(all(is.na(tm))) {
-			if(has.spectra) {
-				tm <- Top.Masses(spectra[[i]], TopMasses, ExcludeMasses)
-			} else {
-				if(all(is.na(sm)))
-					stop ("Error importing library: line ", i+1,
-						".\nNo mass was found. Please check Library file\n.")
-				tm <- sm
-			}
-		}
+    if(!is.null(spectra <- M[[ 'SPECTRUM']])) {
+        spectra <- Spectra(as.character(M$SPECTRUM))
+        temp <- lapply(spectra, Top.Masses, TopMasses, ExcludeMasses)
+        top_mass <- mapply(function(a, b) if(length(a) > 0) a else b, top_mass,
+                       temp, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    }
 
-		tm <- tm[!is.na(tm)]
+    # consolidate selective and top masses
+    f <- function(a, b) if(length(a) > 0) a else b
+    sel_mass <- mapply(f, sel_mass, top_mass, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    top_mass <- mapply(union, sel_mass, top_mass, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    if(any(k <- (vapply(sel_mass, length, 0) == 0)))
+        stop("Invalid entry detected (# ", which(k)[1], ")")
 
-		if(all(is.na(sm))) {
-			sm <- tm[1:min(SelMasses,length(tm))]
-		} else {
-			sm <- sm[!is.na(sm)]
-		}
+    w1 <- if(is.null(M$Win_1)) rep(RI_dev[1], length(M$RI)) else M$Win_1
+    w2 <- if(is.null(M$Win_2)) rep(RI_dev[2], length(M$RI)) else M$Win_2
+    w3 <- if(is.null(M$Win_3)) rep(RI_dev[3], length(M$RI)) else M$Win_3
 
-		selMass[[i]] <- sm
-		topMass[[i]] <- unique(c(sm,tm))
-	}
-
-	if(is.null(M$Win_1)) w1 <- rep(RI_dev[1], length(M$RI)) else w1 <- M$Win_1
-	if(is.null(M$Win_2)) w2 <- rep(RI_dev[2], length(M$RI)) else w2 <- M$Win_2
-	if(is.null(M$Win_3)) w3 <- rep(RI_dev[3], length(M$RI)) else w3 <- M$Win_3
-
-	qM <- M$QUANT_MASS
-
-	new("tsLib", Name = as.character(M$Name), RI = M$RI, medRI = M$RI, RIdev = cbind(w1,w2,w3),
-		selMass = selMass, topMass = topMass, quantMass=qM, spectra = spectra, libData = M)
-
+    new("tsLib", Name = as.character(M$Name), RI = M$RI, medRI = M$RI,
+        RIdev = cbind(w1,w2,w3), selMass = sel_mass, topMass = top_mass,
+        quantMass=q_mass, spectra = spectra, libData = M)
 }
 
 Top.Masses <- function(sp, TopMasses, ExcludeMasses = NULL) {
