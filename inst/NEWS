@@ -1,3 +1,64 @@
+		CHANGES IN VERSION 2.6.0:
+NEW FEATURES
+
+   o	New options for `ImportFameSettings`: New parameter `standard`
+	can take the RI values. The input file can be also a matrix.
+	Column names can now be specified.
+
+   o	A function to plot reference spectra for `tsLib` objects in a
+	similar style of other visualization tools.
+
+BUG FIXES
+
+   o	Check for out-of-bounds in binary search.
+
+DOCUMENTATION
+
+   o	Add note of arguments passed to `plot` via the `dots` operator.
+	The functions `ri_plot_peak` and `ncdf4_plot_peak` accept extra
+	arguments passed to `plot` and others via the `...` argument.
+	However, not all parameters, in particular `panel.first` and
+	`panel.last`, will have an effect.
+
+   o	Fix misplaced dot man page (`RIcorrrect`).
+
+   o	Fix wrong braces in man page (`tsSample-class`).
+
+INTERNAL
+
+   o	Tidy up `NAMESPACE` file.
+
+   o	Add tests for function `ImportFameSettings`.
+
+   o	Refactor internal code of `ImportLibrary` and improve the spectrum
+	parser algorithm (allow NA and make sure the format is valid).
+	Add tests cases.
+
+   o	Improve `tsLib` spectrum handling by ensuring the internal data
+	is consistent. Also allow for empty spectra.
+
+   o	Improve validity checks for `tsProfile` and `tsMSdata` objects.
+	Add tests cases.
+
+
+		CHANGES IN VERSION 2.4.2:
+BUG FIXES
+
+   o	Fix `maybe-uninitialized` warning in some platforms. Set the struct
+	elements to `NULL`.
+
+   o	Fix RI files format incompatibility (affected versions: 2.4.0 and .1).
+	Starting from 2.4.0, these files allow for empty spectra data, but
+	older version raise an error. Therefore, we enforce non empty
+	spectra data to keep compatibility.
+
+		CHANGES IN VERSION 2.4.1:
+BUG FIXES
+
+   o	An error is thrown if all paramaters passed to `FindAllPeaks` are
+	integers (a rare occurrence). Make sure that arguments are doubles
+	before passing them to the C interface. Also add a test for it.
+
 		CHANGES IN VERSION 2.4.0:
 NEW FEATURES
 
