@@ -76,7 +76,7 @@ new("tsSample", Names = [sample names], CDFfiles = [list of CDF file names],
     \item{\code{sampleDays}}{\code{signature(obj = "tsSample")}: measurement days. }
     \item{\code{sampleNames}}{\code{signature(obj = "tsSample")}: sample names. The names must be unique}
     \item{\code{show}}{\code{signature(object = "tsSample")}: the show function. }
-    \item{\code{fileFormat}}{\code{signature}{obj = "tsSample"}: Sets or gets the RI file format.
+    \item{\code{fileFormat}}{\code{signature(obj = "tsSample")}: Sets or gets the RI file format.
         Options are either "binary" or "text". See note below.}
     \item{\code{c}}{Function to combine multiple objects.}
  }
