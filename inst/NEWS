@@ -55,7 +55,7 @@ BUG FIXES
 		CHANGES IN VERSION 2.4.1:
 BUG FIXES
 
-   o	An error is thrown if all paramaters passed to `FindAllPeaks` are
+   o	An error is thrown if all parameters passed to `FindAllPeaks` are
 	integers (a rare occurrence). Make sure that arguments are doubles
 	before passing them to the C interface. Also add a test for it.
 
@@ -136,7 +136,7 @@ BUG FIXES
 
    o	Fix `quantMatrix`. The function has been broken for years as it did
 	not work as intended. Nevertheless, the default option `quantmass`
-	means that the output is now correct (formely, the options `maxint`
+	means that the output is now correct (formerly, the options `maxint`
 	and `maxobs` were simply ignored).
 
 		CHANGES IN VERSION 1.52.0:
@@ -308,7 +308,7 @@ NEW FEATURES
 
    o	New function to transform to nominal mass. Some GC instruments export
 	CDF not in nominal mass format (some even export high mass accuracy).
-	Formely, this type of files were not supported and TargetSearch would
+	Formerly, this type of files were not supported and TargetSearch would
 	refuse to process them. Now, all types of mass accuracy are allowed,
 	obviously at the cost of losing that accuracy.
 
@@ -333,7 +333,7 @@ BUG FIXES
 
 NEW FEATURES
 
-   o	New function `checkRimLim` to vizualise a retention index markers
+   o	New function `checkRimLim` to visualise a retention index markers
 	before the actual time correction. It can be useful to fix the search
 	limits.
 
@@ -349,7 +349,7 @@ NEW FEATURES
 SIGNIFICANT USER-VISIBLE CHANGES
 
    o	The parameter `massRange` (m/z mass range) which used to be needed in
-	some functions is deprected. It was used mostly as a hint and usually
+	some functions is deprecated. It was used mostly as a hint and usually
 	detected automatically. If it is passed, there would be no effect.
 
 BUG FIXES
@@ -388,12 +388,12 @@ BUG FIXES
    o	Fix warnings during R CMD check.
 
    o	Refactor C code for finding peaks. It is possible to return all peaks
-	instead of only the most abundant. No visibles changes for the end user.
+	instead of only the most abundant. No visible changes for the end user.
 
    o	Refactor C code for NetCDF manipulation and peak finding to reduce
 	code duplication. No visible changes for the end user.
 
-   o	General R code houskeeping: Removal of mixed tabs and spaces, fix
+   o	General R code housekeeping: Removal of mixed tabs and spaces, fix
 	tabulation, add Rbuildignore.
 
 		CHANGES IN VERSION 1.26.0:
@@ -404,7 +404,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
 BUG FIXES
 
-   o	Fix potential potencial pearson correlation errors that occur when the
+   o	Fix potential potential pearson correlation errors that occur when the
 	standard is deviation zero. If that is the case, replace the resulting
 	NA/NaN by zero.
 
@@ -500,7 +500,7 @@ BUG FIXES
     o	Profile: check for at least three top masses to calculate spectra
 	similarity scores.
 
-    o	quantMatrix: use character indeces instead of numeric indeces.
+    o	quantMatrix: use character indices instead of numeric indices.
 
 		CHANGES IN VERSION 1.12.0:
 
@@ -509,7 +509,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
     o	New binary file format for the peak-list files, a.k.a. RI files.
 	This speeds up metabolite searches by 5-10 fold. The old TEXT format
 	is kept for compatibility. See method 'fileFormat'. Also see
-	'bin2text' and 'text2bin' funtions.
+	'bin2text' and 'text2bin' functions.
 
     o	New plot peak function 'plotPeak'. The old function was renamed as
 	plotPeakSimple. The function show also the regions in which the
@@ -649,7 +649,7 @@ NEW FEATURES
 	tsSample object from CDF files in a directory.
 
     o	A new GUI layout and new features: Now it is not required to
-	have all the files in the working directory. Basline, Peak detection,
+	have all the files in the working directory. Baseline, Peak detection,
 	and RI correction options gray out when 'Apex data' is selected.
 
 		CHANGES IN VERSION 1.3.2:
@@ -657,7 +657,7 @@ NEW FEATURES
 NEW FEATURES
 
     o	New 'tsProfile' and 'tsMSdata' definitions. Many functions were
-	internaly changed to conform to the changes, however, the changes
+	internally changed to conform to the changes, however, the changes
 	should be (more or less) transparent for the user.
 
     o	classes.R:

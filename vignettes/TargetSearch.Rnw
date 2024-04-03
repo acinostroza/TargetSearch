@@ -52,7 +52,7 @@ use the example files provided by the package \Biocpkg{TargetSearchData}.
 \subsection{NetCDF files}
 
 \Biocpkg{TargetSearch} can currently read only NetCDF files. Many GC-MS
-software vendors are able to convert their propietary raw chromatograms to NetCDF.
+software vendors are able to convert their proprietary raw chromatograms to NetCDF.
 There are however two issues you have to keep in mind:
 
 \begin{itemize}
@@ -142,7 +142,7 @@ samples <- new("tsSample", Names = smp_names, CDFfiles = cdffiles,
 
 To align different chromatograms using RI markers, a tab-delimited definition file
 for these markers has to be provided. At a minimum it should contain three columns
-specifying the search window (lower and upper threshod) and the fixed standard value
+specifying the search window (lower and upper threshold) and the fixed standard value
 for each marker (table \ref{rim:file}). Further, a characteristic ion mass ($m/z$)
 has to be provided either in an additional column or as an argument \Robject{mass}
 to function \Rfunction{ImportFameSettings()}.
@@ -196,7 +196,7 @@ checkRimLim(samples[1:3], rimLimits, single=FALSE, col=2:4, lty=1)
 
 \section{Pre-processing}
 
-\subsection{Convertion of CDF files to TargetSearch format}
+\subsection{Conversion of CDF files to TargetSearch format}
 
 Starting from \Biocpkg{TargetSearch} 1.42, a CDF4 custom format was introduced. This format
 has many advantages over the typical CDF3 that is exported by commercial
@@ -221,7 +221,7 @@ samples <- ncdf4Convert(samples, path=".")
 If you need to perform baseline correction on the CDF files, please
 check the following section instead.
 
-\Note{Although this convertion is optional, it is highly recommended.
+\Note{Although this conversion is optional, it is highly recommended.
 It is still possible to use the classic workflow at the cost of
 computation speed.}
 
@@ -266,7 +266,7 @@ Initially, \Biocpkg{TargetSearch} identifies the local apex intensities
 in all chromatograms, finds the retention time (RT) of the RI markers and converts
 RT to RI using linear interpolation \cite{VandenDool1963}.
 This is done by the function \Rfunction{RIcorrect()}. Parameters to this function are
-sample and retention time limits objects, the intensity threshhold (\Rcode{IntThreshold = 100}),
+sample and retention time limits objects, the intensity threshold (\Rcode{IntThreshold = 100}),
 the peak picking method (\Robject{pp.method}) and a \Robject{Window} parameter
 that will be used by said method. The function will return a matrix
 with the retention times of all RI markers and create a file with all
@@ -275,7 +275,7 @@ extracted peaks of the respective NetCDF file, which will we call
 format) or a custom binary file (default format). The difference between them
 is that the binary file allows much faster parsing compared to the other format.
 
-\Note{Formely, we would use this function for baseline correction, but
+\Note{Formerly, we would use this function for baseline correction, but
 as of \Biocpkg{TargetSearch} 1.42.0, this has to be done as explained in the section above.}
 
 <<RIcorrection>>=
@@ -324,7 +324,7 @@ inject them separately. If this is the case, please look at the vignette
 \file{RetentionIndexCorrection.R} for a workaround.
 
 In case of outliers, there is no single method to fix them as this really depends
-on the particular measurement conditions. However, there are few posibilities. i) If the
+on the particular measurement conditions. However, there are few possibilities i) If the
 time deviation from the mean is small, for example, less than one second, as a rule
 of thumb the outliers can usually be ignored. ii) if the outliers are due to chromatogram
 shift, then it is also fine to ignore them, because that is the point of the markers.
@@ -408,7 +408,7 @@ updated RI. The time deviation is given either in the library file (column
 lib <- medianRILib(samples, lib)
 @
 
-It is also posible to examinate visually the RI deviation of the metabolites
+It is also possible to examine visually the RI deviation of the metabolites
 by setting the parameter \Robject{makeReport=TRUE}, which creates a pdf report
 like the one shown in figure~\ref{fig:medianLib}. This may help to set or update
 the expected RI deviation.
@@ -528,7 +528,7 @@ finalProfile <- ProfileCleanUp(MetabProfile, timeSplit = 500,
 @
 
 The function returns a \Rclass{msProfile} object. The \Rmethod{info} slot
-is similar as described above, but extra columns with a ``Cor\_'' preffix
+is similar as described above, but extra columns with a ``Cor\_'' prefix
 (e.g., ``Cor\_Name'') are included. They provide information about
 metabolite redundancy.
 

@@ -26,7 +26,7 @@ ImportLibrary.msp(libfile, fields = NULL, RI_dev = c(2000,1000,200),
     \code{ImportLibrary.tab} or \code{ImportLibrary.msp} according to the file
     type (option \code{type}).}
   \item{libfile}{A character string naming a library file. See details.}
-  \item{type}{The library file format. Posible options are \code{"tab"} for a
+  \item{type}{The library file format. Possible options are \code{"tab"} for a
   tab-delimited file, \code{"msp"} for NIST MSP format, or \code{"auto"} for
   autodetection. Default to \code{"auto"}.}
   \item{fields}{A two component list. Each component contains a regular

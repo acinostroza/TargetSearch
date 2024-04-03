@@ -58,7 +58,7 @@ ProfileCleanUp(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
 	\item If prioritization='score', corMass=4, score=850, then the
         suggested order is C, A, B.
 	}
-	Note that by chosing \code{prioritization='mass'}, \code{score=0}, and
+	Note that by choosing \code{prioritization='mass'}, \code{score=0}, and
 	\code{corMass=1} you will get the former behavior (\code{TargetSearch <= 1.6}).
 }
 \value{

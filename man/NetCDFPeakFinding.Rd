@@ -59,7 +59,7 @@ require(TargetSearchData)
 # pick first CDF file
 CDFfile <- tsd_cdffiles()[1]
 
-# extrac peaks of first chromatogram
+# extract peaks of first chromatogram
 peaks.1 <- NetCDFPeakFinding(CDFfile, Window = 15, IntThreshold = 10, pp.method = "ppc")
 # scan acquisition times
 head(peaks.1$Time)

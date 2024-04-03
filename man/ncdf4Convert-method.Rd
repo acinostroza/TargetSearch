@@ -46,7 +46,7 @@ cdfpath <- tsd_data_path()
 # update the CDF path
 CDFpath(sampleDescription) <- cdfpath
 
-# tranform the CDF (the files are copied in the current directoru)
+# transform the CDF (the files are copied in the current directoru)
 newSamples <- ncdf4Convert(sampleDescription, path=".")
 }
 \keyword{methods}
