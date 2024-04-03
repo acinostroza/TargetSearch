@@ -78,8 +78,4 @@ fixRI(samples.all, rimLimits, RImatrix2, which(!isRIMarker))
 samples <- samples.all[!isRIMarker]
 RImatrix <- RImatrix2[, !isRIMarker]
 
-# If you prefere to use the GUI, run TargetSearchGUI() from this point
-# and import the RI files by selecting the option "Apex Data" (don't
-# import the standard files)
-
 # continue with the normal work flow (see TargetSearch vignette)
