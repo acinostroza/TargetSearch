@@ -16,7 +16,7 @@ function(samples, Lib, r_thres=0.95, columns = NULL,
 	if(makeReport == TRUE)
 	 	plotAllRIdev(Lib, RES, pdfFile)
 
-	# you can't set this paremeter lower than 5.
+	# you can't set this parameter lower than 5.
 	minPairObs <- max(minPairObs, 5)
 
 	resInt    <- Intensity(RES)

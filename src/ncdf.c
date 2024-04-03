@@ -58,7 +58,7 @@ matrix_t * get_intensity_mat(ncdf_t *x)
 	return mat;
 }
 
-/* tranform a R matrix of intensities into a matrix_t struct */
+/* transform a R matrix of intensities into a matrix_t struct */
 matrix_t * from_matrix(SEXP Matrix)
 {
 	SEXP dim = GET_DIM(Matrix);

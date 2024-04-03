@@ -5,7 +5,7 @@ plotRIdev <- function(Lib, peaks, libID = 1, ...) {
 	equal <- function(x, y) isTRUE(all.equal(x, y))
     # check if `libId` was given
     if('libId' %in% names(list(...))) {
-        warning('The parameter "libId" is deprectated, use "libID" instead.')
+        warning('The parameter "libId" is deprecated, use "libID" instead.')
         libID <- list(...)$libId
     }
 	n <- length(libID)

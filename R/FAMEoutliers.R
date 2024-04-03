@@ -45,7 +45,7 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	}
     RI_out[is.na(RI_out)] <- FALSE
 
-	# find missing markes
+	# find missing markers
 	missingMarkers <- missingIndex <- NULL
 	if(any(is.na(RI_out))) {
 		message("\n Missing Markers: \n ===============\n\n")
@@ -54,7 +54,7 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 			missingMarkers <- append(missingMarkers, sprintf(" RT standard: %2d | Sample: %s", j, manyFiles[is.na(RI_out[j,])]))
 		}
 		cat(missingMarkers, sep="\n")
-		# set missing markers temporaly to FALSE
+		# set missing markers temporarily to FALSE
 		RI_out[missingIndex] <- FALSE
 	}
 

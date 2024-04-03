@@ -6,7 +6,7 @@
 #include "find.h"
 /* cdffix and ncdf_to_matrix */
 #include "ncdf.h"
-/* from dectection.c */
+/* from detection.c */
 SEXP peak_detection_main(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 /* from baseline.c */

@@ -20,7 +20,7 @@ function(files, quiet=FALSE)
 #' check file extensions
 #'
 #' If a file has a proper file extension, we leave it. If not, then tries
-#' to find an appropiate extension. If found, then returns, if not, return
+#' to find an appropriate extension. If found, then returns, if not, return
 #' the file unchanged.
 #' @param files the files to check
 #' @return a character vector with file names

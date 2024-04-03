@@ -8,7 +8,7 @@
 #' @param timeRange A numeric vector of even length describing the lower and upper time limits
 #' @param useRT Logical. If `TRUE`, the time range is in seconds.
 #' @param ... extra parameters passed to internal functions
-#' @return A four column matrix with columm names RI, RT, Intensity, mz.
+#' @return A four column matrix with column names RI, RT, Intensity, mz.
 #'
 `ri_data_extract` <- function(RIfile, massValues, timeRange, useRT=FALSE, ...)
 {
@@ -46,7 +46,7 @@
 #' @param timeRange A numeric vector of even length describing the lower and upper time limits
 #' @param useRT Logical. If `TRUE`, the time range is in seconds.
 #' @param ... extra parameters passed to internal functions
-#' @return A four column matrix with columm names RI, RT, Intensity, mz.
+#' @return A four column matrix with column names RI, RT, Intensity, mz.
 #'
 `ri_data_extract_text` <- function(RIfile, massValues, timeRange, useRT=FALSE, ...)
 {
@@ -68,7 +68,7 @@
 #' @param ref a three-column matrix with m/z, min RI and max RI to search
 #' @param useRT logical. if TRUE, search by RT, otherwise search by RI
 #' @param ... potentially pass the column options
-#' @return A four column matrix with columm names RI, RT, Intensity, mz.
+#' @return A four column matrix with column names RI, RT, Intensity, mz.
 #'
 .r_find_peaks <- function(RIfile, ref, useRT, ...)
 {

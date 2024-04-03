@@ -21,7 +21,7 @@
 #'      intensities smaller than this
 #' @return A two component list. The first element is two-column matrix matrix
 #'      representing the x, y coordinates of the labels, while the second are
-#'      the repective labels.
+#'      the respective labels.
 #' @importFrom utils combn
 #' @importFrom graphics strheight strwidth par
 #' @importFrom assertthat assert_that is.number
@@ -89,7 +89,7 @@
 #' @param label_col the color of the mz labels
 #' @param sel_font the for of the selective masses
 #' @param type the plot type. Only the value 'h' (vertical bars) is allowed.
-#' @param ldots extra plotting parameters passsed to plot
+#' @param ldots extra plotting parameters passed to plot
 #' @return invisible
 #' @importFrom assertthat assert_that is.count
 `plotRefSpectra` <-

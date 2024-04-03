@@ -19,7 +19,7 @@
 #' @return TRUE on success, FALSE otherwise. A message is printed if an error
 #'    happens on the C side, but no error is raised. In this case, is up to
 #'    the caller to check for its return value.
-#' @note If the input paremeters are invalid, an assertion error is thrown.
+#' @note If the input parameters are invalid, an assertion error is thrown.
 `writeRIFile` <-
 function(outFile, Peaks, riInde, massRange, ftype=c("binary", "text"))
 {

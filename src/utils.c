@@ -122,7 +122,7 @@ void refine_peak(const int *x, int n, int w, int *ans, int np)
 
 /* generates gaussian coefficients for gaussian filter (convolution)
  *
- * the coefficiens are normalized to abs sum = 1. The resulting vector
+ * the coefficients are normalized to abs sum = 1. The resulting vector
  * must be freed in a later called.
  *
  * @param n length of vector. n must be odd.
@@ -197,13 +197,13 @@ static inline int get_k(double n, double p)
 }
 
 /**
- * Implementes R's quantiles type 7.
+ * Implements R's quantiles type 7.
  *
- * Computes quantiles in a numberic vector. The vector does not need to be
+ * Computes quantiles in a numeric vector. The vector does not need to be
  * sorted (as previous versions). The sorting is taken care by rPsort.
  *
- * @param xs pointer to a numeriv vector
- * @param p the probabily 0 <= p <= 1
+ * @param xs pointer to a numeric vector
+ * @param p the probability 0 <= p <= 1
  * @param n length of the vector
  * @return the computed sample quantile or NAN if error
  * @note NAN's are neither checked for nor handled. It is expected that

@@ -37,7 +37,7 @@ static void swapp(void *ptr, int size, int len) {
 /* function to read a DAT file:
  * args:
  *   - fp: file pointer
- *   - p_splen: spectra legth
+ *   - p_splen: spectra length
  *   - swap: 1 (big endian; swap) 0 (little endian; no swap)
  * returns: SPECTRA struct */
 spectra_t * read_dat(FILE *fp, int swap)
@@ -181,7 +181,7 @@ int write_dat(FILE *fp, spectra_t *sp, int swap)
 #define MAX(a, b)  ((a) > (b) ? (a) : (b))
 #define CHKCOL(x, col) do \
 	if((x) < 0) { \
-		REprintf("Unable to find colum `%s'\n", col ? col : "NULL"); \
+		REprintf("Unable to find column `%s'\n", col ? col : "NULL"); \
 		goto clean; \
 	} while(0)
 
@@ -214,7 +214,7 @@ spectra_t * read_txt(FILE *fp, const char * SPECTRUM, const char * RI, const cha
 		goto clean;
 	}
 
-	/* column positions are passed explicitely */
+	/* column positions are passed explicitly */
 	if(cols != NULL) {
 		SPECTRUM_COL = cols[0]; RI_COL = cols[1]; RT_COL = cols[2];
 		mintab = MAX(SPECTRUM_COL, MAX(RI_COL, RT_COL)) + 1;
@@ -272,7 +272,7 @@ spectra_t * read_txt(FILE *fp, const char * SPECTRUM, const char * RI, const cha
 		spectra_add(spectra, rt, ri, &p);
 	}
 	if(nread == ALLOC_ERROR) {
-		REprintf("An error ocurred allocating memory\n");
+		REprintf("An error occurred allocating memory\n");
 		goto clean;
 	}
 	R_Free(line);

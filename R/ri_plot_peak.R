@@ -5,7 +5,7 @@
 #' @param timeRange the time range (two-element vector)
 #' @param useRT use RT as time units (RI if FALSE)
 #' @param showRT use RT as y-axis (RI if FALSE)
-#' @param sizefun funtion to scale the plot size
+#' @param sizefun function to scale the plot size
 #' @param plot should a plot be drawn?
 #' @param ... extra plotting parameters
 #' @return a matrix with the data used for plotting

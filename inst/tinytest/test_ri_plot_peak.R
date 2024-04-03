@@ -36,7 +36,7 @@ for(i in seq(repeats)) {
     expect_identical(real, fake)
 }
 
-# shoud raise a warning and return null
+# should raise a warning and return null
 expect_warning(ret <- ri_plot_peak(files, massValues=c(300, 400), timeRange=tm, plot=FALSE))
 expect_null(ret)
 unlink(files)

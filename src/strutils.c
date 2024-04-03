@@ -160,7 +160,7 @@ int file_type(const char * fname)
 }
 
 /**
- * simple routine to get the endiannes at runtime
+ * simple routine to get the endianness at runtime
  *
  * @returns 0 for little endian, 1 for big endian
  */

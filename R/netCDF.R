@@ -31,7 +31,7 @@
 
 	if(any(ncData$scanindex < 0) || any(len == 0) || any(diff(ncData$scanindex) < 0)) {
 		message(sprintf('Error: The NetCDF file "%s" seems to be corrupted.', cdfFile))
-		stop('Unable to processs file. Aborting.')
+		stop('Unable to process file. Aborting.')
 	}
 
 	# check intensity range
@@ -369,7 +369,7 @@ function(cdf_path=".", out_path=cdf_path, recursive = FALSE, ignore.case = TRUE,
 #' the output (a named list) uses slightly different names.
 #'
 #' The NetCDF must be have been previously converted to the custom "TargetSearch" format,
-#' otherwise an error will be raised. See [ncdf4_convert()] for the convertion.
+#' otherwise an error will be raised. See [ncdf4_convert()] for the conversion.
 #'
 #' @param cdfFile A path to a NetCDF file format 4.
 #' @param massValues A numeric vector representing m/z values.
@@ -389,7 +389,7 @@ function(cdf_path=".", out_path=cdf_path, recursive = FALSE, ignore.case = TRUE,
 #'
 #' @note
 #' An error will be produced for invalid files. Also, this function is intended
-#' to be used internally, but it is exposed for convinience, for example, to
+#' to be used internally, but it is exposed for convenience, for example, to
 #' create custom plots.
 #'
 #' @seealso [ncdf4_convert()], [peakCDFextraction()]

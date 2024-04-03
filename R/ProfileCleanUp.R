@@ -6,7 +6,7 @@ function(Profile, timeSplit=500, r_thres=0.95, minPairObs=5,
   if(nrow(profileInfo(Profile)) <= 1)
     return(Profile)
 
-  # you can't set this paremeter lower than 5.
+  # you can't set this parameter lower than 5.
   if(minPairObs < 5)
     warning("'minPairObs' cannot be set to a value lower than 5. ",
       "Using 5 instead.")

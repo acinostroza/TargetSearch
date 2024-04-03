@@ -66,7 +66,7 @@ function(rtTime, observed, standard) {
 
 #########################################################################################
 
-# Function to tranform a matrix of retention indices to a matrix of retention time
+# Function to transform a matrix of retention indices to a matrix of retention time
 # usage: ri2rt(x, rt.observed, ri.standard)
 # args:
 #      x:           A matrix or vector of retention time indices

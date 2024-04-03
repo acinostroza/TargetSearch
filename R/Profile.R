@@ -10,7 +10,7 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     resRT  <- retTime(peakData)
     libId  <- libId(Lib, sel = FALSE)
 
-    # you can't set this paremeter lower than 5.
+    # you can't set this parameter lower than 5.
     minPairObs <- max(minPairObs, 5)
 
     # extract addictonal information

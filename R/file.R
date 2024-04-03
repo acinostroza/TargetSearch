@@ -24,7 +24,7 @@
 	paste(cols['retTime'], cols['spectrum'], cols['retIndex'], sep="\t")
 }
 
-# Convert RI files from text to binary format and viceversa.
+# Convert RI files from text to binary format and vice-versa.
 `.convert_ri_file` <-
 function(in.file, ...)
 {

@@ -33,7 +33,7 @@ matrix_t * new_mat_empty(void)
  * create a new matrix with pre-allocated data
  *
  * Instead of allocating data, a pointer of pre-allocated data is passed.
- * The number of columnn and rows mustmatch the length of the data.
+ * The number of columns and rows must match the length of the data.
  *
  * @param nc number of columns
  * @param nr number of rows

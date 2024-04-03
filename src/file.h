@@ -23,7 +23,7 @@ int write_txt(FILE *, spectra_t *, const char *);
 spectra_t * pktosp(double *, double *, int *, int *, int);
 
 /**
- * Function to parse and valide column options
+ * Function to parse and validate column options
  *
  * The R function `get.columns.name` is used to set the column names or
  * column positions. The output can be either strings or integers,
