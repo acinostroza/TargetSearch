@@ -10,9 +10,9 @@ BiocStyle::latex()
 @
 
 % missing definitions
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\definecolor{fgcolor}{rgb}{0.251, 0.251, 0.251}
+\providecommand{\hlsng}[1]{\textcolor[rgb]{0.251,0.627,0.251}{#1}}
+\providecommand{\hldef}[1]{\textcolor[rgb]{0.251,0.251,0.251}{#1}}
 
 \usepackage{booktabs}
 \definecolor{NoteBlue}{RGB}{45, 28, 156}
