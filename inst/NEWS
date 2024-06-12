@@ -1,3 +1,9 @@
+		CHANGES IN VERSION 2.6.1:
+BUG FIXES
+
+   o	Fix vignettes building by adding missing latex commands due to
+	an incompatibility between BiocStyle and knitr
+
 		CHANGES IN VERSION 2.6.0:
 NEW FEATURES
 
