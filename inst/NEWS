@@ -1,3 +1,8 @@
+		CHANGES IN VERSION 2.6.2:
+BUG FIXES
+
+   o	Use \providecommand for missing defines in vignettes instead
+
 		CHANGES IN VERSION 2.6.1:
 BUG FIXES
 
