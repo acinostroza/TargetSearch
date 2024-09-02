@@ -153,7 +153,14 @@ setMethod("c", "tsSample",
         CDFfiles <- unlist(lapply(z, slot, 'CDFfiles'))
         RIfiles <- unlist(lapply(z, slot, 'RIfiles'))
         days <- unlist(lapply(z, slot, 'days'))
-        data <- do.call('rbind', lapply(z, slot, 'data'))
+
+        # try first to merge sampleData, otherwiwse fails with a more meaningful message
+        data <- try(do.call('.rbind', lapply(z, slot, 'data')), silent=TRUE)
+        if(inherits(data, 'try-error'))
+            stop('Unable to combine `data` slot due to incompatible data types. ',
+                 'Please call the `sampleData` method on the objects to combine and check ',
+                 'they are compatible.')
+
         obj <- new('tsSample', CDFfiles=CDFfiles, RIfiles=RIfiles, days=days, data=data)
         validObject(obj)
         obj

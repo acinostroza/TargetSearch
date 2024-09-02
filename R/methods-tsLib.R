@@ -181,7 +181,14 @@ setMethod("c", "tsLib",
         topMass <- unlist(lapply(z, slot, 'topMass'), recursive=FALSE)
         quantMass <- unlist(lapply(z, slot, 'quantMass'))
         spectra <- unlist(lapply(z, slot, 'spectra'), recursive=FALSE)
-        libData <- do.call('rbind', lapply(z, slot, 'libData'))
+
+        # try first to merge libData, otherwiwse fails with a more meaningful message
+        libData <- try(do.call(.rbind, lapply(z, slot, 'libData')), silent=TRUE)
+        if(inherits(libData, 'try-error'))
+            stop('Unable to combine `libData` slot due to incompatible data types. ',
+                 'Please call the `libData` method on the objects to combine and check ',
+                 'they are compatible.')
+
         obj <- new('tsLib', Name=Name, RI=RI, selMass, medRI=medRI, RIdev=RIdev,
                    topMass=topMass, quantMass=quantMass, spectra=spectra,
                    libData=libData)

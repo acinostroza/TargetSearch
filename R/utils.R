@@ -116,4 +116,30 @@
     p[ !duplicated(p[, 'name']), 'files']
 }
 
+#' Like rbind but with distinct column names
+#'
+#' Combine data.frames by rows like `rbind`, however the column names
+#' need not to be common: missing columns will be filled up with NAs.
+#' Matrices and vectors are not supported.
+#'
+#' @param ... data.frames to be combined. Arguments are *not* coerced.
+#' @return a new data.frame with combined rows.
+#' @note it is known to fail if there are incompatible types to combine,
+#'       for example, matrices and lists. The function does not check
+#'       for these cases.
+#'
+`.rbind` <- function(...)
+{
+    z <- list(...)
+    if(length(z) == 1)
+        return(z[[1]])
+    columns <- unique(unlist(lapply(z, colnames)))
+    z <- lapply(z, function(x) {
+               miss <- setdiff(columns, colnames(x))
+               for(col in miss)
+                   x[[ col ]] <- NA
+               x })
+    do.call('rbind', z)
+}
+
 # vim: set ts=4 sw=4 et:
