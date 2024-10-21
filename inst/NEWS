@@ -1,3 +1,37 @@
+		CHANGES IN VERSION 2.8.0:
+
+NEW FEATURES
+
+   o	Allow incompatible data when combining objects `tsLib` and `tsSample`.
+	The idea is if the column names of the `data` slots are different,
+	the `c` operator do not fail. There are, however, limitations with some
+	data types (like lists or matrices). If this is the case, then throw
+	a more meaningful error message. (commit 6fb2f59)
+
+BUG FIXES
+
+   o	Fix `FAMEoutliers` manual grouping: The comparison should use character
+	vectors instead of numeric. Also, an error was thrown due to an `if`
+	condition not having an scalar return (due to using `is.na`).
+
+	Note that since this version, the default values of startDay and endDay
+	have been set as NULL. (commit 69e8a2f).
+
+INTERNAL
+
+`   o	Add tests for `FAMEoutliers`.
+
+		CHANGES IN VERSION 2.6.2:
+BUG FIXES
+
+   o	Use \providecommand for missing defines in vignettes instead
+
+		CHANGES IN VERSION 2.6.1:
+BUG FIXES
+
+   o	Fix vignettes building by adding missing latex commands due to
+	an incompatibility between BiocStyle and knitr
+
 		CHANGES IN VERSION 2.6.0:
 NEW FEATURES
 
