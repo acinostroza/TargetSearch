@@ -47,3 +47,5 @@ Please report bugs at https://github.com/acinostroza/TargetSearch/issues
 
 The code is licensed under the GNU Public License version 2.0 or greater
 (SPDX License ID: `GPL-2.0-or-later`).
+
+To obtain a copy of the license, see: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
