@@ -1,19 +1,18 @@
 `FAMEoutliers` <-
-function(samples, RImatrix, pdffile = NA, startDay = NA,
-	endDay = NA, threshold = 3, group.threshold = 0.05){
+function(samples, RImatrix, pdffile=NA, startDay=NULL, endDay=NULL,
+         threshold=3, group.threshold=0.05)
+{
   days <- sampleDays(samples)
   days.unique <- unique(days)
-  
+
   manyFiles <- CDFfiles(samples)
 
-	# Algorithm to Identify DayGroups
-	if(is.na(startDay) & is.na(endDay)) {
-		m <- matrix(nrow = nrow(RImatrix), ncol = length(days.unique))
-		# get the daily mean RI per R.T. Standard
-		for(d in days.unique) {
-			tmp <- RImatrix[, d == days, drop=FALSE]
-			m[, which(days.unique %in% d)] <- apply(tmp, 1, mean)
-		}
+    # Algorithm to Identify DayGroups
+    if(is.null_or_na(startDay) && is.null_or_na(endDay)) {
+        # get the daily mean RI per R.T. Standard
+        m <- vapply(days.unique, function(d) {
+                        rowMeans(RImatrix[, d == days, drop=FALSE], na.rm=TRUE)
+             }, numeric(nrow(RImatrix)))
 
 		# Identify the day groups
 		day.groups <- 1
@@ -22,16 +21,24 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 			hc <- hclust(m.dist, "ave")
 			day.groups <- cutree(hc, h = group.threshold * max(m.dist))
 		}
-  }
-  else {
-		day.groups <- numeric(length(days.unique))
-		stopifnot(length(startDay) == length(endDay))
-		for(i in 1:length(startDay))
-			day.groups[days.unique >= startDay[i] & days.unique <= endDay[i]] <- i
+    }
+    else {
+        day.groups <- numeric(length(days.unique))
+        day.index  <- seq(length(days.unique))
+        assert_that(!has_na(startDay), msg="`startDay` cannot contain NAs")
+        assert_that(!has_na(endDay), msg="`endDay` cannot contain NAs")
+        assert_that(length(startDay) == length(endDay), length(startDay) > 0)
+        st <- match(startDay, days.unique)
+        en <- match(endDay, days.unique)
+        assert_that(!has_na(st), !has_na(en),
+                  msg="Unmatched days found in `startDay` and `endDay`")
+        for(k in seq(length(startDay)))
+            day.groups[ day.index >= st[k] & day.index <= en[k] ] <- k
+
 		if(!all(day.groups > 0))
 			stop("Check arguments 'startDay' & 'endDay', at least one of the measurement days is out of range.")
-	}
-	
+    }
+
 	# find the outliers.
 	RI_out <- matrix(FALSE, ncol = ncol(RImatrix), nrow = nrow(RImatrix))
 	colnames(RI_out) <- colnames(RImatrix)
@@ -68,14 +75,14 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 	}
 	cat(outliers, sep = "\n")
 	if(!any(RI_out)) cat("No outliers were found.\n")
-	
+
  	if(is.na(pdffile))
 		pdffile <- paste("TargetSearch-", Sys.Date(), ".FAME-report.pdf", sep = "")
 
 	new.page <- function(x="Outliers Report") {
 	  plot.new()
 	  title(x)
-	}	
+	}
 	# print outliers in FAME report file
 	pdf(pdffile, width = 8, height = 8)
 	on.exit(dev.off())
@@ -105,11 +112,11 @@ function(samples, RImatrix, pdffile = NA, startDay = NA,
 		points(which(RI_out[i,]), RImatrix[i,RI_out[i,]], cex = 2, col = "blue")
 	}
 	message("FAMEs were saved in ", pdffile)
-	
+
 	# set missing markers to NA
 	if(length(missingIndex) > 0)
 		RI_out[missingIndex] <- NA
-		
+
 	return(RI_out)
 }
 
