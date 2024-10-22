@@ -19,7 +19,7 @@ BUG FIXES
 
 INTERNAL
 
-`   o	Add tests for `FAMEoutliers`.
+   o	Add tests for `FAMEoutliers`.
 
 		CHANGES IN VERSION 2.6.2:
 BUG FIXES
