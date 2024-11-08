@@ -8,7 +8,6 @@ function(samples,Lib,peakData,r_thres=0.95, method = "dayNorm", minPairObs = 5){
     resInt <- Intensity(peakData)
     resRI  <- retIndex(peakData)
     resRT  <- retTime(peakData)
-    libId  <- libId(Lib, sel = FALSE)
 
     # you can't set this parameter lower than 5.
     minPairObs <- max(minPairObs, 5)

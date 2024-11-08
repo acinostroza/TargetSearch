@@ -9,7 +9,7 @@ function(samples, Lib, r_thres=0.95, columns = NULL,
 	my.files  <- RIfiles(samples)
 	Names     <- sampleNames(samples)
 	refLib    <- refLib(Lib, w = 2, sel = TRUE)
-	libId     <- libId(Lib, sel = TRUE)
+	libId     <- makeIndex(Lib, sel = TRUE)
 
 	RES       <- FindPeaks(my.files, refLib, columns, showProgressBar)
 

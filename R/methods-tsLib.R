@@ -16,17 +16,16 @@ setMethod("refLib", "tsLib", function(obj, ri, w = 1, sel = TRUE) {
 	ri2 <- rep(ri, rp)
 	out <- cbind(ri2 - win, m, ri2 + win)
 	colnames(out) <- c("minRI", "mz", "maxRI")
-	rownames(out) <- libId(obj, sel)
+	rownames(out) <- makeIndex(obj, sel)
 	out
 })
 
-setGeneric("libId", function(obj, ...) standardGeneric("libId"))
-setMethod("libId", "tsLib", function(obj, sel = TRUE) {
-	if(sel)
-		rep(1:length(obj@RI), sapply(obj@selMass, length))
-	else
-		rep(1:length(obj@RI), sapply(obj@topMass, length))
+setGeneric("libId", function(obj, ...) {
+    .Deprecated('makeIndex')
+    standardGeneric("libId")
 })
+
+setMethod("libId", "tsLib", function(obj, ...) makeIndex(obj, ...))
 
 setGeneric("medRI", function(obj) standardGeneric("medRI"))
 setMethod("medRI", "tsLib", function(obj) obj@medRI)

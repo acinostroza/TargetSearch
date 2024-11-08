@@ -141,6 +141,7 @@ export(
 	"ImportLibrary.tab",
 	"ImportSamples",
 	"ImportSamplesFromDir",
+	"makeIndex",
 	"medianRILib",
 	"ncdf4_convert",
 	"ncdf4_convert_from_path",
