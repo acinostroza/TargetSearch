@@ -376,7 +376,7 @@ int get_columns(SEXP columns, struct column_s * col)
 static inline SEXP mkInt(int x)
 {
 	SEXP ans = PROTECT(NEW_INTEGER(1));
-	SET_LOGICAL_ELT(ans, 0, x);
+	SET_INTEGER_ELT(ans, 0, x);
 	UNPROTECT(1);
 	return ans;
 }
