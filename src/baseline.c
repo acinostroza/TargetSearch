@@ -11,7 +11,7 @@ bsline(double *x, double *t, double qntl, double win, int step, int n,
 {
 	/* compute the quantiles */
 	double st = (double) step;
-	double *q = Calloc(n, double);
+	double *q = R_Calloc(n, double);
 
 	int qlen = qntl_win(x, t, qntl, win, step, n, q);
 
@@ -28,7 +28,7 @@ bsline(double *x, double *t, double qntl, double win, int step, int n,
 	for(int i = (qlen - 1) * step; i < n; i++)
 		ret[i] = q[ qlen - 1 ];
 
-	Free(q);
+	R_Free(q);
 }
 
 /* R interface for baseline correction */

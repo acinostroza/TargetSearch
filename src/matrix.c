@@ -9,9 +9,9 @@
  */
 matrix_t * new_mat(int nc, int nr)
 {
-	matrix_t *mat = Calloc(1, matrix_t);
+	matrix_t *mat = R_Calloc(1, matrix_t);
 	mat->alloc = nc * nr;
-	mat->x  = mat->alloc > 0 ? Calloc(mat->alloc, int) : NULL;
+	mat->x  = mat->alloc > 0 ? R_Calloc(mat->alloc, int) : NULL;
 	mat->nc = nc;
 	mat->nr = nr;
 	mat->mzmin = 0;
@@ -72,6 +72,6 @@ void free_mat(matrix_t * mat)
 	if(mat == NULL)
 		return;
 	if(mat->alloc != 0)
-		Free(mat->x);
-	Free(mat);
+		R_Free(mat->x);
+	R_Free(mat);
 }

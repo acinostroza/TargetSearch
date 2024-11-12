@@ -96,7 +96,7 @@ int find_peak_diff(const double *x, int n, int *ans)
 void refine_peak(const int *x, int n, int w, int *ans, int np)
 {
 	int k = 0;
-	int *peaks = Calloc(np, int);
+	int *peaks = R_Calloc(np, int);
 
 	/* save detected peaks */
 	for(int i = 0; i < n; i++) {
@@ -117,7 +117,7 @@ void refine_peak(const int *x, int n, int w, int *ans, int np)
 		}
 		ans[best] = 1;
 	}
-	Free(peaks);
+	R_Free(peaks);
 }
 
 /* generates gaussian coefficients for gaussian filter (convolution)
@@ -129,7 +129,7 @@ void refine_peak(const int *x, int n, int w, int *ans, int np)
  */
 double * gaussian_coef(int n)
 {
-	double * coef = Calloc(n, double);
+	double * coef = R_Calloc(n, double);
 	double sigma  = (double) (n-1) / 6.0;
 	double sum    = 0.0;
 	double c      = (n-1) / 2.0;
@@ -283,7 +283,7 @@ void find(double *x, double a, double b, int n, int eq, int *pa, int *pb)
 int qntl_win(double *x, double *t, double qntl, double win, int step, int n, double *ans)
 {
 	int a, b, eq = 1, len, k = 0;
-	double *tmp = Calloc(n, double);
+	double *tmp = R_Calloc(n, double);
 
 	for(int i = 0; i < n; i+= step) {
 		find(t, t[i] - win / 2.0, t[i] + win / 2.0, n, eq, &a, &b);
@@ -295,7 +295,7 @@ int qntl_win(double *x, double *t, double qntl, double win, int step, int n, dou
 		Memcpy(tmp, x + a, len);
 		ans[k++] = quantile(tmp, qntl, len);
 	}
-	Free(tmp);
+	R_Free(tmp);
 	return k;
 }
 

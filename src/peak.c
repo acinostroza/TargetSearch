@@ -32,11 +32,11 @@ void set_max_intensity(int *x, int n, int min_int, int *ans)
 void
 smoothing(int *x, int win, int search, int n, int *ans)
 {
-	double *temp = Calloc(n, double);
+	double *temp = R_Calloc(n, double);
 	moving(x, win, n, temp);
 	int npeaks = find_peak_diff(temp, n, ans);
 	refine_peak(x, n, search, ans, npeaks);
-	Free(temp);
+	R_Free(temp);
 }
 
 /** performs peak detection based on gaussian smoothing
@@ -54,11 +54,11 @@ smoothing(int *x, int win, int search, int n, int *ans)
 void
 gaussian (int *x, double *coef, int win, int search, int n, int *ans)
 {
-	double *temp = Calloc(n, double);
+	double *temp = R_Calloc(n, double);
 	convolve(x, n, coef, win, temp);
 	int npeaks = find_peak_diff(temp, n, ans);
 	refine_peak(x, n, search, ans, npeaks);
-	Free(temp);
+	R_Free(temp);
 }
 
 /** main function for peak detection
@@ -111,7 +111,7 @@ peak_detection(char method, matrix_t *mat, int win, int search, int min_int,
 
 clean:
 	if(coef != NULL)
-		Free(coef);
+		R_Free(coef);
 	return ret;
 }
 

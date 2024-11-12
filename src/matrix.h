@@ -5,8 +5,8 @@
 
 #ifndef USING_R
         #include <stdlib.h>
-        #define Calloc(n,t) (t *) calloc( n, sizeof(t) )
-        #define Free(x)     free(x)
+        #define R_Calloc(n,t) (t *) calloc( n, sizeof(t) )
+        #define R_Free(x)     free(x)
 	#pragma message "not using R"
 #endif
 

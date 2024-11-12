@@ -40,14 +40,14 @@ static void mass_range(ncdf_t *x, int *min, int *max)
 matrix_t * get_intensity_mat(ncdf_t *x)
 {
 	int min, max, n, *z;
-	matrix_t *mat = Calloc(1, matrix_t);
+	matrix_t *mat = R_Calloc(1, matrix_t);
 	mass_range(x, &min, &max);
 	mat->mzmin = min;
 	mat->mzmax = max;
 	mat->nc    = (max - min + 1);
 	mat->nr    = x->nscans;
 	mat->alloc = n = (max - min + 1) * x->nscans;
-	z = Calloc(n, int);
+	z = R_Calloc(n, int);
 
 	for(int s = 0; s < x->nscans; s++) {
 		for(int i = 0; i < x->p_count[s]; i++) {
@@ -77,7 +77,7 @@ matrix_t * from_matrix(SEXP Matrix)
  */
 ncdf_t * new_ncdf(SEXP NCDF)
 {
-	ncdf_t *cdf = Calloc(1, ncdf_t);
+	ncdf_t *cdf = R_Calloc(1, ncdf_t);
 	SEXP RT         = get(NCDF, "rt");
 	SEXP RI         = get(NCDF, "ri");
 	SEXP PointCount = get(NCDF, "point_count");
@@ -111,14 +111,14 @@ ncdf_t * new_ncdf(SEXP NCDF)
 static ncdf_t *
 alloc_cdf(int ns, int np)
 {
-	ncdf_t *x   = Calloc(1, ncdf_t);
+	ncdf_t *x   = R_Calloc(1, ncdf_t);
 
-	x->mass     = Calloc(np, int);
-	x->in       = Calloc(np, int);
-	x->scan_idx = Calloc(ns, int);
-	x->p_count  = Calloc(ns, int);
-	x->rt       = Calloc(ns, double);
-	x->ri       = Calloc(ns, double);
+	x->mass     = R_Calloc(np, int);
+	x->in       = R_Calloc(np, int);
+	x->scan_idx = R_Calloc(ns, int);
+	x->p_count  = R_Calloc(ns, int);
+	x->rt       = R_Calloc(ns, double);
+	x->ri       = R_Calloc(ns, double);
 	x->nscans   = ns;
 	x->npoints  = np;
 	x->alloc    = 1;
@@ -134,14 +134,14 @@ free_ncdf(ncdf_t *x)
 	if(x == NULL)
 		return;
 	if(x->alloc == 1) {
-		Free(x->rt);
-		Free(x->ri);
-		Free(x->mass);
-		Free(x->in);
-		Free(x->scan_idx);
-		Free(x->p_count);
+		R_Free(x->rt);
+		R_Free(x->ri);
+		R_Free(x->mass);
+		R_Free(x->in);
+		R_Free(x->scan_idx);
+		R_Free(x->p_count);
 	}
-	Free(x);
+	R_Free(x);
 }
 
 /* main function to transform CDF data to nominal mass. Duplicated intensities are
@@ -267,7 +267,7 @@ SEXP ncdf_to_matrix(SEXP NCDF, SEXP massRange)
 		for(int j = 0; j < nc->nscans; j++)
 			z[j + i*nc->nscans] = x[j];
 	}
-	Free(nc);
+	R_Free(nc);
 	free_mat(mat);
 	UNPROTECT(1);
 	return ansMat;
