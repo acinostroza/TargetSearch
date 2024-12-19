@@ -18,9 +18,15 @@ mk_lib <- function(prefix, size, data=NULL)
     lib  <- new("tsLib", Name = names, RI = ri, RIdev = dev, selMass = sel, spectra = sp, libData = data)
 }
 
-lib <- mk_lib('Metab', 4)
+expect_silent(lib <- mk_lib('Metab', 4))
 expect_true(validObject(lib))
 expect_equal(length(lib), 4L)
+
+# test warning and column libID
+expect_silent(d <- libData(lib))
+colnames(d)[1] <- 'libid' # column should be renamed
+expect_warning( libData(lib) <- d )
+expect_equal(colnames(libData(lib))[1], 'libID')
 
 # split object
 a <- lib[1:2]

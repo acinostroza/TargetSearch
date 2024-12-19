@@ -132,6 +132,11 @@ setValidity("tsLib", function(object) {
             (is.null(x)) || (length(x) == 0) || (is.numeric(x) && is.matrix(x) && (ncol(x) == 2))
         all(sapply(spectra, check))
     }
+    check_names <- function(x) {
+        rnames <- function(x) if(!is.null(dim(x))) rownames(x) else names(x)
+        anames <- vapply(slotNames(x), function(n) rnames(slot(x, n)), character(length(x)))
+        all(anames == x@libData$libID)
+    }
 	n <- length(object@Name)
 	if(length(object@RI) != n)
 		paste("Unequal number of Names and RI: ", n,", ", length(object@RI), sep = "")
@@ -153,6 +158,8 @@ setValidity("tsLib", function(object) {
 		paste("Unequal number of Names and libData: ", n,", ", nrow(object@libData), sep = "")
     else if(!check_spectra(object@spectra))
         paste("Detected invalid elements in `spectra`. Expecting a list of two-column matrices.")
+    else if(!check_names(object))
+        paste("Invalid (row)names detected.")
 	else TRUE
 })
 
@@ -250,6 +257,19 @@ setMethod("initialize",
             .Object
           })
 
+.libdata <- function(libData)
+{
+    # remove names in data.frame libData
+    dat <- lapply(as.list( libData ), function(x) { unname(x) })
+    dat <- data.frame(dat, stringsAsFactors=FALSE)
+
+    # remove extra columns
+    extra <- c("Win_1", "Win_2", "Win_3", "SEL_MASS", "TOP_MASS", "SPECTRUM", "QUANT_MASS")
+    k <- setdiff(colnames(dat), extra)
+    dat <- dat[, k,drop=FALSE]
+    dat
+}
+
 .setLibrary <- function(lib)
 {
     # remove NAs and take unique
@@ -268,27 +288,17 @@ setMethod("initialize",
         id <- lib@libData$libID
     }
 
-    # remove names in data.frame libData
-    dat <- lapply(as.list( lib@libData ), function(x) { unname(x) })
-    dat <- data.frame(dat, stringsAsFactors=FALSE)
-
+    # fix masses
     lib@selMass <- ma(uf, lib@quantMass, lib@selMass)
     lib@topMass <- ma(uf, lib@quantMass, lib@selMass, lib@topMass)
     lib@quantMass <- sapply(lib@topMass, getElement, 1)
 
-    rownames(lib@RIdev) <- rownames(dat) <- id
+    # fix colnames of RIdev matrix
     colnames(lib@RIdev) <- sprintf("Win_%d", 1:3)
-    names(lib@Name) <- names(lib@RI) <- names(lib@medRI) <- names(lib@selMass) <- id
-    names(lib@topMass) <- names(lib@quantMass) <- names(lib@spectra) <- id
 
-    # remove extra columns from dat
-    extra <- c("Win_1", "Win_2", "Win_3", "SEL_MASS", "TOP_MASS", "SPECTRUM", "QUANT_MASS")
-    k <- setdiff(colnames(dat), extra)
-    dat <- dat[, k,drop=FALSE]
-
-    lib@libData <- dat
-    stopifnot( validObject(lib) )
-    lib
+    # remove artifacts from libData slot
+    lib@libData <- .libdata(lib@libData)
+    .set_uid(lib, id)
 }
 
 .addLibID <- function(lib) {
@@ -310,6 +320,22 @@ setMethod("initialize",
         warning("Some identifiers where renamed in order to make them unique")
     lib$libID <- id
     return(lib)
+}
+
+#' sets the unique ID in the library object
+.set_uid <- function(obj, uid)
+{
+     uid <- as.character(uid)
+     if(any(duplicated(uid)))
+         stop("library identifiers cannot be duplicated; they must be unique.")
+     assert_that(length(uid) == length(obj))
+
+     obj@libData$libID <- uid
+     rownames(obj@RIdev) <- rownames(obj@libData) <- uid
+     names(obj@Name) <- names(obj@RI) <- names(obj@medRI) <- names(obj@selMass) <- uid
+     names(obj@topMass) <- names(obj@quantMass) <- names(obj@spectra) <- uid
+     stopifnot(validObject(obj))
+     obj
 }
 
 # vim: set ts=4 sw=4 et:
