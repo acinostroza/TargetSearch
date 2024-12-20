@@ -27,6 +27,14 @@ setGeneric("libId", function(obj, ...) {
 
 setMethod("libId", "tsLib", function(obj, ...) makeIndex(obj, ...))
 
+# generic methods to set/get the library unique ID
+setGeneric("libUID", function(obj) standardGeneric("libUID"))
+setGeneric("libUID<-", function(obj, value) standardGeneric("libUID<-"))
+
+# methods to set/get the library unique ID
+setMethod("libUID", "tsLib", function(obj) obj@libData[, 'libID'])
+setMethod("libUID<-", "tsLib", function(obj, value) .set_uid(obj, value))
+
 setGeneric("medRI", function(obj) standardGeneric("medRI"))
 setMethod("medRI", "tsLib", function(obj) obj@medRI)
 setGeneric("medRI<-", function(obj, value) standardGeneric("medRI<-"))

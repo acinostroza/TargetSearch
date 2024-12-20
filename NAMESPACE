@@ -92,6 +92,8 @@ exportMethods(
 	"quantMass<-",
 	"spectra",
 	"spectra<-",
+	"libUID",
+	"libUID<-",
 	"libName",
 	"libName<-",
 	"libRI",

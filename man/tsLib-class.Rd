@@ -19,6 +19,10 @@
 \alias{libRI}
 \alias{libRI<-,tsLib-method}
 \alias{libRI<-}
+\alias{libUID,tsLib-method}
+\alias{libUID}
+\alias{libUID<-,tsLib-method}
+\alias{libUID<-}
 \alias{medRI,tsLib-method}
 \alias{medRI}
 \alias{medRI<-,tsLib-method}
@@ -48,10 +52,8 @@
 \alias{topMass<-}
 
 \title{Class for representing a reference library }
-\description{ This is a class representation of a reference library.}
-\section{Objects from the Class}{
-Objects can be created by the function \code{\link{ImportLibrary}}.
-}
+\description{This is a class representation of a reference GC library.}
+
 \section{Slots}{
   \describe{
     \item{\code{Name}:}{\code{"character"}, the metabolite or analyte names.}
@@ -65,6 +67,7 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{spectra}:}{\code{"list"}, the metabolite spectra. Each component is a two column matrix: m/z and intensity. }
   }
 }
+
 \section{Methods}{
   \describe{
     \item{\code{[}}{\code{signature(x = "tsLib")}: Selects a subset of metabolites from the library.}
@@ -74,6 +77,8 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
     \item{\code{libData}}{\code{signature(obj = "tsLib")}: gets/sets the \code{libData} slot.}
     \item{\code{libName}}{\code{signature(obj = "tsLib")}: gets the \code{Name} slot. }
     \item{\code{libRI}}{\code{signature(obj = "tsLib")}: gets the \code{RI} slot.  }
+    \item{\code{libUID}}{\code{signature(obj = "tsLib")}: gets the library unique identifiers, also know as \code{libID}. }
+    \item{\code{libUID<-}}{\code{signature(obj = "tsLib")}: sets the library unique identifiers, also know as \code{libID}. }
     \item{\code{medRI}}{\code{signature(obj = "tsLib")}: gets the \code{medRI} slot.  }
     \item{\code{refLib}}{\code{signature(obj = "tsLib")}: Low level method to create a matrix representation of the library.}
     \item{\code{RIdev}}{\code{signature(obj = "tsLib")}: gets the RI deviations. }
@@ -88,7 +93,13 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
   }
 }
 
-\note{
+\details{
+Objects of this class are normally created by the function \code{\link{ImportLibrary}}, which
+is the recommended method, though they can be created manually as shown in the examples.
+
+Use one of the methods described below to set or get the information of various slots.
+Most of them are self-evident, but we describe some methods in the following paragraphs.
+
 Some care is needed when using the methods \code{quantMass<-}, \code{selMass<-}, \code{topMass<-}.
 In order to be consistent, the first m/z value of the slot \code{topMass} and \code{selMass} are
 equal to \code{quantMass}, and the values of \code{selMass} are equal to the first couple of values
@@ -103,17 +114,28 @@ of \code{topMass}. In other words, the following constrain is applied.
 where \code{1 <= k <= n} and \code{x[i]} is a m/z value. Thus, using one these methods will
 change the values of the other slots. In the future, these methods will be deprecated, so it
 is better to not rely on them.
-
 See the last example on how this can lead to unexpected results.
 
 The \code{c} method requires that the combination of all objects have unique identifiers (names),
 or in other words, the objects cannot share identifiers. Duplicated identifiers are not
-allowed and an error will be thrown. This method also requires that the column names of the
-\code{libData} slot (see method \code{libData}) are the same, because the method calls
-\code{rbind} internally.
+allowed and an error will be thrown. Since \code{\link{TargetSearch}} \code{2.8.0}, different
+column names of the \code{libData} slot (see method \code{libData}) are allowed, as long as
+the data types are characters, numeric, or logical. More complex type may or not may work.
+
+Use the \code{libUID} method to set or get the library unique identifiers (also referred as \code{libID}).
+This is a short string used for internal object data checking. It is sometimes useful if these identifiers
+refer to identifiers of external databases, for example, KEGG identifiers.
+These identifiers are normally supplied via the \code{libID} column in the function \code{\link{ImportLibrary}}.
 
 Note that the method \code{libId} is deprecated and may be removed in a future version of
 \code{\link{TargetSearch}}. Use the equivalent \code{\link{makeIndex}} instead.
+This method has nothing to do with unique identifiers like \code{libUID}.
+}
+
+\note{
+  Accessing the object slots directly via the \code{@} operator is \strong{not supported},
+  in particular, using it to set slot values, because it could result in invalid objects.
+  Always use the accessor methods to retrieve the information.
 }
 
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
@@ -155,6 +177,10 @@ topMass(refLibrary)[[3]] <- c(158,201,219,220,323)
 # change the retention time deviations
 RIdev(refLibrary)[3,] <- c(8,4,1)
 
+# get and change the library identifiers
+(gcID <- libUID(refLibrary))
+libUID(refLibrary) <- c('GC_1', 'GC_2', 'GC_3')
+
 #####################################################################
 # objects can be subset and combined with the `[` and `c` operators
 lib1 <- refLibrary[1:2]
@@ -162,7 +188,7 @@ lib2 <- refLibrary[3]
 lib  <- c(lib1, lib2) # this restores the object refLibrary
 
 #####################################################################
-# These examples show how changing a quantitaive or selective mass
+# These examples show how changing a quantitative or selective mass
 # could lead to unexpected results.
 
 # show quantMasses

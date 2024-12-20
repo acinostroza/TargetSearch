@@ -67,3 +67,7 @@ expect_silent(lib <- c(la, lb))
 expect_equal(nrow(da), length(la))
 expect_equal(nrow(db), length(lb))
 expect_equal(length(lib), length(la) + length(lb))
+
+# test libUID method and others
+expect_equal(libUID(lib), c(da$libID, db$libID))
+expect_silent(libUID(lib) <- paste0('GC_', 1:10))
