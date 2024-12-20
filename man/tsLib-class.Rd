@@ -69,7 +69,7 @@ Objects can be created by the function \code{\link{ImportLibrary}}.
   \describe{
     \item{\code{[}}{\code{signature(x = "tsLib")}: Selects a subset of metabolites from the library.}
     \item{\code{$name}}{\code{signature(x = "tsLib")}: Access column \code{name} of \code{libData} slot. }
-    \item{\code{libId}}{\code{signature(obj = "tsLib")}: Returns a vector of indices. }
+    \item{\code{libId}}{\code{signature(obj = "tsLib")}: Deprecated. Use \code{\link{makeIndex}} instead. }
     \item{\code{length}}{\code{signature(x = "tsLib")}: returns the length of the library. i.e., number of metabolites.}
     \item{\code{libData}}{\code{signature(obj = "tsLib")}: gets/sets the \code{libData} slot.}
     \item{\code{libName}}{\code{signature(obj = "tsLib")}: gets the \code{Name} slot. }
@@ -111,6 +111,9 @@ or in other words, the objects cannot share identifiers. Duplicated identifiers 
 allowed and an error will be thrown. This method also requires that the column names of the
 \code{libData} slot (see method \code{libData}) are the same, because the method calls
 \code{rbind} internally.
+
+Note that the method \code{libId} is deprecated and may be removed in a future version of
+\code{\link{TargetSearch}}. Use the equivalent \code{\link{makeIndex}} instead.
 }
 
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
