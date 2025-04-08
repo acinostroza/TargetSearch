@@ -1,3 +1,27 @@
+		CHANGES IN VERSION 2.10.0:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o	The method `libId` is deprecated. Use the fully equivalent function
+	`makeIndex`. This method was mostly used internally, so it should not
+	cause disruption.
+
+NEW FEATURES
+
+   o	New method `libUID` which sets or gets the metabolite library unique
+	identifiers. Previously, there was no method to change them after
+	import.
+
+BUG FIXES
+
+   o	Use `SET_INTEGER_ELT` to set an integer in the C code. The wrong
+	macro was used for unknown reasons. This generated an error on newer R.
+
+INTERNAL
+
+   o	Replace the memory allocation functions due to STRICT_R_HEADERS being
+	enabled (Calloc, Free => R_Calloc, R_Free)
+
 		CHANGES IN VERSION 2.8.0:
 
 NEW FEATURES
