@@ -66,8 +66,9 @@ riMatrix <- function(samples, rim)
 	rownames(RImat) <- rownames(rLimits)
 	if(length(mass) == 1)
 		mass <- rep(mass, dim(rLimits)[1])
+	RIint    <- RImat
 
-	for (i in 1:length(ri.files)) {
+	for (i in seq_along(ri.files)) {
 		out  <- .c_find_peaks(
 						as.character(ri.files[i]), # MyFile
 						as.integer(mass),          # Mass
@@ -79,8 +80,9 @@ riMatrix <- function(samples, rim)
 						NULL)
 		assert_that(!is.null(out), msg=sprintf("Error processing `%s`", ri.files[i]))
 		RImat[out[[4]]+1,i] <- out[[3]]
+		RIint[out[[4]]+1,i] <- out[[1]]
 	}
-	RImat
+	structure(RImat, intensity=RIint, mass=rimMass(rim))
 }
 
 fixRI <- function(samples, rimLimits, RImatrix=NULL, sampleNames=NULL, quiet=TRUE)

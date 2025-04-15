@@ -88,7 +88,7 @@ fixRI(smp, rim)
 RImat <- riMatrix(smp, rim)
 
 # compare the values with the real ones (previously stored in RImatrix)
-stopifnot( all.equal(RImat, RImatrix[,1:4], tolerance=1e-8) )
+stopifnot( all.equal(RImat[, 1:4], RImatrix[,1:4], tolerance=1e-8) )
 
 # manual adjustment or RI markers for sample 3.
 # Warning: this is just an example to illustrate how to use this function.

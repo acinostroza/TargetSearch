@@ -11,7 +11,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 		standard  <- rimStandard(rimLimits)
 		mass      <- rimMass(rimLimits)
 		rLimits   <- rimLimits(rimLimits)
-		RIcheck <- matrix(nrow=dim(rLimits)[1], ncol=length(Names))
+		RTfame    <- setNames(vector('list', length(Names)), Names)
 	}
 
 	# check Files
@@ -64,7 +64,7 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 					paste(mass[mass < massRange[1] | mass > massRange[2]], collapse=", ")))
 
 			fameTimes <- findRetentionTime(Peaks$Time, Peaks$Peaks[, mass - massRange[1] + 1], rLimits)
-			RIcheck[,i] <- fameTimes
+			RTfame[[Names[i]]] <- fameTimes
 			riInde <- rt2ri(Peaks$Time, fameTimes, standard)
 			writeRIFile(outFile[i], Peaks, riInde, massRange, ftype)
 
@@ -85,9 +85,10 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 		close(pb)
 
 	if(is.null(rimLimits) == FALSE) {
-		colnames(RIcheck) <- Names
-		rownames(RIcheck) <- rownames(rLimits)
-		return(RIcheck)
+		RIcheck <- do.call('cbind', RTfame)
+		RIint <- sapply(RTfame, attr, 'intensity')
+		rownames(RIcheck) <- rownames(RIint) <- rownames(rLimits)
+		return(structure(RIcheck, intensity=RIint, mass=mass))
 	} else {
 		return(NULL)
 	}

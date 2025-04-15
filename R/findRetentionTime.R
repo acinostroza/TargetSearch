@@ -1,19 +1,12 @@
-findRetentionTime <- function(rTime, Intensity, rimLimits) {
-        nc <- if(is.null(dim(Intensity))) 1 else dim(Intensity)[2]
-        if(nc != 1 & nc != nrow(rimLimits))
-                stop("Error in 'findRetentionTime': # of columns of Intensity must be",
-                " the same as number of rows of rimLimits")
+findRetentionTime <- function(rTime, Intensity, limits)
+{
+    low <- findInterval(limits[,1], rTime) + 1
+    upp <- findInterval(limits[,2], rTime)
+    get <- function(x, k) if(!is.null(dim(x))) x[,k] else x
 
-        fameTimes <- numeric(nrow(rimLimits))
-        for(i in 1:nrow(rimLimits)) {
-                window <- which(rTime > rimLimits[i,1] & rTime < rimLimits[i,2])
-                if(length(window) == 0) {
-                        fameTimes[i] <- NA
-                        next
-                }
-                fameTimes[i] <- if(nc == 1) rTime[window[which.max(Intensity[window])]]
-                        else rTime[window[which.max(Intensity[window,i])]]
-        }
-        return(fameTimes)
+    ret <- mapply(function(a, b, k) {
+                    if(a <= b) (which.max(get(Intensity, k)[a:b]) + a - 1) else NA
+                  }, low, upp, seq(nrow(limits)))
+    int <- mapply(function(i, j) get(Intensity, j)[i], ret, seq(nrow(limits)))
+    structure(rTime[ ret ], intensity=Intensity[ ret ])
 }
-

@@ -25,8 +25,11 @@ riMatrix(samples, rim)
     format. See the documentation in function \code{\link{text2bin}}.
 }
 \value{
-    A retention time matrix of the found retention time markers. Every column represents a
-    sample and rows RT markers.
+    A matrix of the retention time of the markers. Every column represents a
+    sample, while rows are RT markers. In addition the matrix has two extra attributes named
+    "intensity" and "mass". The former is a matrix of same dimensions which contain
+    the peak intensity of the markers, while the latter represents the \code{m/z} value
+    of the respective marker (this is taken from the \code{rimLimits} object).
 }
 \examples{
 require(TargetSearchData)

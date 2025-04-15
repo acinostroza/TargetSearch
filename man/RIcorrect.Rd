@@ -72,8 +72,11 @@ RIcorrect(samples, rimLimits = NULL, massRange=NULL, Window, IntThreshold,
     details.
 }
 \value{
-	A retention time matrix of the found retention time markers. Every column represents a
-	sample and rows RT markers.
+    A matrix of the retention time of the markers. Every column represents a
+    sample, while rows are RT markers. In addition the matrix has two extra attributes named
+    "intensity" and "mass". The former is a matrix of same dimensions which contain
+    the peak intensity of the markers, while the latter represents the \code{m/z} value
+    of the respective marker (this is taken from the \code{rimLimits} object).
 }
 \examples{
 require(TargetSearchData)
@@ -109,6 +112,13 @@ RImatrix <- RIcorrect(sampleDescription, rimLimits,
 
 RImatrix <- RIcorrect(sampleDescription, rimLimits,
             Window = 15, pp.method = "ppc", IntThreshold = 100)
+
+# the attributes intensity and mass can be accessed with by the attr function
+intensities <- attr(RImatrix, "intensity")
+mass <- attr(RImatrix, "mass")
+
+# they should be identical
+identical(mass, rimMass(rimLimits))
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
 \seealso{ \code{\link{ImportSamples}}, \code{\link{ImportFameSettings}},
