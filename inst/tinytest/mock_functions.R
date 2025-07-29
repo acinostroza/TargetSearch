@@ -44,9 +44,9 @@ mock_ncdf_data <- function(mz_range, time_range, n_peaks, n_scans, ri_factor=100
     list(Time=t, Peaks=p, massRange=mz_range, Index=t * ri_factor, baselineCorrected=TRUE)
 }
 
-mock_write_cdf <- function(peaks)
+mock_write_cdf <- function(peaks, ...)
 {
-    outfile <- tempfile()
+    outfile <- tempfile(...)
     TargetSearch:::ncdf4_write(outfile, peaks)
     outfile
 }
