@@ -40,11 +40,16 @@ RIcorrect <- function(samples, rimLimits = NULL, massRange=NULL, Window, IntThre
 
 		# writing NCDF-4
 		if(writeCDF4) {
-			if(ncdfInfo$creator == 'TargetSearch') {
+			if(cdf4Files[i] != manyFiles[i]) {
+				ncdf4_write(cdf4Files[i], ncdf)
+			}
+			else if(ncdfInfo$creator == 'TargetSearch') {
 				if(ncdfInfo$baseline_corrected == 0 & baseline)
 					ncdf4_write(cdf4Files[i], ncdf)
-			} else {
-				ncdf4_write(cdf4Files[i], ncdf)
+			}
+			else {
+				stop("The file `", manyFiles[i], "` has the correct extension but is not a file",
+					 " TargetSearch recognizes. Aborting...")
 			}
 		}
 

@@ -78,6 +78,20 @@ RIcorrect(samples, rimLimits = NULL, massRange=NULL, Window, IntThreshold,
     the peak intensity of the markers, while the latter represents the \code{m/z} value
     of the respective marker (this is taken from the \code{rimLimits} object).
 }
+\note{
+    This function expects that the file extension of the input files is \strong{not}
+    \code{.nc4}, unless those files were created by \code{\link{TargetSearch}}.
+    If this is the case, the function may throw an error, in particular if
+    \code{writeCDF4path} is used. However, this should not be an issue as most vendor
+    software export the chromatograms as \code{.cdf} files.
+
+    If the parameter \code{writeCDF4path} points to a new path, you may need to call
+    the methods \code{\link{ncdf4Convert}} or \code{\link{CDFpath}} to update the
+    path of the \code{\linkS4class{tsSample}} object, as this is not done automatically.
+
+    Likewise, if the files are \code{\link{TargetSearch}}'s, but do \strong{not}
+    have the \code{.nc4} extension, this function will create new \code{.nc4} files.
+}
 \examples{
 require(TargetSearchData)
 # import refLibrary, rimLimits and sampleDescription.
@@ -121,8 +135,11 @@ mass <- attr(RImatrix, "mass")
 identical(mass, rimMass(rimLimits))
 }
 \author{Alvaro Cuadros-Inostroza, Matthew Hannah, Henning Redestig }
-\seealso{ \code{\link{ImportSamples}}, \code{\link{ImportFameSettings}},
-\code{\link{NetCDFPeakFinding}}, \code{\link{FAMEoutliers}},
-\code{\linkS4class{tsSample}}, \code{\linkS4class{tsRim}}.}
+\seealso{
+    The functions \code{\link{ImportSamples}}, \code{\link{ImportFameSettings}},
+    \code{\link{NetCDFPeakFinding}}, \code{\link{FAMEoutliers}},
+    the method \code{\link{ncdf4Convert}}, and the class definitions
+    \code{\linkS4class{tsSample}}, \code{\linkS4class{tsRim}}.
+}
 
 % vim: set ts=4 sw=4 et:
