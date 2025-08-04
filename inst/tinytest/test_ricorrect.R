@@ -1,3 +1,5 @@
+## load common functions
+source('mock_functions.R')
 
 #' simulate the profile a RI marker
 #' @param t the time vector
@@ -5,12 +7,15 @@
 #' @param e error term to introduce random variation
 sim_rim <- function(t, x, e=2) {
     n <- length(x)
-    x <- x + runif(n, -e, e)
+    y <- x + runif(n, -e, e)
     A <- 10^runif(n, 4, 6)
     s <- runif(n, 0.5, 1.5)
-    z <- mapply(function(xx, aa, ss) gauss_peak(t, xx, aa, ss), x, A, s)
-    i <- apply(z, 2, which.max)
+    z <- mapply(function(xx, aa, ss) gauss_peak(t, xx, aa, ss), y, A, s)
     z <- round(rowSums(z))
+    i <- sapply(x, function(u) {
+                    j <- which(abs(t - u) < 3*e)
+                    j[ which.max(z[j]) ]
+         })
     list(z=z, rim=t[i], rim_int=z[i])
 }
 
@@ -53,3 +58,5 @@ expect_equivalent(RIint, attr(RI, 'intensity'))
 RI2 <- riMatrix(smp, rim)
 expect_equal(RI2, RI)
 
+unlink(CDFfiles(smp))
+unlink(RIfiles(smp))
