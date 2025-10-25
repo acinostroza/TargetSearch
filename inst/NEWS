@@ -1,3 +1,20 @@
+		CHANGES IN VERSION 2.12.0:
+NEW FEATURES
+
+   o	Return intensities and masses as attributes in the output of
+	`RIcorrect` and `RImatrix`.
+
+BUG FIXES
+
+   o	`RIcorrect` cannot open file under certain conditions. This occurs when
+	the input files are NC4 and the `writeCDF4path` option is set to write
+	to a different path. Same if they are TargetSearch files, but lack the
+	correct extension.
+
+INTERNAL
+
+   o	Add new tests for functions `RIcorrect` and `RImatrix`.
+
 		CHANGES IN VERSION 2.10.0:
 
 SIGNIFICANT USER-VISIBLE CHANGES
