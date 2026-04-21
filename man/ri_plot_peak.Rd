@@ -17,7 +17,7 @@ ri_plot_peak(obj, massValues, timeRange, useRT = TRUE, showRT = useRT, sizefun =
     \item{timeRange}{A numeric vector of length 2 representing the lower and upper time limits.}
     \item{useRT}{Logical. If \code{TRUE} (default), the time range is expressed in seconds,
         otherwise if \code{FALSE}, the time range is in retention time index units.}
-    \item{showRT}{Logical. Whether the \emph{x}-axis of the resulting plot should represent seconds
+    \item{showRT}{Logical. Whether the \emph{y}-axis of the resulting plot should represent seconds
         (\code{TRUE}) or retention index units (\code{FALSE}). This allows, for example, to search
         for a time range in seconds and display a graph in index units.}
     \item{sizefun}{A function that could be used to scale the point size of the plot via the
