@@ -1,3 +1,8 @@
+		CHANGES IN VERSION 2.14.0:
+DOCUMENTATION
+
+   o	Fix typo in `ri_plot_peak` man page.
+
 		CHANGES IN VERSION 2.12.0:
 NEW FEATURES
 
